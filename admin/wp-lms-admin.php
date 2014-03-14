@@ -57,11 +57,31 @@ class wp_lms_admin extends wp_lms {
      **/
 	public function schedule_page(){
 		$page_base = $this->page_url();
+		$page_query = new WP_Query();
 		ob_start();
 		?>
-		<div class="wp_lms settings">
+		<div id="poststuff" class="wp_lms settings">
+		<div id="post-body" class="columns-2">
 			<h1>Schedule</h1>
-
+			<style type="text/css">
+				#poststuff #post-body.columns-2 #postbox-container-1 {
+					float: left;
+					/*margin-right: -300px;*/
+					width: 280px;
+				}
+				.wp_lms .js .postbox .hndle {
+					cursor: pointer;
+				}
+			</style>
+			<form id="postbox-container-1" action="<?= $page_base; ?>" method="post">
+			<?php
+			wp_lms_html_gen::list_select( 'instructor', 'Instructors', "POST", $_POST );
+			wp_lms_html_gen::list_select( 'course', 'Courses', "POST", $_POST );
+			wp_lms_html_gen::date_set( 'Dates Active', 'no-time' );
+        	?>
+			
+			</form>
+		</div>
 		</div>
 		<?
 		ob_end_flush();
@@ -119,7 +139,7 @@ class wp_lms_admin extends wp_lms {
 			<h2>
 			<a href="http://grand/wp-admin/post-new.php?post_type=assignment&amp;course=568" class="add-new-h2">Add Assignment</a>
 			</h2>
-			<?php echo do_shortcode( '[searchandfilter taxonomies="course_assigned_name"]' ); ?>
+			<?php //echo do_shortcode( '[searchandfilter taxonomies="course_assigned_name"]' ); ?>
   			<? wp_lms_html_gen::form_open(array("post_type" => "assignment", "course_assigned_num" => "566", "showposts" => "10"), $page_base ) ?>
 		</div>
 		<?

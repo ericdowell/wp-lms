@@ -177,11 +177,14 @@ class wp_lms {
     public function create_metabox( $post, $metabox ) {
       global $post;
       $type = $metabox['args']['type'];
+      $create = $metabox['args']['create'];
       $page_query = new WP_Query();
       $all_pages = $page_query->query( array( 'post_type' => $metabox['args']['type'], 'posts_per_page' => -1, 'orderby' => 'title',
         'order' => 'ASC' ) );
       $course = get_post_meta($post->ID, '_'.$metabox['args']['type'], true);
-      ob_start();
+      switch($create){
+          case 'select':
+            ob_start();
       ?>
       <label for="_<?= $type; ?>">
           <?= $course; ?>
@@ -198,7 +201,16 @@ class wp_lms {
         <?php } ?>
       </select>
       <?
-      ob_end_flush();
+          ob_end_flush();
+          break;
+        case 'link':
+
+          break;
+        default:
+          //nothing to do here yet
+          break;
+        }
+
     }
 
     public function save_post_meta( $post_id ) {
