@@ -17,7 +17,7 @@ class wp_lms_admin extends wp_lms {
 	public function admin_settings(){
 		$this->menu_pages['main'] = add_menu_page( $this::$plugin_name, 'GrandPubbah', 'manage_options', $this::$plugin_name, array( $this, 'main_options_page' ) );
 		//add_menu_page( $page_title, $menu_title, $capability, $menu_slug, $function, $icon_url, $position );
-		$this->menu_pages['schedule'] = add_submenu_page( "edit.php?post_type=course", 'WP LMS Schedule', 'Schedule', 'manage_options', $this::$plugin_name.'_schedule', array( $this,"schedule_page" ), $this->plugin_img_url.'png/24/schedule.png' );
+		$this->menu_pages['schedule'] = add_submenu_page( "edit.php?post_type=session", 'WP LMS Schedule', 'Schedule Courses', 'manage_options', $this::$plugin_name.'_schedule', array( $this,"schedule_page" ), $this->plugin_img_url.'png/24/schedule.png' );
 		$this->menu_pages['assignments'] = add_submenu_page( "edit.php?post_type=course", 'WP LMS Assignments', 'Assignments', 'manage_options', $this::$plugin_name.'_assign', array( $this,"assignment_page" ) );
 		$this->menu_pages['lectures'] = add_submenu_page( "edit.php?post_type=course", 'WP LMS Lectures', 'Lectures', 'manage_options', $this::$plugin_name.'_lecture', array( $this,"lecture_page" ) );
 		$this->menu_pages['settings'] = add_submenu_page( "edit.php?post_type=course", 'WP LMS Settings', 'Settings', 'manage_options', $this::$plugin_name.'_settings', array( $this,"settings_page" ) );
@@ -61,22 +61,24 @@ class wp_lms_admin extends wp_lms {
 		ob_start();
 		?>
 		<style type="text/css">
+				*, *:before, *:after {
+  					-moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box;
+				}
 				#poststuff #post-body.columns-2 {
 					margin:0;
 				}
 				#poststuff #post-body.columns-2 #postbox-container-1 {
 					float: left;
 					margin-right: 0px;
-					max-width: 280px;
-					width:30%;
+					width:20%;
 				}
-				#post-body h1 {
+				#poststuff h1 {
 					margin:.67em 2.25px;
 				}
 				#schedule-body-content {
-					width:65%;
+					width:80%;
 					float:left;
-					margin: 0 0 0 20px;
+					padding: 0 0 0 100px;
 				}
 				#schedule-body-content h2{
 					font-size: 23px;
@@ -88,10 +90,15 @@ class wp_lms_admin extends wp_lms {
 				.wp_lms .js .postbox .hndle {
 					cursor: pointer;
 				}
+				@media only screen and (max-width:1040px) {
+					#schedule-body-content {
+						width:100%;
+						padding:0;
+				}
 			</style>
-		<div id="poststuff" class="wp_lms settings">
-		<div id="post-body" class="columns-2">
+		<div id="poststuff" class="wp_lms wrap schedule">
 			<h1>Schedule</h1>
+		<div id="post-body" class="columns-2">
 			
 			<form id="postbox-container-1" action="<?= $page_base; ?>" method="post">
 			<?php
@@ -101,9 +108,9 @@ class wp_lms_admin extends wp_lms {
         	?>
 			
 			</form>
-		</div>
-		<div id="schedule-body-content">
-			<h2>No Courses Scheduled</h2>
+			<div id="schedule-body-content">
+				<? wp_lms_html_gen::form_open(array("post_type" => "lecture", "showposts" => "10"), $page_base ) ?>
+			</div>
 		</div>
 		</div>
 		<?

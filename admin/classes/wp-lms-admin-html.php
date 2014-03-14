@@ -169,31 +169,31 @@ class wp_lms_html_gen extends wp_lms {
 		$c = 0;
 		?>
 		<table class="wp-list-table widefat fixed pages" cellspacing="0">
-				<thead>
-					<tr>
-						<th scope="col" id="cb" class="manage-column column-cb check-column" style=""><label class="screen-reader-text" for="cb-select-all-1">Select All</label><input id="cb-select-all-1" type="checkbox">
-						</th>
-						<th scope="col" id="title" class="manage-column column-title sortable <? echo $switch_order; ?>" style=""><a href="<?php echo $page_base; ?>&amp;orderby=title&amp;order=<? echo $switch_order; ?>"><span>Title</span><span class="sorting-indicator"></span></a>
-						</th>
-						<th scope="col" id="date-modified" class="manage-column column-date sortable <? echo $switch_order; ?>" style=""><a href="<?php echo $page_base; ?>&amp;orderby=date-modified&amp;order=<? echo $switch_order; ?>"><span>Date Modified</span><span class="sorting-indicator"></span></a>
-						</th>
-						<th scope="col" id="date" class="manage-column column-date sortable <? echo $switch_order; ?>" style=""><a href="<?php echo $page_base; ?>&amp;orderby=date&amp;order=<? echo $switch_order; ?>"><span>Date</span><span class="sorting-indicator"></span></a>
-						</th>
-					</tr>
-				</thead>
-				<tfoot>
-					<tr>
-						<th scope="col" class="manage-column column-cb check-column" style=""><label class="screen-reader-text" for="cb-select-all-2">Select All</label><input id="cb-select-all-2" type="checkbox">
-						</th>
-						<th scope="col" class="manage-column column-title sortable desc" style=""><a href="http://grand/wp-admin/edit.php?post_type=<?= $post_type; ?>&amp;orderby=title&amp;order=asc"><span>Title</span><span class="sorting-indicator"></span></a>
-						</th>
-						<th scope="col" class="manage-column column-date sortable <? echo $switch_order; ?>" style=""><a href="<?php echo $page_base; ?>&amp;orderby=date-modified&amp;order=<? echo $switch_order; ?>"><span>Date Modified</span><span class="sorting-indicator"></span></a>
-						</th>
-						<th scope="col" class="manage-column column-date sortable asc" style=""><a href="http://grand/wp-admin/edit.php?post_type=<?= $post_type; ?>&amp;orderby=date&amp;order=desc"><span>Date</span><span class="sorting-indicator"></span></a></th>
-					</tr>
-				</tfoot>
-				<tbody id="the-list">
-		<?php while (have_posts()) : the_post(); ?>
+			<thead>
+				<tr>
+					<th scope="col" id="cb" class="manage-column column-cb check-column" style=""><label class="screen-reader-text" for="cb-select-all-1">Select All</label><input id="cb-select-all-1" type="checkbox">
+					</th>
+					<th scope="col" id="title" class="manage-column column-title sortable <? echo $switch_order; ?>" style=""><a href="<?php echo $page_base; ?>&amp;orderby=title&amp;order=<? echo $switch_order; ?>"><span>Title</span><span class="sorting-indicator"></span></a>
+					</th>
+					<th scope="col" id="date-modified" class="manage-column column-date sortable <? echo $switch_order; ?>" style=""><a href="<?php echo $page_base; ?>&amp;orderby=date-modified&amp;order=<? echo $switch_order; ?>"><span>Date Modified</span><span class="sorting-indicator"></span></a>
+					</th>
+					<th scope="col" id="date" class="manage-column column-date sortable <? echo $switch_order; ?>" style=""><a href="<?php echo $page_base; ?>&amp;orderby=date&amp;order=<? echo $switch_order; ?>"><span>Date</span><span class="sorting-indicator"></span></a>
+					</th>
+				</tr>
+			</thead>
+			<tfoot>
+				<tr>
+					<th scope="col" class="manage-column column-cb check-column" style=""><label class="screen-reader-text" for="cb-select-all-2">Select All</label><input id="cb-select-all-2" type="checkbox">
+					</th>
+					<th scope="col" class="manage-column column-title sortable desc" style=""><a href="http://grand/wp-admin/edit.php?post_type=<?= $post_type; ?>&amp;orderby=title&amp;order=asc"><span>Title</span><span class="sorting-indicator"></span></a>
+					</th>
+					<th scope="col" class="manage-column column-date sortable <? echo $switch_order; ?>" style=""><a href="<?php echo $page_base; ?>&amp;orderby=date-modified&amp;order=<? echo $switch_order; ?>"><span>Date Modified</span><span class="sorting-indicator"></span></a>
+					</th>
+					<th scope="col" class="manage-column column-date sortable asc" style=""><a href="http://grand/wp-admin/edit.php?post_type=<?= $post_type; ?>&amp;orderby=date&amp;order=desc"><span>Date</span><span class="sorting-indicator"></span></a></th>
+				</tr>
+			</tfoot>
+			<tbody id="the-list">
+			<?php while (have_posts()) : the_post(); ?>
 				<?php 
 				$c++;
 				$this_post = get_post(get_the_ID());
@@ -236,9 +236,11 @@ class wp_lms_html_gen extends wp_lms {
 					<td class="date column-date"><abbr title="<?php echo get_the_date('Y-m-d').' '.get_the_time(); ?>"><?php echo get_the_date(); echo "<br>"; the_time(); ?></abbr><br>Published</td>	
 				</tr>
 			<?php endwhile; ?>
+			<? if( $c == 0 ) { ?>
+				<tr class="no-items"><td class="colspanchange" colspan="3">No <?php echo ucfirst($post_type); ?>s Found</td></tr>
+			<? } ?>
 			</tbody>
-			</table>
-		</div>
+		</table>
 		<?
 	}
 
