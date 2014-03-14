@@ -60,19 +60,39 @@ class wp_lms_admin extends wp_lms {
 		$page_query = new WP_Query();
 		ob_start();
 		?>
-		<div id="poststuff" class="wp_lms settings">
-		<div id="post-body" class="columns-2">
-			<h1>Schedule</h1>
-			<style type="text/css">
+		<style type="text/css">
+				#poststuff #post-body.columns-2 {
+					margin:0;
+				}
 				#poststuff #post-body.columns-2 #postbox-container-1 {
 					float: left;
-					/*margin-right: -300px;*/
-					width: 280px;
+					margin-right: 0px;
+					max-width: 280px;
+					width:30%;
+				}
+				#post-body h1 {
+					margin:.67em 2.25px;
+				}
+				#schedule-body-content {
+					width:65%;
+					float:left;
+					margin: 0 0 0 20px;
+				}
+				#schedule-body-content h2{
+					font-size: 23px;
+					font-weight: 400;
+					padding:0 15px 4px 0;
+					margin:0 0 15px 0;
+					line-height: 29px;
 				}
 				.wp_lms .js .postbox .hndle {
 					cursor: pointer;
 				}
 			</style>
+		<div id="poststuff" class="wp_lms settings">
+		<div id="post-body" class="columns-2">
+			<h1>Schedule</h1>
+			
 			<form id="postbox-container-1" action="<?= $page_base; ?>" method="post">
 			<?php
 			wp_lms_html_gen::list_select( 'instructor', 'Instructors', "POST", $_POST );
@@ -81,6 +101,9 @@ class wp_lms_admin extends wp_lms {
         	?>
 			
 			</form>
+		</div>
+		<div id="schedule-body-content">
+			<h2>No Courses Scheduled</h2>
 		</div>
 		</div>
 		<?

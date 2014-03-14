@@ -138,15 +138,15 @@ class wp_lms_html_gen extends wp_lms {
 		<p></p>
 	</div>
 	<div id="major-publishing-actions">
-		<? if( count($POST) > 0 ) {?>
+		<? if( count($POST) < 0 ) {?>
 		<div id="delete-action">
 			<a class="submitdelete deletion" href="http://grand/wp-admin/post.php?post=627&amp;action=trash&amp;_wpnonce=2a702372e1">Move to Queue</a>
 		</div>
 		<? } ?>
 	<div id="publishing-action">
 	<span class="spinner"></span>
-		<input name="original_publish" type="hidden" id="original_publish" value="Schedule Course">
-		<input name="save" type="submit" class="button button-primary button-large" id="publish" accesskey="p" value="Schedule Course">
+		<input name="original_publish" type="hidden" id="original_publish" value="<? if( count($POST) < 0 ) {?>Update Course<? } else { ?>Schedule Course<? } ?>">
+		<input name="save" type="submit" class="button button-primary button-large" id="publish" accesskey="p" value="<? if( count($POST) < 0 ) {?>Update Course<? } else { ?>Schedule Course<? } ?>">
 	</div>
 	<div class="clear"></div>
 	</div>
