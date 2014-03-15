@@ -31,8 +31,11 @@ class wp_lms {
         $this->plugin_dir_long = dirname( __FILE__ );
         $this->plugin_inc_dir = $this->plugin_dir_long . '/inc/';
         $this->set_aval = array("admin_option_pages", "version" => $this::$version, "custom_post_type_names", "settings_page_options", "post_meta");
-        $this->filters_post = array('assignment', 'assignment');
-        $this->filters_tax = array('course_name', 'instructor_name');
+        // $this->filters_post_a = array('assignment', 'assignment');
+        // $this->filters_tax_a = array('course_name', 'instructor_name');
+        // $this->filters_post_l = array('lecture', 'lecture');
+        // $this->filters_tax_l = array('course_name', 'instructor_name');
+        $this->tax_names = array('assignment' => array('course_name_a', 'instructor_name_a'), 'lecture' => array('course_name_l', 'instructor_name_l') );
         $this->post_metabox = array(array(
                             'wp_lms_course_list_assign',
                             'Course List', 
@@ -70,6 +73,14 @@ class wp_lms {
                             'side', 
                             'high', 
                             array( 'name' => "Go Back to Assignemnts", 'type' => 'assignment', 'create' => 'link') 
+                           ),
+                            array(
+                            'wp_lms_link_to_type_lecture', 
+                            'Go back to Lectures', 
+                            'lecture', 
+                            'side', 
+                            'high', 
+                            array( 'name' => "Go Back to Lectures", 'type' => 'lecture', 'create' => 'link') 
                            ) );
         //run on this
         if( !get_parent_class( $this ) ) {
@@ -210,9 +221,10 @@ class wp_lms {
             ob_start();
       ?>
       <label for="_<?= $type; ?>"> 
-          <?= $course; ?>         
+          <?php //echo $course; ?>         
           <?= $metabox['args']['name']; ?>
       </label>
+      <p></p>
       <input type="hidden" name="<?= $type; ?>meta_noncename" id="<?= $type; ?>meta_noncename" value="<?php echo wp_create_nonce( plugin_basename(__FILE__) ); ?>" />
       <select name="_<?= $type; ?>" class="widefat">
         <?php foreach( $all_pages as $k => $p ) { ?>
@@ -227,26 +239,52 @@ class wp_lms {
           ob_end_flush();
           break;
         case 'link':
-        $postCategories = get_the_category($post->ID);
-        for($i=0;$i<2;$i++){
-          foreach ( $postCategories as $postCategory ) {
-            if($i==0){
-              $courseid = get_term_by('id', $postCategory->cat_ID, 'course_name');
-            }
-            else if($i==1){
-            $instructorid = get_term_by('id', $postCategory->cat_ID, 'course_name');
-            }
-          }
+        if($post->post_type == "assignment") {
+          $term_array = $this->tax_names['assignment'];
+          $prefix = "_a";
         }
-        // $courseid = get_term_by('id', $postCategories[0]->cat_ID, 'course_name');
-        // $instructorid = get_term_by('id', $postCategories[0]->cat_ID, 'instructor_name');
-        $link = "edit.php?s&post_status=all&post_type=".$type."&action=-1&m=0&course_name=".$courseid."&instructor_name=".$instructorid."&paged=1&action2=-1"
+        else if($post->post_type == "lecture") {
+          $term_array = $this->tax_names['lecture'];
+          $prefix = "_l";
+        }
+       // $this->terms = array('course_name','instructor_name');
+        for($i=0;$i<2;$i++){
+          $term =  $term_array[$i];
+          $terms = wp_get_post_terms($post->ID, $term);
+          $var[] = $term;
+          foreach ($terms as $termid) { 
+            ${$term} = $termid->term_id;
+           // echo ${$term}." ";
+          }
+          if( $var[0] == "course_name".$prefix && empty( $$var[0] ) ) $course_label = "Not Set";
+          if( $var[1] == "instructor_name".$prefix  && empty( $$var[1] ) ) $instructor_label = "Not Set";
+          print_r($terms);
+        }
+        // print_r($var);
+        //echo "| ".get_term($$var[0], "course_name".$prefix)->name." |";
+        // echo $course_name_a." course_name".$prefix;
+        // echo get_term( $course_name, "course_name".$prefix )->name." ". get_term($instructor_name, "instructor_name".$prefix)->name;
+        if( empty( $$var[1] ) && empty( $$var[0] ) ) {
+           $link = "#";
+           $link_name = "Post Not Published";
+        }
+        else {
+          $link = "edit.php?s&post_status=all&post_type=".$type."&action=-1&m=0&course_name$prefix=".$$var[0]."&instructor_name$prefix=".$$var[1]."&paged=1&action2=-1";
+          $link_name = $name;
+          if(!empty( $$var[1] ) ) $instructor_label = get_term($$var[1], 'instructor_name'.$prefix)->name;
+          if(!empty( $$var[0] ) ) $course_label = get_term($$var[0], 'course_name'.$prefix)->name;
+        }
+
         ?>
         <label class="screen-reader-text" for="_<?= $create; ?>">
           <?= $name; ?>
         </label>
         <p>
-          <a href="<?= $link; ?>" title="<?= $name; ?>"><?= $name; ?></a>
+          <pre><? //print_r($postCategories); ?></pre>
+          <a href="<?= $link; ?>" title="<?= $name; ?>"><?= $link_name; ?></a>
+        </p>
+          Course Filter: <?= $course_label; ?><br>
+          Instructor Filter: <?= $instructor_label; ?>
         </p>
         <?
           break;
@@ -286,25 +324,41 @@ class wp_lms {
         if(get_post_meta($post->ID, $key, FALSE)) { 
         // If the custom field already has a value
           update_post_meta($post->ID, $key, $value);
-          if( $key == "_course" ) {
+          if( $key == "_course"  && $post->post_type == "lecture" ) {
             wp_set_object_terms( $post->ID, $value, 'course_num' );
-            wp_set_object_terms( $post->ID, get_the_title($value), 'course_name' );
+            wp_set_object_terms( $post->ID, get_the_title($value), 'course_name_l' );
           }
-          if( $key == "_instructor" ) {
+          if( $key == "_instructor" && $post->post_type == "lecture"  ) {
             wp_set_object_terms( $post->ID, $value, 'instructor_num' );
-            wp_set_object_terms( $post->ID, get_the_title($value), 'instructor_name' ); 
+            wp_set_object_terms( $post->ID, get_the_title($value), 'instructor_name_l' ); 
+          }
+          if( $key == "_course"  && $post->post_type == "assignment" ) {
+            wp_set_object_terms( $post->ID, $value, 'course_num' );
+            wp_set_object_terms( $post->ID, get_the_title($value), 'course_name_a' );
+          }
+          if( $key == "_instructor" && $post->post_type == "assignment"  ) {
+            wp_set_object_terms( $post->ID, $value, 'instructor_num' );
+            wp_set_object_terms( $post->ID, get_the_title($value), 'instructor_name_a' ); 
           }
         } 
         else { 
         // If the custom field doesn't have a value
           add_post_meta($post->ID, $key, $value);
-          if( $key == "_course" ) {
+          if( $key == "_course"  && $post->post_type == "lecture" ) {
             wp_set_object_terms( $post->ID, $value, 'course_num' );
-            wp_set_object_terms( $post->ID, get_the_title($value), 'course_name' );
+            wp_set_object_terms( $post->ID, get_the_title($value), 'course_name_l' );
           }
-          if( $key == "_instructor" ) {
+          if( $key == "_instructor" && $post->post_type == "lecture"  ) {
             wp_set_object_terms( $post->ID, $value, 'instructor_num' );
-            wp_set_object_terms( $post->ID, get_the_title($value), 'instructor_name' ); 
+            wp_set_object_terms( $post->ID, get_the_title($value), 'instructor_name_l' ); 
+          }
+          if( $key == "_course"  && $post->post_type == "assignment" ) {
+            wp_set_object_terms( $post->ID, $value, 'course_num' );
+            wp_set_object_terms( $post->ID, get_the_title($value), 'course_name_a' );
+          }
+          if( $key == "_instructor" && $post->post_type == "assignment"  ) {
+            wp_set_object_terms( $post->ID, $value, 'instructor_num' );
+            wp_set_object_terms( $post->ID, get_the_title($value), 'instructor_name_a' ); 
           }
         }
         if(!$value) delete_post_meta($post->ID, $key); 
@@ -360,16 +414,30 @@ class wp_lms {
 
     public function restrict_assign_by_course() {
     global $typenow;
-    $post_type = $this->filters_post;
-    $taxonomy = $this->filters_tax;
-    foreach($post_type as $k => $p){
-      if ($typenow == $post_type[$k]) {
-        $selected = isset($_GET[$taxonomy[$k]]) ? $_GET[$taxonomy[$k]] : '';
-        $info_taxonomy = get_taxonomy($taxonomy[$k]);
+    //$screen = get_current_screen();
+    if(isset($_GET['post_type'])){
+      $type = $_GET['post_type'];
+    //  echo $type;
+    }
+    //echo $screen->post_type;
+    if($type == "assignment" ) {
+      $post_type = 'assignment';
+      $taxonomy = $this->tax_names['assignment'];
+    }
+    if($type == "lecture" ) {
+      $post_type = 'lecture';
+      $taxonomy = $this->tax_names['lecture'];
+    }
+   //echo $post_type;
+   //print_r($taxonomy);
+    foreach($taxonomy as $k => $tax){
+      if ($typenow == $post_type ) {
+        $selected = isset($_GET[$tax]) ? $_GET[$tax] : '';
+        $info_taxonomy = get_taxonomy($tax);
         wp_dropdown_categories(array(
           'show_option_all' => __("Show All {$info_taxonomy->label}"),
-          'taxonomy' => $taxonomy[$k],
-          'name' => $taxonomy[$k],
+          'taxonomy' => $tax,
+          'name' => $tax,
           'orderby' => 'name',
           'selected' => $selected,
           'show_count' => true,
@@ -382,13 +450,24 @@ class wp_lms {
 
   public function convert_id_to_term_in_query($query) {
     global $pagenow;
-    $post_type = $this->filters_post;
-    $taxonomy = $this->filters_tax;
+    if(isset($_GET['post_type'])){
+      $type = $_GET['post_type'];
+      //echo $type;
+    }
+    //$screen = get_current_screen();
+    if($type == "assignment" ) {
+      $post_type = 'assignment';
+      $taxonomy = $this->tax_names['assignment'];
+    }
+    if($type == "lecture" ) {
+      $post_type = 'lecture';
+      $taxonomy = $this->tax_names['lecture'];
+    }
     $q_vars = &$query->query_vars;
-    foreach($post_type as $k => $p){
-      if ($pagenow == 'edit.php' && isset($q_vars['post_type']) && $q_vars['post_type'] == $post_type[$k] && isset($q_vars[$taxonomy[$k]]) && is_numeric($q_vars[$taxonomy[$k]]) && $q_vars[$taxonomy[$k]] != 0) {
-        $term = get_term_by('id', $q_vars[$taxonomy[$k]], $taxonomy[$k]);
-        $q_vars[$taxonomy[$k]] = $term->slug;
+    foreach($taxonomy as $k => $tax){
+      if ($pagenow == 'edit.php' && isset($q_vars['post_type']) && $q_vars['post_type'] == $post_type && isset($q_vars[$tax]) && is_numeric($q_vars[$tax]) && $q_vars[$tax] != 0) {
+        $term = get_term_by('id', $q_vars[$tax], $tax);
+        $q_vars[$tax] = $term->slug;
       }
     }
   }

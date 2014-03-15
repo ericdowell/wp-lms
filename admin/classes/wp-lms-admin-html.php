@@ -197,9 +197,41 @@ class wp_lms_html_gen extends wp_lms {
 				<?php 
 				$c++;
 				$this_post = get_post(get_the_ID());
+				if($post_type == "course" && $_GET['page'] == 'wp_lms_assign') {
+		          	$term_array = $this->tax_names['assignment'];
+		          	$prefix = "_a";
+		          	$type = 'assignment';
+		          	$course_obj = wp_get_post_terms($post->ID, $term_array[0]);
+		          	$instructor_obj = wp_get_post_terms($post->ID, $term_array[1]);
+		          	$page_query = new WP_Query();
+					$all_pages = $page_query->query( array( 'post_type' => $type, $term_array[0] => $course_obj->ID, $term_array[1] => $instructor_obj->ID, 'posts_per_page' => -1, 'orderby' => 'title', 'order' => 'ASC' ) );
+					//echo "<pre>";print_r($all_pages);echo "</pre>";
+		          	//echo $type;
+		          	$first_post = $all_pages[0]->ID;
+		        }
+		        else if($post_type == "course" && $_GET['page'] == 'wp_lms_assign') {
+		          	$term_array = $this->tax_names['lecture'];
+		          	$prefix = "_l";
+		          	$type = 'lecture';
+		          	//echo $type;
+		        }
+		        for($i=0;$i<2;$i++){
+					$term =  $term_array[$i];
+	          		$terms = wp_get_post_terms($first_post, $term);
+	          		$var[] = $term;
+	          		//echo " here ";
+			        foreach ($terms as $termid) { 
+			        	${$term} = $termid->term_id;
+			           	// echo " ".${$term}." ";
+			        }
+			        if( $var[0] == "course_name".$prefix && empty( $$var[0] ) ) $course_label = "Not Set";
+			        if( $var[1] == "instructor_name".$prefix  && empty( $$var[1] ) ) $instructor_label = "Not Set";
+			    }
 				$add_assign_link = "";
-				if( $post_type == 'course') { 
+				if( $post_type == 'course' || $post_type == 'lecture') { 
 					$add_assign_link = '| </span><span class="view"><a class="viewpost" title="Add New Assignment" href="'.admin_url('post-new.php?post_type=assignment&amp;course='.get_the_ID()).'">Add New Assignment</a>';
+					$link = "edit.php?s&post_status=all&post_type=".$type."&action=-1&m=0&course_name$prefix=".$$var[0]."&instructor_name$prefix=".$$var[1]."&paged=1&action2=-1";
+					//$link = "#";
 				}
 				$level = "level-0";
 				$front_sym = "";
@@ -214,7 +246,7 @@ class wp_lms_html_gen extends wp_lms {
 						<input id="cb-select-570" type="checkbox" name="post[]" value="570">
 						<div class="locked-indicator"></div>
 					</th>
-					<td class="post-title page-title column-title"><strong><a class="row-title" href="#" title="Edit “<?php the_title(); ?>”"><?= $front_sym; ?><?php the_title(); ?></a></strong>
+					<td class="post-title page-title column-title"><strong><a class="row-title" href="<?= $link; ?>" title="Edit “<?php the_title(); ?>”"><?= $front_sym; ?><?php the_title(); ?></a></strong>
 						<div class="locked-info"><span class="locked-avatar"></span> <span class="locked-text"></span></div>
 						<div class="row-actions"><span class="edit"><a href="<?= get_edit_post_link( get_the_ID() ); ?>" title="Edit this item">Edit</a> <?= $add_assign_link; ?></span></div>
 						<div class="hidden" id="inline_570">
