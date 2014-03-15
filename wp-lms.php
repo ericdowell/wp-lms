@@ -41,6 +41,8 @@ class wp_lms {
             add_action( 'manage_assignment_posts_custom_column' , array($this,'custom_assignment_column'), 10, 2 );
             add_filter('manage_edit-assignment_sortable_columns', array($this, 'assignment_sortable_columns') );
             add_filter('requests', array($this, 'handle_assignment_column_sorting') );
+            add_action('restrict_manage_posts', 'restrict_assign_by_course');
+            add_filter('parse_query', 'convert_id_to_term_in_query');
 
             include('wp-lms-helpers.php');
             //includes all admin options
@@ -271,7 +273,7 @@ class wp_lms {
     public function add_assignment_columns( $columns ) {
       return array_merge($columns, 
                 array('course_assigned' => __('Course'),
-                    'term' =>__( 'Term')
+                    'session' =>__( 'Session')
                 )
             );
     }
@@ -282,7 +284,7 @@ class wp_lms {
             echo get_the_title( get_post_meta( $post->ID , '_course' , true ) );
             break;
 
-          case 'term':
+          case 'session':
             echo "-"; //get_post_meta( $post_id , 'client' , true ); 
             break;
         }
@@ -290,7 +292,7 @@ class wp_lms {
 
     public function assignment_sortable_columns( $columns ){
         $columns['course_assigned'] = 'course_assigned';
-        $columns['term'] = 'term';
+        $columns['session'] = 'session';
         return $columns;
     }
     function handle_assignment_column_sorting( $vars ){
@@ -301,14 +303,45 @@ class wp_lms {
             'orderby'  => 'meta_value'
           ));
         }
-        if( isset($vars['orderby']) && 'term' == $vars['orderby'] ){
+        if( isset($vars['orderby']) && 'session' == $vars['orderby'] ){
           $vars = array_merge( $vars, array(
-            'meta_key' => 'term',
+            'meta_key' => 'session',
             'orderby'  => 'meta_value'
           ));
         }
         return $vars;
     }
+    function restrict_assign_by_course() {
+    global $typenow;
+    $post_type = 'assignment'; // change HERE
+    $taxonomy = 'course_assigned_name'; // change HERE
+    if ($typenow == $post_type) {
+      $selected = isset($_GET[$taxonomy]) ? $_GET[$taxonomy] : '';
+      $info_taxonomy = get_taxonomy($taxonomy);
+      wp_dropdown_categories(array(
+        'show_option_all' => __("Show All {$info_taxonomy->label}"),
+        'taxonomy' => $taxonomy,
+        'name' => $taxonomy,
+        'orderby' => 'name',
+        'selected' => $selected,
+        'show_count' => true,
+        'hide_empty' => true,
+      ));
+    };
+  }
+
+  
+
+  function convert_id_to_term_in_query($query) {
+    global $pagenow;
+    $post_type = 'assignment'; // change HERE
+    $taxonomy = 'course_assigned_name'; // change HERE
+    $q_vars = &$query->query_vars;
+    if ($pagenow == 'edit.php' && isset($q_vars['post_type']) && $q_vars['post_type'] == $post_type && isset($q_vars[$taxonomy]) && is_numeric($q_vars[$taxonomy]) && $q_vars[$taxonomy] != 0) {
+      $term = get_term_by('id', $q_vars[$taxonomy], $taxonomy);
+      $q_vars[$taxonomy] = $term->slug;
+    }
+  }
 }//end Object
 
 /**

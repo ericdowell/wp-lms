@@ -236,8 +236,12 @@ class wp_lms_html_gen extends wp_lms {
 					<td class="date column-date"><abbr title="<?php echo get_the_date('Y-m-d').' '.get_the_time(); ?>"><?php echo get_the_date(); echo "<br>"; the_time(); ?></abbr><br>Published</td>	
 				</tr>
 			<?php endwhile; ?>
-			<? if( $c == 0 ) { ?>
-				<tr class="no-items"><td class="colspanchange" colspan="3">No <?php echo ucfirst($post_type); ?>s Found</td></tr>
+			<? if( $c == 0 ) { 
+				if( $post_type == "schedule") $empty_message = "No Course has been Scheduled";
+				if( $post_type == "course") $empty_message = "No Course";
+				?>
+
+				<tr class="no-items"><td class="colspanchange" colspan="3"><?php echo $empty_message; ?></td></tr>
 			<? } ?>
 			</tbody>
 		</table>

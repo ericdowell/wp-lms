@@ -60,42 +60,6 @@ class wp_lms_admin extends wp_lms {
 		$page_query = new WP_Query();
 		ob_start();
 		?>
-		<style type="text/css">
-				*, *:before, *:after {
-  					-moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box;
-				}
-				#poststuff #post-body.columns-2 {
-					margin:0;
-				}
-				#poststuff #post-body.columns-2 #postbox-container-1 {
-					float: left;
-					margin-right: 0px;
-					width:20%;
-				}
-				#poststuff h1 {
-					margin:.67em 2.25px;
-				}
-				#schedule-body-content {
-					width:80%;
-					float:left;
-					padding: 0 0 0 100px;
-				}
-				#schedule-body-content h2{
-					font-size: 23px;
-					font-weight: 400;
-					padding:0 15px 4px 0;
-					margin:0 0 15px 0;
-					line-height: 29px;
-				}
-				.wp_lms .js .postbox .hndle {
-					cursor: pointer;
-				}
-				@media only screen and (max-width:1040px) {
-					#schedule-body-content {
-						width:100%;
-						padding:0;
-				}
-			</style>
 		<div id="poststuff" class="wp_lms wrap schedule">
 			<h1>Schedule</h1>
 		<div id="post-body" class="columns-2">
@@ -108,8 +72,8 @@ class wp_lms_admin extends wp_lms {
         	?>
 			
 			</form>
-			<div id="schedule-body-content">
-				<? wp_lms_html_gen::form_open(array("post_type" => "lecture", "showposts" => "10"), $page_base ) ?>
+			<div id="post-body-content">
+				<? wp_lms_html_gen::form_open(array("post_type" => "schedule", "showposts" => "10"), $page_base ) ?>
 			</div>
 		</div>
 		</div>
