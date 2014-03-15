@@ -175,6 +175,8 @@ class wp_lms_html_gen extends wp_lms {
 					</th>
 					<th scope="col" id="title" class="manage-column column-title sortable <? echo $switch_order; ?>" style=""><a href="<?php echo $page_base; ?>&amp;orderby=title&amp;order=<? echo $switch_order; ?>"><span>Title</span><span class="sorting-indicator"></span></a>
 					</th>
+					<th scope="col" id="title" class="manage-column column-title sortable <? echo $switch_order; ?>" style=""><a href="<?php echo $page_base; ?>&amp;orderby=title&amp;order=<? echo $switch_order; ?>"><span>Title</span><span class="sorting-indicator"></span></a>
+					</th>
 					<th scope="col" id="date-modified" class="manage-column column-date sortable <? echo $switch_order; ?>" style=""><a href="<?php echo $page_base; ?>&amp;orderby=date-modified&amp;order=<? echo $switch_order; ?>"><span>Date Modified</span><span class="sorting-indicator"></span></a>
 					</th>
 					<th scope="col" id="date" class="manage-column column-date sortable <? echo $switch_order; ?>" style=""><a href="<?php echo $page_base; ?>&amp;orderby=date&amp;order=<? echo $switch_order; ?>"><span>Date</span><span class="sorting-indicator"></span></a>
@@ -197,12 +199,15 @@ class wp_lms_html_gen extends wp_lms {
 				<?php 
 				$c++;
 				$this_post = get_post(get_the_ID());
-				if($post_type == "course" && $_GET['page'] == 'wp_lms_assign') {
+				if($post_type == "course" && isset($_GET['page']) && $_GET['page'] == 'wp_lms_assign') {
 		          	$term_array = $this->tax_names['assignment'];
 		          	$prefix = "_a";
 		          	$type = 'assignment';
 		          	$course_obj = wp_get_post_terms($post->ID, $term_array[0]);
 		          	$instructor_obj = wp_get_post_terms($post->ID, $term_array[1]);
+		          	//for inactive course only, active courses will have this pre-defined
+		          	//make method to check for the same course with more than one instructor
+		          	//then another to return the instructor custom post type id's
 		          	$page_query = new WP_Query();
 					$all_pages = $page_query->query( array( 'post_type' => $type, $term_array[0] => $course_obj->ID, $term_array[1] => $instructor_obj->ID, 'posts_per_page' => -1, 'orderby' => 'title', 'order' => 'ASC' ) );
 					//echo "<pre>";print_r($all_pages);echo "</pre>";
@@ -220,10 +225,12 @@ class wp_lms_html_gen extends wp_lms {
 	          		$terms = wp_get_post_terms($first_post, $term);
 	          		$var[] = $term;
 	          		//echo " here ";
-			        foreach ($terms as $termid) { 
-			        	${$term} = $termid->term_id;
-			           	// echo " ".${$term}." ";
-			        }
+	          		if( is_array($terms) && !empty($terms) ) {
+				        foreach ($terms as $termid) { 
+				        	${$term} = $termid->term_id;
+				           	// echo " ".${$term}." ";
+				        }
+			    	}
 			        if( $var[0] == "course_name".$prefix && empty( $$var[0] ) ) $course_label = "Not Set";
 			        if( $var[1] == "instructor_name".$prefix  && empty( $$var[1] ) ) $instructor_label = "Not Set";
 			    }

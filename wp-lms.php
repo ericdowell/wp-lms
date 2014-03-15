@@ -463,6 +463,9 @@ class wp_lms {
       $post_type = 'lecture';
       $taxonomy = $this->tax_names['lecture'];
     }
+    if( empty($taxonomy) ) {
+      return;
+    }
     $q_vars = &$query->query_vars;
     foreach($taxonomy as $k => $tax){
       if ($pagenow == 'edit.php' && isset($q_vars['post_type']) && $q_vars['post_type'] == $post_type && isset($q_vars[$tax]) && is_numeric($q_vars[$tax]) && $q_vars[$tax] != 0) {
