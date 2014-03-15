@@ -133,7 +133,6 @@ class wp_lms_admin extends wp_lms {
 			<h2>
 			<a href="http://grand/wp-admin/post-new.php?post_type=assignment&amp;course=568" class="add-new-h2">Add Assignment</a>
 			</h2>
-			<?php //echo do_shortcode( '[searchandfilter taxonomies="course_assigned_name"]' ); ?>
   			<? wp_lms_html_gen::form_open(array("post_type" => "assignment", "course_assigned_num" => "566", "showposts" => "10"), $page_base ) ?>
 		</div>
 		<?
@@ -160,13 +159,15 @@ class wp_lms_admin extends wp_lms {
 			<?
 			}
 			$class_num = "568";
-			$instructor_num = "560";
+			$instructor_num = "Douglas Brull";
 			$the_post_type = 'lecture';
+			$the_course_term = "course_num";
+			$the_instructor_term = "instructor_name";
 			$args = array(
 				'sort_column' => 'menu_order',
 				'post_type' => $the_post_type,
-				"course_assigned_num" => $class_num,
-				'instructor_assigned_num' => $instructor_num,
+				"course_num" => $class_num,
+				'instructor_name' => $instructor_num,
 				'post_status' => 'publish'
 			);
 			$pages = get_pages( $args );
@@ -174,7 +175,7 @@ class wp_lms_admin extends wp_lms {
 			$all_pages = $page_query->query( array( 'post_type' => $the_post_type, 'post_status' => 'publish', 'posts_per_page' => -1 ) );
 			$parent_count = 0;
 			foreach( $pages as $k => $p ){ 
-				if( $p->post_parent == 0 && has_term( $class_num, 'course_assigned_num', $p->ID ) && has_term( $instructor_num, 'instructor_assigned_num', $p->ID ) ) {
+				if( $p->post_parent == 0 && has_term( $class_num, $the_course_term, $p->ID ) && has_term( $instructor_num, $the_instructor_term, $p->ID ) ) {
 					$parent_count++;
 					$page_children = get_page_children( $p->ID, $all_pages );
 					$hasChildren = "";
