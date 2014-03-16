@@ -74,14 +74,30 @@ class wp_lms {
                             'high', 
                             array( 'name' => "Go Back to Assignemnts", 'type' => 'assignment', 'create' => 'link') 
                            ),
-                            array(
+                          array(
                             'wp_lms_link_to_type_lecture', 
                             'Go back to Lectures', 
                             'lecture', 
                             'side', 
                             'high', 
                             array( 'name' => "Go Back to Lectures", 'type' => 'lecture', 'create' => 'link') 
-                           ) );
+                          ),
+                          array(
+                            'wp_lms_session_begin', 
+                            'Session Begins On', 
+                            'session', 
+                            'side', 
+                            'high', 
+                            array( 'name' => "Session Begins On", 'type' => 'session', 'create' => 'date') 
+                          ),
+                          array(
+                            'wp_lms_session_weeks', 
+                            'Weeks Active', 
+                            'session', 
+                            'side', 
+                            'high', 
+                            array( 'name' => "Weeks Active", 'type' => 'session', 'create' => 'weeks') 
+                          ) );
         //run on this
         if( !get_parent_class( $this ) ) {
             add_filter( 'plugin_action_links', array( $this, 'action_links' ), 10, 2 );
@@ -213,31 +229,43 @@ class wp_lms {
       $name = $metabox['args']['name'];
       $create = $metabox['args']['create'];
       $page_query = new WP_Query();
-      $all_pages = $page_query->query( array( 'post_type' => $metabox['args']['type'], 'posts_per_page' => -1, 'orderby' => 'title',
+      $all_pages = $page_query->query( array( 'post_type' => $type, 'posts_per_page' => -1, 'orderby' => 'title',
         'order' => 'ASC' ) );
-      $course = get_post_meta($post->ID, '_'.$metabox['args']['type'], true);
+      $course = get_post_meta($post->ID, '_'.$type, true);
       switch($create){
-          case 'select':
-            ob_start();
-      ?>
-      <label for="_<?= $type; ?>"> 
-          <?php //echo $course; ?>         
-          <?= $metabox['args']['name']; ?>
-      </label>
-      <p></p>
-      <input type="hidden" name="<?= $type; ?>meta_noncename" id="<?= $type; ?>meta_noncename" value="<?php echo wp_create_nonce( plugin_basename(__FILE__) ); ?>" />
-      <select name="_<?= $type; ?>" class="widefat">
-        <?php foreach( $all_pages as $k => $p ) { ?>
-          <? $current = "";
-            if( isset( $course ) && $course == $p->ID ) $current = " selected";
-            else if( isset( $_GET[$type] ) && $_GET[$type] == $p->ID ) $current = " selected";
+
+        /**
+         *  Calls object install on plugin activation
+         *  @since 0.0.1
+        **/
+
+        case 'select':
+          //ob_start();
           ?>
-          <option value="<?php echo $p->ID; ?>"<?php echo $current; ?>><?php echo $p->post_title; ?></option>
-        <?php } ?>
-      </select>
-      <?
-          ob_end_flush();
+          <label for="_<?= $type; ?>"> 
+              <?php //echo $course; ?>         
+              <?= $name; ?>
+          </label>
+          <p></p>
+          <input type="hidden" name="<?= $type; ?>meta_noncename" id="<?= $type; ?>meta_noncename" value="<?php echo wp_create_nonce( plugin_basename(__FILE__) ); ?>" />
+          <select name="_<?= $type; ?>" class="widefat">
+            <?php foreach( $all_pages as $k => $p ) { ?>
+              <? $current = "";
+                if( isset( $course ) && $course == $p->ID ) $current = " selected";
+                else if( isset( $_GET[$type] ) && $_GET[$type] == $p->ID ) $current = " selected";
+              ?>
+              <option value="<?php echo $p->ID; ?>"<?php echo $current; ?>><?php echo $p->post_title; ?></option>
+            <?php } ?>
+          </select>
+          <?
+          //ob_end_flush();
           break;
+
+        /**
+         *  Calls object install on plugin activation
+         *  @since 0.0.1
+        **/
+
         case 'link':
         if($post->post_type == "assignment") {
           $term_array = $this->tax_names['assignment'];
@@ -252,18 +280,14 @@ class wp_lms {
           $term =  $term_array[$i];
           $terms = wp_get_post_terms($post->ID, $term);
           $var[] = $term;
-          foreach ($terms as $termid) { 
-            ${$term} = $termid->term_id;
-           // echo ${$term}." ";
+          if( !empty($terms) ) {
+            foreach ($terms as $termid) { 
+              ${$term} = $termid->term_id;
+            }
           }
-          if( $var[0] == "course_name".$prefix && empty( $$var[0] ) ) $course_label = "Not Set";
-          if( $var[1] == "instructor_name".$prefix  && empty( $$var[1] ) ) $instructor_label = "Not Set";
-          print_r($terms);
+          if( $var[0] == "course_name".$prefix && empty( $$var[0] ) ) $course_label = " Not Set";
+          if( $var[1] == "instructor_name".$prefix  && empty( $$var[1] ) ) $instructor_label = " Not Set";
         }
-        // print_r($var);
-        //echo "| ".get_term($$var[0], "course_name".$prefix)->name." |";
-        // echo $course_name_a." course_name".$prefix;
-        // echo get_term( $course_name, "course_name".$prefix )->name." ". get_term($instructor_name, "instructor_name".$prefix)->name;
         if( empty( $$var[1] ) && empty( $$var[0] ) ) {
            $link = "#";
            $link_name = "Post Not Published";
@@ -274,18 +298,73 @@ class wp_lms {
           if(!empty( $$var[1] ) ) $instructor_label = get_term($$var[1], 'instructor_name'.$prefix)->name;
           if(!empty( $$var[0] ) ) $course_label = get_term($$var[0], 'course_name'.$prefix)->name;
         }
-
         ?>
         <label class="screen-reader-text" for="_<?= $create; ?>">
           <?= $name; ?>
         </label>
         <p>
-          <pre><? //print_r($postCategories); ?></pre>
           <a href="<?= $link; ?>" title="<?= $name; ?>"><?= $link_name; ?></a>
         </p>
-          Course Filter: <?= $course_label; ?><br>
-          Instructor Filter: <?= $instructor_label; ?>
+        <p>
+          <strong>Link above will use filters below:</strong>
         </p>
+        <p>
+          Course Filter: <strong><?= $course_label; ?></strong><br>
+          Instructor Filter: <strong><?= $instructor_label; ?></strong>
+        </p>
+        <p><strong>OR</strong></p>
+        <p>
+          <a href="edit.php?post_type=course&amp;page=wp_lms_<?= $type; ?>" title="Go Back List of Courses">Go Back List of Courses</a>
+        </p>
+        <?
+          break;
+
+        /**
+         *  Calls object install on plugin activation
+         *  @since 0.0.1
+        **/
+        case 'date':
+        ?>
+       <input type="hidden" name="<?= $type; ?>begin_noncename" id="<?= $type; ?>begin_noncename" value="<?php echo wp_create_nonce( plugin_basename(__FILE__) ); ?>" />
+        <div id="" class="hide-if-js" style="display: block;">
+          <div class="timestamp-wrap">
+            <p>
+              <label for="mm" class="screen-reader-text">
+                <?= $name; ?>
+              </label>
+            </p>
+          <select id="" name="_<?= $type; ?>_date_begin_month">
+            <option value="01">01-Jan</option>
+            <option value="02">02-Feb</option>
+            <option value="03" selected="selected">03-Mar</option>
+            <option value="04">04-Apr</option>
+            <option value="05">05-May</option>
+            <option value="06">06-Jun</option>
+            <option value="07">07-Jul</option>
+            <option value="08">08-Aug</option>
+            <option value="09">09-Sep</option>
+            <option value="10">10-Oct</option>
+            <option value="11">11-Nov</option>
+            <option value="12">12-Dec</option>
+          </select> 
+          <input type="text" id="" name="_<?= $type; ?>_date_begin_day" value="15" size="2" maxlength="2" autocomplete="off">, <input type="text" id="" name="_date_begin_year" value="2014" size="4" maxlength="4" autocomplete="off">
+         </div>
+        </div>
+        <?
+          break;
+        case 'weeks':
+        ?>
+        <input type="hidden" name="<?= $type; ?>length_noncename" id="<?= $type; ?>length_noncename" value="<?php echo wp_create_nonce( plugin_basename(__FILE__) ); ?>" />
+        <p>
+        <label class="screen-reader-text">
+            <?= $name; ?>
+        </label>
+        </p>
+        <input type="text" name="_session_length" value="" size="2" maxlength="2" autocomplete="off">
+        <select name="_period_measurement">
+          <option name="weeks">Weeks</option>
+          <option name="months">Months</option>
+        </select>
         <?
           break;
         default:
@@ -414,12 +493,9 @@ class wp_lms {
 
     public function restrict_assign_by_course() {
     global $typenow;
-    //$screen = get_current_screen();
     if(isset($_GET['post_type'])){
       $type = $_GET['post_type'];
-    //  echo $type;
     }
-    //echo $screen->post_type;
     if($type == "assignment" ) {
       $post_type = 'assignment';
       $taxonomy = $this->tax_names['assignment'];
@@ -428,8 +504,9 @@ class wp_lms {
       $post_type = 'lecture';
       $taxonomy = $this->tax_names['lecture'];
     }
-   //echo $post_type;
-   //print_r($taxonomy);
+    if( empty($taxonomy) ) {
+      return;
+    }
     foreach($taxonomy as $k => $tax){
       if ($typenow == $post_type ) {
         $selected = isset($_GET[$tax]) ? $_GET[$tax] : '';
@@ -452,9 +529,7 @@ class wp_lms {
     global $pagenow;
     if(isset($_GET['post_type'])){
       $type = $_GET['post_type'];
-      //echo $type;
     }
-    //$screen = get_current_screen();
     if($type == "assignment" ) {
       $post_type = 'assignment';
       $taxonomy = $this->tax_names['assignment'];

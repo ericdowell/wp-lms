@@ -18,7 +18,7 @@ class wp_lms_admin extends wp_lms {
 		$this->menu_pages['main'] = add_menu_page( $this::$plugin_name, 'GrandPubbah', 'manage_options', $this::$plugin_name, array( $this, 'main_options_page' ) );
 		//add_menu_page( $page_title, $menu_title, $capability, $menu_slug, $function, $icon_url, $position );
 		$this->menu_pages['schedule'] = add_submenu_page( "edit.php?post_type=session", 'WP LMS Schedule', 'Schedule Courses', 'manage_options', $this::$plugin_name.'_schedule', array( $this,"schedule_page" ), $this->plugin_img_url.'png/24/schedule.png' );
-		$this->menu_pages['assignments'] = add_submenu_page( "edit.php?post_type=course", 'WP LMS Assignments', 'Assignments', 'manage_options', $this::$plugin_name.'_assign', array( $this,"assignment_page" ) );
+		$this->menu_pages['assignments'] = add_submenu_page( "edit.php?post_type=course", 'WP LMS Assignments', 'Assignments', 'manage_options', $this::$plugin_name.'_assignment', array( $this,"assignment_page" ) );
 		$this->menu_pages['lectures'] = add_submenu_page( "edit.php?post_type=course", 'WP LMS Lectures', 'Lectures', 'manage_options', $this::$plugin_name.'_lecture', array( $this,"lecture_page" ) );
 		$this->menu_pages['settings'] = add_submenu_page( "edit.php?post_type=course", 'WP LMS Settings', 'Settings', 'manage_options', $this::$plugin_name.'_settings', array( $this,"settings_page" ) );
 		//edit.php?post_type=student_directory
@@ -60,6 +60,12 @@ class wp_lms_admin extends wp_lms {
 		$page_query = new WP_Query();
 		ob_start();
 		?>
+		<style type="text/css">
+			.wp_lms.wrap h1 {
+				display: inline-block;
+				width:80%;
+			}
+		</style>
 		<div id="poststuff" class="wp_lms wrap schedule">
 			<h1>Schedule</h1>
 		<div id="post-body" class="columns-2">
@@ -68,12 +74,13 @@ class wp_lms_admin extends wp_lms {
 			<?php
 			wp_lms_html_gen::list_select( 'instructor', 'Instructors', "POST", $_POST );
 			wp_lms_html_gen::list_select( 'course', 'Courses', "POST", $_POST );
-			wp_lms_html_gen::date_set( 'Dates Active', 'no-time' );
+			wp_lms_html_gen::list_select( 'session', 'Sessions', 'POST', $_POST);
+			wp_lms_html_gen::date_set( 'Day/Time Active', 'no-dates', $_POST );
         	?>
 			
 			</form>
 			<div id="post-body-content">
-				<? wp_lms_html_gen::form_open(array("post_type" => "schedule", "showposts" => "10"), $page_base ) ?>
+				<? wp_lms_html_gen::form_open(array("post_type" => "schedule", "showposts" => "10"), $page_base ); ?>
 			</div>
 		</div>
 		</div>

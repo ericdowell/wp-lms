@@ -31,7 +31,7 @@ class wp_lms_html_gen extends wp_lms {
 	} //end function
 	public function list_select( $type, $name, $method = "GET", $POST = "", $GET = "" ){
 		$page_query = new WP_Query();
-		$all_pages = $page_query->query( array( 'post_type' => $type, 'posts_per_page' => -1, 'orderby' => 'title',
+		$all_pages = $page_query->query( array( 'post_type' => $type, 'posts_per_page' => -1, 'orderby' => 'menu_order',
         'order' => 'ASC' ) );
 		?>
 		<div class="postbox">
@@ -63,66 +63,57 @@ class wp_lms_html_gen extends wp_lms {
 	<div id="submit" class="postbox">
 	<h3 class="hndle"><span><?php echo $name; ?></span></h3>
 	<div class="inside">
-		<div id="timestampdiv" class="hide-if-js" style="display: block;">
+		<div id="scheduletimewrap" class="hide-if-js" style="display: block;">
 			<p>
-				<strong>Begin Date</strong>
+				<strong>Days</strong>
 			</p>
-			<label class="screen-reader-text">Begin Date</label>
+			<label class="screen-reader-text">Days</label>
 			<div class="timestamp-wrap">
-				<select id="mm" name="mm">
-					<option value="01">01-Jan</option>
-					<option value="02">02-Feb</option>
-					<option value="03" selected="selected">03-Mar</option>
-					<option value="04">04-Apr</option>
-					<option value="05">05-May</option>
-					<option value="06">06-Jun</option>
-					<option value="07">07-Jul</option>
-					<option value="08">08-Aug</option>
-					<option value="09">09-Sep</option>
-					<option value="10">10-Oct</option>
-					<option value="11">11-Nov</option>
-					<option value="12">12-Dec</option>
-				</select> 
-				
-				<input type="text" id="jj" name="jj" value="13" size="2" maxlength="2" autocomplete="off">, 
-				<input type="text" id="aa" name="aa" value="2014" size="4" maxlength="4" autocomplete="off"><?
-				if($time != 'no-time') {
-				?> @ 
-				<input type="text" id="hh" name="hh" value="10" size="2" maxlength="2" autocomplete="off"> : 
-				<input type="text" id="mn" name="mn" value="42" size="2" maxlength="2" autocomplete="off">
-				<?
-				}
-				?>
+				<label for="sun">S
+					<input type="checkbox" name="sun" value="0">
+				</label>
+				<label for="mon">M
+					<input type="checkbox" name="mon" value="1">
+				</label>
+				<label for="tues">T
+					<input type="checkbox" name="tues" value="2">
+				</label>
+				<label for="wedn">W
+					<input type="checkbox" name="wedn" value="3">
+				</label>
+				<label for="thurs">R
+					<input type="checkbox" name="thurs" value="4">
+				</label>
+				<label for="fri">F
+					<input type="checkbox" name="fri" value="5">
+				</label>
+				<label for="sat">S
+					<input type="checkbox" name="sat" value="6">
+				</label>
+			</div>
+			<p>
+				<strong>Begin Time</strong>
+			</p>
+			<label class="screen-reader-text">Begin Time</label>
+			<div class="timestamp-wrap">
+				<input type="text" name="wp_lms_hr" value="10" size="2" maxlength="2" autocomplete="off"> : 
+				<input type="text" name="wp_lms_min" value="42" size="2" maxlength="2" autocomplete="off">
+				<select name="wp_lms_ofday">
+					<option value="am">AM</option>
+					<option value="pm">PM</option>
+				</select>
 			</div>
 			<div class="timestamp-wrap">
 				<p>
-					<strong>End Date</strong>
+					<strong>End Time</strong>
 				</p>
-				<label class="screen-reader-text">End Date</label>
-				<select id="mm" name="mm">
-					<option value="01">01-Jan</option>
-					<option value="02">02-Feb</option>
-					<option value="03" selected="selected">03-Mar</option>
-					<option value="04">04-Apr</option>
-					<option value="05">05-May</option>
-					<option value="06">06-Jun</option>
-					<option value="07">07-Jul</option>
-					<option value="08">08-Aug</option>
-					<option value="09">09-Sep</option>
-					<option value="10">10-Oct</option>
-					<option value="11">11-Nov</option>
-					<option value="12">12-Dec</option>
-				</select> 
-				
-				<input type="text" id="jj" name="jj" value="13" size="2" maxlength="2" autocomplete="off">, 
-				<input type="text" id="aa" name="aa" value="2014" size="4" maxlength="4" autocomplete="off"><?
-				if($time != 'no-time') {
-				?> @ 
-				<input type="text" id="hh" name="hh" value="10" size="2" maxlength="2" autocomplete="off"> : 
-				<input type="text" id="mn" name="mn" value="42" size="2" maxlength="2" autocomplete="off">
-				<?
-				}
-				?>
+				<label class="screen-reader-text">End Time</label>
+				<input type="text" name="hh" value="10" size="2" maxlength="2" autocomplete="off"> : 
+				<input type="text" name="mn" value="42" size="2" maxlength="2" autocomplete="off">
+				<select name="mm">
+					<option value="am">AM</option>
+					<option value="pm">PM</option>
+				</select>
 			</div>
 			<input type="hidden" id="ss" name="ss" value="<? date('s'); ?>">
 			<input type="hidden" id="hidden_mm" name="hidden_mm" value="03">
@@ -175,7 +166,7 @@ class wp_lms_html_gen extends wp_lms {
 					</th>
 					<th scope="col" id="title" class="manage-column column-title sortable <? echo $switch_order; ?>" style=""><a href="<?php echo $page_base; ?>&amp;orderby=title&amp;order=<? echo $switch_order; ?>"><span>Title</span><span class="sorting-indicator"></span></a>
 					</th>
-					<th scope="col" id="title" class="manage-column column-title sortable <? echo $switch_order; ?>" style=""><a href="<?php echo $page_base; ?>&amp;orderby=title&amp;order=<? echo $switch_order; ?>"><span>Title</span><span class="sorting-indicator"></span></a>
+					<th scope="col" id="instructor" class="manage-column column-instructor sortable <? echo $switch_order; ?>" style=""><a href="<?php echo $page_base; ?>&amp;orderby=instructor&amp;order=<? echo $switch_order; ?>"><span>Instructor</span><span class="sorting-indicator"></span></a>
 					</th>
 					<th scope="col" id="date-modified" class="manage-column column-date sortable <? echo $switch_order; ?>" style=""><a href="<?php echo $page_base; ?>&amp;orderby=date-modified&amp;order=<? echo $switch_order; ?>"><span>Date Modified</span><span class="sorting-indicator"></span></a>
 					</th>
@@ -189,6 +180,7 @@ class wp_lms_html_gen extends wp_lms {
 					</th>
 					<th scope="col" class="manage-column column-title sortable desc" style=""><a href="http://grand/wp-admin/edit.php?post_type=<?= $post_type; ?>&amp;orderby=title&amp;order=asc"><span>Title</span><span class="sorting-indicator"></span></a>
 					</th>
+					<th scope="col" class="manage-column column-instructor sortable desc" style=""><a href="http://grand/wp-admin/edit.php?post_type=<?= $post_type; ?>&amp;orderby=instructor&amp;order=asc"><span>Instructor</span><span class="sorting-indicator"></span></a>
 					<th scope="col" class="manage-column column-date sortable <? echo $switch_order; ?>" style=""><a href="<?php echo $page_base; ?>&amp;orderby=date-modified&amp;order=<? echo $switch_order; ?>"><span>Date Modified</span><span class="sorting-indicator"></span></a>
 					</th>
 					<th scope="col" class="manage-column column-date sortable asc" style=""><a href="http://grand/wp-admin/edit.php?post_type=<?= $post_type; ?>&amp;orderby=date&amp;order=desc"><span>Date</span><span class="sorting-indicator"></span></a></th>
@@ -270,6 +262,8 @@ class wp_lms_html_gen extends wp_lms {
 							<div class="mn">13</div>
 							<div class="ss">22</div>
 							<div class="post_password"></div><div class="post_parent">0</div><div class="menu_order">0</div></div>
+					</td>
+					<td class="post-title page-title column-title"><strong><a class="row-title" href="<?= $link; ?>" title="Edit “<?php  ?>”"><?php wp_get_post_terms($post->ID, $term_array[1])->name; ?></a></strong>
 					</td>
 					<td class="date-modified column-date-modified"><abbr title="<? echo get_the_modified_date('Y-m-d')." ".get_the_modified_time(); ?>"><? echo get_the_modified_date()."<br>".get_the_modified_time(); ?></abbr><br>Modified</td>
 					<td class="date column-date"><abbr title="<?php echo get_the_date('Y-m-d').' '.get_the_time(); ?>"><?php echo get_the_date(); echo "<br>"; the_time(); ?></abbr><br>Published</td>	
