@@ -83,12 +83,12 @@ class wp_lms {
                             array( 'name' => "Go Back to Lectures", 'type' => 'lecture', 'create' => 'link') 
                           ),
                           array(
-                            'wp_lms_session_begin', 
-                            'Session Begins On', 
-                            'session', 
+                            'wp_lms_course_time', 
+                            'Course Schedule', 
+                            'course', 
                             'side', 
                             'high', 
-                            array( 'name' => "Session Begins On", 'type' => 'session', 'create' => 'date') 
+                            array( 'name' => "Course Schedule", 'type' => 'course', 'create' => 'date') 
                           ),
                           array(
                             'wp_lms_session_weeks', 
@@ -97,6 +97,22 @@ class wp_lms {
                             'side', 
                             'high', 
                             array( 'name' => "Weeks Active", 'type' => 'session', 'create' => 'weeks') 
+                          ),
+                          array(
+                            'wp_lms_instructor_list_course', 
+                            'Instructor List', 
+                            'course', 
+                            'side', 
+                            'high', 
+                            array( 'name' => "Instructors", 'type' => 'instructor', 'create' => 'select') 
+                          ),
+                          array(
+                            'wp_lms_course_status', 
+                            'Course Status', 
+                            'course', 
+                            'side', 
+                            'high', 
+                            array( 'name' => "Status", 'type' => 'course', 'create' => 'status') 
                           ) );
         //run on this
         if( !get_parent_class( $this ) ) {
@@ -104,8 +120,8 @@ class wp_lms {
             add_action( 'init', array($this, 'post_types' ) );
             add_action( 'add_meta_boxes', array( $this, 'post_metaboxes' ) );
             add_action('save_post', array( $this, 'save_post_meta') );
-            add_filter( 'manage_assignment_posts_columns', array($this,'add_assignment_columns') );
-            add_action( 'manage_assignment_posts_custom_column' , array($this,'custom_assignment_column'), 10, 2 );
+            //add_filter( 'manage_assignment_posts_columns', array($this,'add_assignment_columns') );
+            //add_action( 'manage_assignment_posts_custom_column' , array($this,'custom_assignment_column'), 10, 2 );
             add_action( 'wp_before_admin_bar_render', array($this, 'content_menu' ) );
             //sorting not working yet
             // add_filter('manage_edit-assignment_sortable_columns', array($this, 'assignment_sortable_columns') );
@@ -261,29 +277,6 @@ class wp_lms {
         'href' => admin_url( 'edit.php?post_type=session&page=wp_lms_schedule' ),
       );
       $wp_admin_bar->add_node( $args );
-      // // add a group node with a class "first-toolbar-group"
-      // $args = array(
-      //   'id'     => 'first_group',
-      //   'parent' => 'parent_node',
-      //   'meta'   => array( 'class' => 'first-toolbar-group' )
-      // );
-      // $wp_admin_bar->add_group( $args );
-
-      // // add an item to our group item
-      // $args = array(
-      //   'id'     => 'first_grouped_node',
-      //   'title'  => 'first group node',
-      //   'parent' => 'first_group'
-      // );
-      // $wp_admin_bar->add_node( $args );
-
-      // // add another child item to our parent item (not to our first group)
-      // $args = array(
-      //   'id'     => 'another_child_node',
-      //   'title'  => 'another child node',
-      //   'parent' => 'parent_node'
-      // );
-      //$wp_admin_bar->add_node( $args );
     }
 
     public function post_metaboxes() {
@@ -400,13 +393,16 @@ class wp_lms {
          *  @since 0.0.1
         **/
         case 'date':
+        $d_values = array('01','02','03','04','05','06','07','08','09','10','11','12');
+        $c_values = array();
+        $c_lables = array();
         ?>
        <input type="hidden" name="<?= $type; ?>begin_noncename" id="<?= $type; ?>begin_noncename" value="<?php echo wp_create_nonce( plugin_basename(__FILE__) ); ?>" />
         <div id="" class="hide-if-js" style="display: block;">
           <div class="timestamp-wrap">
             <p>
-              <label for="mm" class="screen-reader-text">
-                <?= $name; ?>
+              <label for="_<?= $type; ?>_date_begin_month">
+                Begin Date <?= date('M',mktime(0, 0, 0, 03, 0, 0) ); ?>
               </label>
             </p>
           <select id="" name="_<?= $type; ?>_date_begin_month">
@@ -423,8 +419,81 @@ class wp_lms {
             <option value="11">11-Nov</option>
             <option value="12">12-Dec</option>
           </select> 
-          <input type="text" id="" name="_<?= $type; ?>_date_begin_day" value="15" size="2" maxlength="2" autocomplete="off">, <input type="text" id="" name="_date_begin_year" value="2014" size="4" maxlength="4" autocomplete="off">
+          <input type="text" name="_<?= $type; ?>_date_begin_day" value="15" size="2" maxlength="2" autocomplete="off">, <input type="text" id="" name="_date_begin_year" value="2014" size="4" maxlength="4" autocomplete="off">
          </div>
+         <div class="timestamp-wrap">
+            <p>
+              <label for="_<?= $type; ?>_date_end_month">
+                End Date
+              </label>
+            </p>
+          <select id="" name="_<?= $type; ?>_date_end_month">
+            <option value="01">01-Jan</option>
+            <option value="02">02-Feb</option>
+            <option value="03" selected="selected">03-Mar</option>
+            <option value="04">04-Apr</option>
+            <option value="05">05-May</option>
+            <option value="06">06-Jun</option>
+            <option value="07">07-Jul</option>
+            <option value="08">08-Aug</option>
+            <option value="09">09-Sep</option>
+            <option value="10">10-Oct</option>
+            <option value="11">11-Nov</option>
+            <option value="12">12-Dec</option>
+          </select> 
+          <input type="text" name="_<?= $type; ?>_date_end_day" value="15" size="2" maxlength="2" autocomplete="off">, <input type="text" id="" name="_date_end_year" value="2014" size="4" maxlength="4" autocomplete="off">
+         </div>
+         <p>
+        <strong>Days</strong>
+      </p>
+      <label class="screen-reader-text">Days</label>
+      <div class="timestamp-wrap">
+        <label for="sun">S
+          <input type="checkbox" name="sun" value="0">
+        </label>
+        <label for="mon">M
+          <input type="checkbox" name="mon" value="1">
+        </label>
+        <label for="tues">T
+          <input type="checkbox" name="tues" value="2">
+        </label>
+        <label for="wedn">W
+          <input type="checkbox" name="wedn" value="3">
+        </label>
+        <label for="thurs">R
+          <input type="checkbox" name="thurs" value="4">
+        </label>
+        <label for="fri">F
+          <input type="checkbox" name="fri" value="5">
+        </label>
+        <label for="sat">S
+          <input type="checkbox" name="sat" value="6">
+        </label>
+      </div>
+      <p>
+        <strong>Begin Time</strong>
+      </p>
+      <label class="screen-reader-text">Begin Time</label>
+      <div class="timestamp-wrap">
+        <input type="text" name="wp_lms_hr" value="10" size="2" maxlength="2" autocomplete="off"> : 
+        <input type="text" name="wp_lms_min" value="42" size="2" maxlength="2" autocomplete="off">
+        <select name="wp_lms_ofday">
+          <option value="am">AM</option>
+          <option value="pm">PM</option>
+        </select>
+      </div>
+      <div class="timestamp-wrap">
+        <p>
+          <strong>End Time</strong>
+        </p>
+        <label class="screen-reader-text">End Time</label>
+        <input type="text" name="hh" value="10" size="2" maxlength="2" autocomplete="off"> : 
+        <input type="text" name="mn" value="42" size="2" maxlength="2" autocomplete="off">
+        <select name="mm">
+          <option value="am">AM</option>
+          <option value="pm">PM</option>
+        </select>
+      </div>
         </div>
         <?
           break;
@@ -442,6 +511,21 @@ class wp_lms {
           <option name="months">Months</option>
         </select>
         <?
+          break;
+
+        case "status":
+          ?>
+          <input type="hidden" name="<?= $type; ?>status_noncename" id="<?= $type; ?>status_noncename" value="<?php echo wp_create_nonce( plugin_basename(__FILE__) ); ?>" />
+          <p>
+            <label for="_status">
+              <?= $name; ?>
+            </label>
+          </p>
+          <select name="_status">
+            <option value="inactive">Inactive</option>
+            <option value="active">Active</option>
+          </select>
+          <?
           break;
         default:
           //nothing to do here yet
