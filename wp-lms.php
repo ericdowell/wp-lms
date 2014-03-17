@@ -106,6 +106,7 @@ class wp_lms {
             add_action('save_post', array( $this, 'save_post_meta') );
             add_filter( 'manage_assignment_posts_columns', array($this,'add_assignment_columns') );
             add_action( 'manage_assignment_posts_custom_column' , array($this,'custom_assignment_column'), 10, 2 );
+            add_action( 'wp_before_admin_bar_render', array($this, 'content_menu' ) );
             //sorting not working yet
             // add_filter('manage_edit-assignment_sortable_columns', array($this, 'assignment_sortable_columns') );
             // add_filter('requests', array($this, 'handle_assignment_column_sorting') );
@@ -206,8 +207,83 @@ class wp_lms {
         return $links;
     }//end action_links
 
+    /**
+     *  All of the Custom Post Types and Taxonomy are registered
+     *  @since 1.0.0
+     */
     public function post_types() {
 
+    }
+
+    public function content_menu() {
+      global $wp_admin_bar;
+      $wp_admin_bar->add_menu( array(
+            'parent' => 'new-content',
+            'id' => 'new_assignment',
+            'title' => 'Assignment',
+            'href' => admin_url( 'post-new.php?post_type=assignment' ),
+            )
+      );
+      $wp_admin_bar->add_menu( array(
+            'parent' => 'new-content',
+            'id' => 'new_lecture',
+            'title' => 'Lecture',
+            'href' => admin_url( 'post-new.php?post_type=lecture' ),
+            )
+      );
+      $args = array(
+        'id'    => 'wp_lms',
+        'title' => 'WP LMS'
+      );
+      $wp_admin_bar->add_node( $args );
+
+      // add a child item to our parent item
+      $args = array(
+        'id'     => 'go_to_assignments',
+        'title'  => 'Go to Assignments',
+        'parent' => 'wp_lms',
+        'href' => admin_url( 'edit.php?post_type=course&page=wp_lms_assignment' ),
+      );
+      $wp_admin_bar->add_node( $args );
+
+      $args = array(
+        'id'     => 'go_to_lectures',
+        'title'  => 'Go to Lectures',
+        'parent' => 'wp_lms',
+        'href' => admin_url( 'edit.php?post_type=course&page=wp_lms_lecture' ),
+      );
+      $wp_admin_bar->add_node( $args );
+
+      $args = array(
+        'id'     => 'go_to_schedule',
+        'title'  => 'Go to Schedule',
+        'parent' => 'wp_lms',
+        'href' => admin_url( 'edit.php?post_type=session&page=wp_lms_schedule' ),
+      );
+      $wp_admin_bar->add_node( $args );
+      // // add a group node with a class "first-toolbar-group"
+      // $args = array(
+      //   'id'     => 'first_group',
+      //   'parent' => 'parent_node',
+      //   'meta'   => array( 'class' => 'first-toolbar-group' )
+      // );
+      // $wp_admin_bar->add_group( $args );
+
+      // // add an item to our group item
+      // $args = array(
+      //   'id'     => 'first_grouped_node',
+      //   'title'  => 'first group node',
+      //   'parent' => 'first_group'
+      // );
+      // $wp_admin_bar->add_node( $args );
+
+      // // add another child item to our parent item (not to our first group)
+      // $args = array(
+      //   'id'     => 'another_child_node',
+      //   'title'  => 'another child node',
+      //   'parent' => 'parent_node'
+      // );
+      //$wp_admin_bar->add_node( $args );
     }
 
     public function post_metaboxes() {
