@@ -31,10 +31,6 @@ class wp_lms {
         $this->plugin_dir_long = dirname( __FILE__ );
         $this->plugin_inc_dir = $this->plugin_dir_long . '/inc/';
         $this->set_aval = array("admin_option_pages", "version" => $this::$version, "custom_post_type_names", "settings_page_options", "post_meta");
-        // $this->filters_post_a = array('assignment', 'assignment');
-        // $this->filters_tax_a = array('course_name', 'instructor_name');
-        // $this->filters_post_l = array('lecture', 'lecture');
-        // $this->filters_tax_l = array('course_name', 'instructor_name');
         $this->tax_names = array('assignment' => array('course_name_a', 'instructor_name_a'), 'lecture' => array('course_name_l', 'instructor_name_l') );
         $this->post_metabox = array(array(
                             'wp_lms_course_list_assign',
@@ -120,6 +116,7 @@ class wp_lms {
             add_action( 'init', array($this, 'post_types' ) );
             add_action( 'add_meta_boxes', array( $this, 'post_metaboxes' ) );
             add_action('save_post', array( $this, 'save_post_meta') );
+            add_filter('post_type_link', array($this, 'filter_post_links'), 1, 2);
             //add_filter( 'manage_assignment_posts_columns', array($this,'add_assignment_columns') );
             //add_action( 'manage_assignment_posts_custom_column' , array($this,'custom_assignment_column'), 10, 2 );
             add_action( 'wp_before_admin_bar_render', array($this, 'content_menu' ) );
@@ -230,6 +227,36 @@ class wp_lms {
     public function post_types() {
 
     }
+
+
+    public function filter_post_links($url, $post) {
+      if ( 'assignment' == get_post_type( $post ) || 'lecture' == get_post_type( $post ) ) {
+        $course = get_post_meta($post->ID, '_course', true);
+        $instructor = get_post_meta($post->ID, '_instructor', true);
+        if( empty($course) ) {
+          $course = "pick_course";
+        }
+        else {
+          $course = get_post($course)->post_name;
+        }
+        if( empty($instructor) ) {
+          $instructor = "pick_instructor";
+        }
+        else {
+          $instructor = get_post($instructor)->post_name;
+          $instructor = explode("-", $instructor)[1];
+          $instructor = strtolower($instructor);
+        }
+        if( 'assignment' == get_post_type( $post ) ) {
+          return str_replace('%assign%', "a-".$instructor."-".$course, $url);
+        }
+        if( 'lecture' == get_post_type( $post ) ) {
+          return str_replace('%lect%', "l-".$instructor."-".$course, $url);
+        }
+      }
+      return $url;
+    }
+
 
     public function content_menu() {
       global $wp_admin_bar;
