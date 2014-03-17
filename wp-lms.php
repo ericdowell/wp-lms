@@ -240,7 +240,7 @@ class wp_lms {
       // add a child item to our parent item
       $args = array(
         'id'     => 'go_to_assignments',
-        'title'  => 'Go to Assignments',
+        'title'  => 'Assignments',
         'parent' => 'wp_lms',
         'href' => admin_url( 'edit.php?post_type=course&page=wp_lms_assignment' ),
       );
@@ -248,7 +248,7 @@ class wp_lms {
 
       $args = array(
         'id'     => 'go_to_lectures',
-        'title'  => 'Go to Lectures',
+        'title'  => 'Lectures',
         'parent' => 'wp_lms',
         'href' => admin_url( 'edit.php?post_type=course&page=wp_lms_lecture' ),
       );
@@ -256,7 +256,7 @@ class wp_lms {
 
       $args = array(
         'id'     => 'go_to_schedule',
-        'title'  => 'Go to Schedule',
+        'title'  => 'Schedule',
         'parent' => 'wp_lms',
         'href' => admin_url( 'edit.php?post_type=session&page=wp_lms_schedule' ),
       );
