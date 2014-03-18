@@ -17,17 +17,17 @@ class wp_lms_admin extends wp_lms {
 	public function admin_settings(){
 		$this->menu_pages['main'] = add_menu_page( $this::$plugin_name, 'GrandPubbah', 'manage_options', $this::$plugin_name, array( $this, 'main_options_page' ) );
 		//add_menu_page( $page_title, $menu_title, $capability, $menu_slug, $function, $icon_url, $position );
-		$this->menu_pages['schedule'] = add_submenu_page( "edit.php?post_type=session", 'WP LMS Schedule', 'Schedule Courses', 'manage_options', $this::$plugin_name.'_schedule', array( $this,"schedule_page" ), $this->plugin_img_url.'png/24/schedule.png' );
-		$this->menu_pages['assignments'] = add_submenu_page( "edit.php?post_type=course", 'WP LMS Assignments', 'Assignments', 'manage_options', $this::$plugin_name.'_assignment', array( $this,"assignment_page" ) );
-		$this->menu_pages['lectures'] = add_submenu_page( "edit.php?post_type=course", 'WP LMS Lectures', 'Lectures', 'manage_options', $this::$plugin_name.'_lecture', array( $this,"lecture_page" ) );
-		$this->menu_pages['settings'] = add_submenu_page( "edit.php?post_type=course", 'WP LMS Settings', 'Settings', 'manage_options', $this::$plugin_name.'_settings', array( $this,"settings_page" ) );
+		//$this->menu_pages['schedule'] = add_submenu_page( "edit.php?post_type=session", 'WP LMS Schedule', 'Schedule Courses', 'manage_options', $this::$plugin_name.'_schedule', array( $this,"schedule_page" ), $this->plugin_img_url.'png/24/schedule.png' );
+		//$this->menu_pages['assignments'] = add_submenu_page( "edit.php?post_type=course", 'WP LMS Assignments', 'Assignments', 'manage_options', $this::$plugin_name.'_assignment', array( $this,"assignment_page" ) );
+		//$this->menu_pages['lectures'] = add_submenu_page( "edit.php?post_type=course", 'WP LMS Lectures', 'Lectures', 'manage_options', $this::$plugin_name.'_lecture', array( $this,"lecture_page" ) );
+		//$this->menu_pages['settings'] = add_submenu_page( "edit.php?post_type=course", 'WP LMS Settings', 'Settings', 'manage_options', $this::$plugin_name.'_settings', array( $this,"settings_page" ) );
 		//edit.php?post_type=student_directory
 		$this->menu_pages['view-student'] = add_submenu_page( "edit.php?post_type=student_directory", 'WP LMS View Students', 'View Students', 'manage_options', $this::$plugin_name.'_view_student', array( $this,"view_student" ) );
 		$this->menu_pages['view-instructors'] = add_submenu_page( "edit.php?post_type=instructor", 'WP LMS View Instrustors', 'View Instrustors', 'manage_options', $this::$plugin_name.'_view_instructor', array( $this,"view_instructor" ) );
+		$this->menu_pages['view-course-students'] = add_submenu_page( "edit.php?post_type=course", 'WP LMS View Course Students', 'View Enrollment', 'manage_options', $this::$plugin_name.'_view_enrollment', array( $this,"view_enrollment" ) );
 		//add_submenu_page( $parent_slug, $page_title, $menu_title, $capability, $menu_slug, $function );
 	}//end admin_settings
 	static public function page_url(){
-		//post_type=course&page=wp_lms_assign
 		return admin_url( "edit.php?post_type=".$_GET['post_type']."&amp;page=".$_GET["page"] );
 	}
 
@@ -233,8 +233,6 @@ class wp_lms_admin extends wp_lms {
 			$args = array(
 				'sort_column' => 'menu_order',
 				'post_type' => 'student_directory',
-				//"course_assigned_num" => $class_num,
-				//'instructor_assigned_num' => $instructor_num,
 				'post_status' => 'publish',
 				'orderby' => 'title',
 				'order' => 'ASC'
@@ -297,6 +295,55 @@ class wp_lms_admin extends wp_lms {
 				        continue;
 				    //echo $key . " => " . $value . "<br />";
 				    // $the_keys[] = $value;
+				    $custom_field = get_post_custom($s->ID);
+				    echo "<p>".$value.": ".$custom_field[$value][0]."<p>";
+				}
+			}
+			?>
+
+		</div>
+		<?
+		ob_end_flush();
+	}//end main_options_page
+
+	/**
+     *  Options Page for Plugin
+     *  @since 1.0.0
+     *  @updated 1.0.0
+     *  @return HTML settings page
+     **/
+	public function view_enrollment(){
+		$page_base = $this->page_url();
+		ob_start();
+		?>
+		<div class="wp_lms settings">
+			<h1>View Student Information</h1>
+			<?
+			$args = array(
+				'sort_column' => 'menu_order',
+				'post_type' => 'course',
+				//"course_assigned_num" => $class_num,
+				//'instructor_assigned_num' => $instructor_num,
+				'post_status' => 'publish',
+				'orderby' => 'title',
+				'order' => 'ASC'
+			);
+			echo "<pre>";print_r($args);echo "</pre>";
+			$pages = get_pages( $args );
+			echo "<pre>";print_r($pages);echo "</pre>";
+			foreach( $pages as $k => $s ){ 
+				?>
+				<h2><?= $s->post_title; ?></h2>
+				<p>Enrollment: </p>
+				<?
+				$custom_field_keys = get_post_custom_keys($s->ID);
+				echo "<pre>";print_r($custom_field_keys);echo "</pre>";
+				foreach ( $custom_field_keys as $key => $value ) {
+				    $valuet = trim($value);
+				    if ( '_' == $valuet{0} )
+				        continue;
+				    //echo $key . " => " . $value . "<br />";
+				    //$the_keys[] = $value;
 				    $custom_field = get_post_custom($s->ID);
 				    echo "<p>".$value.": ".$custom_field[$value][0]."<p>";
 				}

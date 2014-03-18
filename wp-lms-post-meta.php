@@ -23,16 +23,16 @@ class wp_lms_post_meta extends wp_lms {
       $page_query = new WP_Query();
       $all_pages = $page_query->query( array( 'post_type' => $type, 'posts_per_page' => -1, 'orderby' => 'title',
         'order' => 'ASC' ) );
-      $course = get_post_meta($post->ID, '_'.$type, true);
       switch($create){
 
         /**
-         *  Calls object install on plugin activation
+         *  
          *  @since 0.0.1
         **/
 
         case 'select':
           //ob_start();
+        	$course = get_post_meta($post->ID, '_'.$type, true);
           ?>
           <label for="_<?= $type; ?>"> 
               <?php echo $course; ?>
@@ -54,22 +54,21 @@ class wp_lms_post_meta extends wp_lms {
           break;
 
         /**
-         *  Calls object install on plugin activation
+         *  
          *  @since 0.0.1
         **/
 
         case 'link':
         if($post->post_type == "assignment") {
           $term_array = $this->tax_names['assignment'];
-          $prefix = "_a";
+          $prefix = "assignment";
         }
         else if($post->post_type == "lecture") {
           $term_array = $this->tax_names['lecture'];
-          $prefix = "_l";
+          $prefix = "lecture";
         }
-       // $this->terms = array('course_name','instructor_name');
         for($i=0;$i<2;$i++){
-          $term =  $term_array[$i];
+          $term =  $term_array[$i].$prefix;
           $terms = wp_get_post_terms($post->ID, $term);
           $var[] = $term;
           if( !empty($terms) ) {
@@ -77,18 +76,18 @@ class wp_lms_post_meta extends wp_lms {
               ${$term} = $termid->term_id;
             }
           }
-          if( $var[0] == "course_name".$prefix && empty( $$var[0] ) ) $course_label = " Not Set";
-          if( $var[1] == "instructor_name".$prefix  && empty( $$var[1] ) ) $instructor_label = " Not Set";
+          if( $var[0] == "_course_name".$prefix && empty( $$var[0] ) ) $course_label = " Not Set";
+          if( $var[1] == "_instructor_name".$prefix  && empty( $$var[1] ) ) $instructor_label = " Not Set";
         }
         if( empty( $$var[1] ) && empty( $$var[0] ) ) {
            $link = "#";
            $link_name = "Post Not Published";
         }
         else {
-          $link = "edit.php?s&post_status=all&post_type=".$type."&action=-1&m=0&course_name$prefix=".$$var[0]."&instructor_name$prefix=".$$var[1]."&paged=1&action2=-1";
+          $link = "edit.php?s&post_status=all&post_type=".$type."&action=-1&m=0&_course_name_$prefix=".$$var[0]."&_instructor_name_$prefix=".$$var[1]."&paged=1&action2=-1";
           $link_name = $name;
-          if(!empty( $$var[1] ) ) $instructor_label = get_term($$var[1], 'instructor_name'.$prefix)->name;
-          if(!empty( $$var[0] ) ) $course_label = get_term($$var[0], 'course_name'.$prefix)->name;
+          if(!empty( $$var[0] ) ) $course_label = get_term($$var[0], '_course_name_'.$prefix)->name;
+          if(!empty( $$var[1] ) ) $instructor_label = get_term($$var[1], '_instructor_name_'.$prefix)->name;
         }
         ?>
         <label class="screen-reader-text" for="_<?= $create; ?>">
@@ -114,37 +113,45 @@ class wp_lms_post_meta extends wp_lms {
           break;
 
         /**
-         *  Calls object install on plugin activation
+         *  
          *  @since 0.0.1
         **/
         case 'date':
-        $d_values = array('01','02','03','04','05','06','07','08','09','10','11','12');
-        $c_values = array();
-        $c_lables = array();
+        $m_labels = array('01','02','03','04','05','06','07','08','09','10','11','12');
+        $m_values = array('2','3','4','5','6','7', '8','9','10','11','12','13','14');
+        $get_meta = array('begin_month' => "_".$type."_date_begin_month", 'begin_day' => "_".$type."_date_begin_day",'begin_year' =>"_".$type."_date_begin_year",'end_month' => "_".$type."_date_end_month",'end_day' => "_".$type."_date_end_day",'end_year' => "_".$type."_date_end_year");
+        foreach($get_meta as $var => $meta){
+       		$$var = get_post_meta($post->ID, $meta, true);
+       	}
         ?>
        <input type="hidden" name="<?= $type; ?>begin_noncename" id="<?= $type; ?>begin_noncename" value="<?php echo wp_create_nonce( plugin_basename(__FILE__) ); ?>" />
         <div id="" class="hide-if-js" style="display: block;">
           <div class="timestamp-wrap">
             <p>
               <label for="_<?= $type; ?>_date_begin_month">
-                Begin Date <?= date('M',mktime(0, 0, 0, 03, 0, 0) ); ?>
+                Begin Date
               </label>
             </p>
           <select id="" name="_<?= $type; ?>_date_begin_month">
-            <option value="01">01-Jan</option>
-            <option value="02">02-Feb</option>
-            <option value="03" selected="selected">03-Mar</option>
-            <option value="04">04-Apr</option>
-            <option value="05">05-May</option>
-            <option value="06">06-Jun</option>
-            <option value="07">07-Jul</option>
-            <option value="08">08-Aug</option>
-            <option value="09">09-Sep</option>
-            <option value="10">10-Oct</option>
-            <option value="11">11-Nov</option>
-            <option value="12">12-Dec</option>
+          	<?php 
+          	if( empty($begin_month) ) $begin_month = date("m");
+          	foreach($m_labels as $k => $n){ 
+          		$selected = "";
+          		if($n == $begin_month) {
+          			$selected = " selected";
+          		}
+          	?>
+            <option value="<?php echo $n; ?>"<?php echo $selected; ?>><?php echo $n."-".date('M', mktime(0, 0, 0, $m_values[$k], 0, 0) ); ?></option>
+            <? } ?>
           </select> 
-          <input type="text" name="_<?= $type; ?>_date_begin_day" value="15" size="2" maxlength="2" autocomplete="off">, <input type="text" id="" name="_date_begin_year" value="2014" size="4" maxlength="4" autocomplete="off">
+         	<?
+         	if( empty( $begin_day ) ) $begin_day = date("j");
+         	?>
+          <input type="text" name="_<?= $type; ?>_date_begin_day" value="<?= $begin_day; ?>" size="2" maxlength="2" autocomplete="off">, 
+          <?
+          if( empty( $begin_year ) ) $begin_year = date("Y");
+          ?>
+          <input type="text" id="" name="_<?= $type; ?>_date_begin_year" value="<?= $begin_year; ?>" size="4" maxlength="4" autocomplete="off">
          </div>
          <div class="timestamp-wrap">
             <p>
@@ -153,58 +160,77 @@ class wp_lms_post_meta extends wp_lms {
               </label>
             </p>
           <select id="" name="_<?= $type; ?>_date_end_month">
-            <option value="01">01-Jan</option>
-            <option value="02">02-Feb</option>
-            <option value="03" selected="selected">03-Mar</option>
-            <option value="04">04-Apr</option>
-            <option value="05">05-May</option>
-            <option value="06">06-Jun</option>
-            <option value="07">07-Jul</option>
-            <option value="08">08-Aug</option>
-            <option value="09">09-Sep</option>
-            <option value="10">10-Oct</option>
-            <option value="11">11-Nov</option>
-            <option value="12">12-Dec</option>
+          	<?php 
+          	if( empty($end_month) ) $end_month = date("m");
+          	foreach($m_labels as $k => $n){ 
+          		$selected = "";
+          		if($n == $end_month) {
+          			$selected = " selected";
+          		}
+          	?>
+            <option value="<?php echo $n; ?>"<?php echo $selected; ?>><?php echo $n."-".date('M', mktime(0, 0, 0, $m_values[$k], 0, 0) ); ?></option>
+            <? } ?>
           </select> 
-          <input type="text" name="_<?= $type; ?>_date_end_day" value="15" size="2" maxlength="2" autocomplete="off">, <input type="text" id="" name="_date_end_year" value="2014" size="4" maxlength="4" autocomplete="off">
+          <?
+         	if( empty( $end_day ) ) $end_day = date("j")+7;
+         	?>
+          <input type="text" name="_<?= $type; ?>_date_end_day" value="<?= $end_day; ?>" size="2" maxlength="2" autocomplete="off">, 
+          <?
+          if( empty( $end_year ) ) $end_year = date("Y");
+          ?>
+          <input type="text" id="" name="_<?= $type; ?>_date_end_year" value="<?= $end_year;?>" size="4" maxlength="4" autocomplete="off">
          </div>
          <p>
         <strong>Days</strong>
       </p>
       <label class="screen-reader-text">Days</label>
       <div class="timestamp-wrap">
-        <label for="sun">S
-          <input type="checkbox" name="_<?= $type; ?>_day_sun" value="0">
+      	<?
+      	$get_checkboxes = array('day_sun' => "_".$type."_day_sun", 'day_mon' => "_".$type."_day_mon", 'day_tues' => "_".$type."_day_tues",'day_wedn' => "_".$type."_day_wedn", 'day_thurs' => "_".$type."_day_thurs", 'day_fri' => "_".$type."_day_fri", 'day_sat' => "_".$type."_day_sat");
+      	foreach($get_checkboxes as $var => $meta) {
+      		$$var = get_post_meta($post->ID, $meta, true);
+      		$checkbox[] = $$var;
+      	}
+      	$ch_values = array('1', '2', '3', '4', '5', '6', '7');
+        $ch_labels = array('S', 'M', 'T', 'W', 'R', 'F', 'S');
+        foreach($ch_labels as $k => $ch) {
+        	$checked = "";
+        	if( !empty( $checkbox[$k] ) && $$checkbox[$k] == $ch_values[$k]) $checked = " checked";
+      	?>
+        <label for="<?= '_'.$type.'_'.$checkbox[$k]; ?>"><?= $ch; ?>
+          <input type="checkbox" name="<?= '_'.$type.'_'.$checkbox[$k]; ?>" value="<?= $ch_values[$k]; ?>"<?= $checked; ?>>
         </label>
-        <label for="mon">M
-          <input type="checkbox" name="_<?= $type; ?>_day_mon" value="1">
-        </label>
-        <label for="tues">T
-          <input type="checkbox" name="_<?= $type; ?>_day_tues" value="2">
-        </label>
-        <label for="wedn">W
-          <input type="checkbox" name="_<?= $type; ?>_day_wedn" value="3">
-        </label>
-        <label for="thurs">R
-          <input type="checkbox" name="_<?= $type; ?>_day_thurs" value="4">
-        </label>
-        <label for="fri">F
-          <input type="checkbox" name="_<?= $type; ?>_day_fri" value="5">
-        </label>
-        <label for="sat">S
-          <input type="checkbox" name="_<?= $type; ?>_day_sat" value="6">
-        </label>
+        <? } ?>
       </div>
       <p>
         <strong>Begin Time</strong>
       </p>
       <label class="screen-reader-text">Begin Time</label>
       <div class="timestamp-wrap">
-        <input type="text" name="_<?= $type; ?>_begin_hr" value="10" size="2" maxlength="2" autocomplete="off"> : 
-        <input type="text" name="_<?= $type; ?>_begin_min" value="42" size="2" maxlength="2" autocomplete="off">
+    	  <?php
+    	  $get_times = array('begin_hour' => '_'.$type.'_begin_hour', 'begin_min' => '_'.$type.'_begin_min', 'begin_ofday' => '_'.$type.'_begin_ofday','end_hour' => '_'.$type.'_end_hour', 'end_min' => '_'.$type.'_end_min', 'end_ofday' => '_'.$type.'_end_ofday');
+    	  $time_of_day = array('am', 'pm');
+    	  foreach($get_times as $var => $meta) {
+    	  	$$var = get_post_meta($post->ID, $meta, true);
+    	  }
+       	if( empty( $begin_hour ) ) $begin_hour = date("g");
+       	?>
+        <input type="text" name="_<?= $type; ?>_begin_hour" value="<?= $begin_hour; ?>" size="2" maxlength="2" autocomplete="off"> : 
+        <?php
+       	if( empty( $begin_min ) ) $begin_min = date("i");
+       	?>
+        <input type="text" name="_<?= $type; ?>_begin_min" value="<?= $begin_min; ?>" size="2" maxlength="2" autocomplete="off">
+
         <select name="_<?= $type; ?>_begin_ofday">
-          <option value="am">AM</option>
-          <option value="pm">PM</option>
+        	<?
+        	foreach ($time_of_day as $key => $tod) {  
+        		$selected = "";
+  					if( $tod == $begin_ofday ) $selected = " selected";
+        	?>
+          <option value="<?= $tod; ?>"><?= strtoupper($tod); ?></option>
+          <?
+        	}
+          ?>
         </select>
       </div>
       <div class="timestamp-wrap">
@@ -212,11 +238,24 @@ class wp_lms_post_meta extends wp_lms {
           <strong>End Time</strong>
         </p>
         <label class="screen-reader-text">End Time</label>
-        <input type="text" name="_coures_end_hr" value="10" size="2" maxlength="2" autocomplete="off"> : 
-        <input type="text" name="_coures_end_min" value="42" size="2" maxlength="2" autocomplete="off">
+        <?php
+         	if( empty( $end_hour ) ) $end_hour = date("g")+3;
+       	?>
+        <input type="text" name="_<?= $type; ?>_end_hr" value="<?= $end_hour; ?>" size="2" maxlength="2" autocomplete="off"> : 
+        <?php
+       	if( empty( $end_min ) ) $end_min = date("i");
+       	?>
+        <input type="text" name="_<?= $type; ?>_end_min" value="<?= $end_min; ?>" size="2" maxlength="2" autocomplete="off">
         <select name="_<?= $type; ?>_end_ofday">
-          <option value="am">AM</option>
-          <option value="pm">PM</option>
+					<?
+        	foreach ($time_of_day as $key => $tod) {  
+        		$selected = "";
+  					if( $tod == $end_ofday ) $selected = " selected";
+        	?>
+          <option value="<?= $tod; ?>"><?= strtoupper($tod); ?></option>
+          <?
+        	}
+          ?>
         </select>
       </div>
         </div>
@@ -241,16 +280,27 @@ class wp_lms_post_meta extends wp_lms {
           break;
 
         case "status":
+        	$status = get_post_meta($post->ID, "_status", true);
+        	$statuses = array("inactive", "active");
           ?>
           <input type="hidden" name="<?= $type; ?>status_noncename" id="<?= $type; ?>status_noncename" value="<?php echo wp_create_nonce( plugin_basename(__FILE__) ); ?>" />
           <p>
             <label for="_status">
+            	<? //echo $status; ?>
               <?= $name; ?>
             </label>
           </p>
           <select name="_status">
-            <option value="inactive">Inactive</option>
-            <option value="active">Active</option>
+          	<? 
+          	foreach($statuses as $k => $s){ 
+          		$selected = "";
+          		if( $status == $s ) $selected = " selected";
+          	?>
+            <option value="<?= $s; ?>"<?= $selected; ?>><?= ucfirst($s); ?></option>
+            <? 
+          	} 
+          	?>
+            <!-- <option value="active">Active</option> -->
           </select>
           <?
           break;
@@ -266,6 +316,7 @@ class wp_lms_post_meta extends wp_lms {
       // verify this came from the our screen and with proper authorization,
       // because save_post can be triggered at other times
       $doReturn = true;
+      $type = $post->post_type;
       foreach( $this->noncename as $k => $v ) {
         if( wp_verify_nonce( $_POST[$v], plugin_basename(__FILE__) ) ) {
           $doReturn = false;
@@ -282,11 +333,15 @@ class wp_lms_post_meta extends wp_lms {
       // OK, we're authenticated: we need to find and save the data
       // We'll put it into an array to make it easier to loop though.
     	foreach( $this->postdataname as $k => $v ) {
-    		if( in_array($v, $_POST) ){
+    		if( array_key_exists($v, $_POST) ){
 	      	$events_meta[$v] = $_POST[$v];
 	      	//$events_meta['_instructor'] = $_POST['_instructor'];
       	}
+      	// else {
+      	// 	echo $v." is not in the array of POST<br>";
+      	// }
       }
+     	//echo "<pre>";print_r($events_meta);echo "</pre>";
       if(is_array($events_meta) ) {
       	// Add values of $events_meta as custom fields
 	      foreach ($events_meta as $key => $value) { 
@@ -301,50 +356,63 @@ class wp_lms_post_meta extends wp_lms {
 	        if(get_post_meta($post->ID, $key, FALSE)) { 
 	        // If the custom field already has a value
 	          update_post_meta($post->ID, $key, $value);
-	          /*if( $key == "_course"  && $post->post_type == "lecture" ) {
+	          if($key == "_status") {
+	          	wp_set_object_terms( $post->ID, $value, 'course_status' );
+	          }
+	          if($key == "_instructor" && $post->post_type == 'course') {
+	          	wp_set_object_terms( $post->ID, get_the_title($value), 'course_instructor_name' );
+	          }
+	          if( $key == "_course"  && $post->post_type == "lecture" ) {
 	            wp_set_object_terms( $post->ID, $value, 'course_num' );
-	            wp_set_object_terms( $post->ID, get_the_title($value), 'course_name_l' );
+	            wp_set_object_terms( $post->ID, get_the_title($value), $key.'_name_'.$type );
 	          }
 	          if( $key == "_instructor" && $post->post_type == "lecture"  ) {
 	            wp_set_object_terms( $post->ID, $value, 'instructor_num' );
-	            wp_set_object_terms( $post->ID, get_the_title($value), 'instructor_name_l' ); 
+	            wp_set_object_terms( $post->ID, get_the_title($value), $key.'_name_'.$type );
 	          }
 	          if( $key == "_course"  && $post->post_type == "assignment" ) {
 	            wp_set_object_terms( $post->ID, $value, 'course_num' );
-	            wp_set_object_terms( $post->ID, get_the_title($value), 'course_name_a' );
+	            wp_set_object_terms( $post->ID, get_the_title($value), $key.'_name_'.$type );
 	          }
 	          if( $key == "_instructor" && $post->post_type == "assignment"  ) {
-	            wp_set_object_terms( $post->ID, $value, 'instructor_num' );
-	            wp_set_object_terms( $post->ID, get_the_title($value), 'instructor_name_a' ); 
-	          } */
-	        } 
-
+	            wp_set_object_terms( $post->ID, $value, $key.'_num_'.$type );
+	            wp_set_object_terms( $post->ID, get_the_title($value), $key.'_name_'.$type );
+	          }
+	        }
 	        else { 
 	        // If the custom field doesn't have a value
 	          add_post_meta($post->ID, $key, $value);
-	          /*
+	          if($key == "_status") {
+	          	wp_set_object_terms( $post->ID, $value, 'course_status' );
+	          }
+	          if($key == "_instructor" && $post->post_type == 'course') {
+	          	wp_set_object_terms( $post->ID, get_the_title($value), 'course_instructor_name' );
+	          }
 	          if( $key == "_course"  && $post->post_type == "lecture" ) {
 	            wp_set_object_terms( $post->ID, $value, 'course_num' );
-	            wp_set_object_terms( $post->ID, get_the_title($value), 'course_name_l' );
+	            wp_set_object_terms( $post->ID, get_the_title($value), $key.'_name_'.$type );
 	          }
 	          if( $key == "_instructor" && $post->post_type == "lecture"  ) {
 	            wp_set_object_terms( $post->ID, $value, 'instructor_num' );
-	            wp_set_object_terms( $post->ID, get_the_title($value), 'instructor_name_l' ); 
+	            wp_set_object_terms( $post->ID, get_the_title($value), $key.'_name_'.$type ); 
 	          }
 	          if( $key == "_course"  && $post->post_type == "assignment" ) {
 	            wp_set_object_terms( $post->ID, $value, 'course_num' );
-	            wp_set_object_terms( $post->ID, get_the_title($value), 'course_name_a' );
+	            wp_set_object_terms( $post->ID, get_the_title($value), $key.'_name_'.$type );
 	          }
 	          if( $key == "_instructor" && $post->post_type == "assignment"  ) {
-	            wp_set_object_terms( $post->ID, $value, 'instructor_num' );
-	            wp_set_object_terms( $post->ID, get_the_title($value), 'instructor_name_a' ); 
+	            wp_set_object_terms( $post->ID, $value, $key.'_num_'.$type );
+	            wp_set_object_terms( $post->ID, get_the_title($value), $key.'_name_'.$type ); 
 	          }
-	          */
 	        }
 	        if(!$value) delete_post_meta($post->ID, $key); 
 	        // Delete if blank
 	      }//end foreach
     	} //end if is_array
+    	// else {
+    	// 	echo "something has gone wrong";
+    	// 	echo "<pre>";print_r($_POST);echo "</pre>";
+    	// }
     }
 
     public function add_assignment_columns( $columns ) {
