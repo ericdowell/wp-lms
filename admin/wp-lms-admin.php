@@ -140,7 +140,7 @@ class wp_lms_admin extends wp_lms {
 			<h2>
 			<a href="http://grand/wp-admin/post-new.php?post_type=assignment&amp;course=568" class="add-new-h2">Add Assignment</a>
 			</h2>
-  			<? wp_lms_html_gen::form_open(array("post_type" => "assignment", "course_assigned_num" => "566", "showposts" => "10"), $page_base ) ?>
+  			<? wp_lms_html_gen::form_open(array("post_type" => "assignment", "_course" => "566", "showposts" => "10"), $page_base ) ?>
 		</div>
 		<?
 		ob_end_flush();

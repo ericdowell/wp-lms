@@ -32,97 +32,16 @@ class wp_lms {
         $this->plugin_inc_dir = $this->plugin_dir_long . '/inc/';
         $this->set_aval = array("admin_option_pages", "version" => $this::$version, "custom_post_type_names", "settings_page_options", "post_meta");
         $this->tax_names = array('assignment' => array('course_name_a', 'instructor_name_a'), 'lecture' => array('course_name_l', 'instructor_name_l') );
-        $this->post_metabox = array(array(
-                            'wp_lms_course_list_assign',
-                            'Course List', 
-                            'assignment', 
-                            'side',
-                            'high', 
-                            array('name' => "Courses", 'type' => 'course', 'create' => 'select') 
-                           ), array(
-                            'wp_lms_course_list_lecture', 
-                            'Course List', 
-                            'lecture', 
-                            'side', 
-                            'high', 
-                            array( 'name' => "Courses", 'type' => 'course', 'create' => 'select') 
-                           ), array(
-                            'wp_lms_instructor_list_assign', 
-                            'Instructor List', 
-                            'assignment', 
-                            'side', 
-                            'high', 
-                            array( 'name' => "Instructors", 'type' => 'instructor', 'create' => 'select') 
-                           ),
-                           array(
-                            'wp_lms_instructor_list_lecture', 
-                            'Instructor List', 
-                            'lecture', 
-                            'side', 
-                            'high', 
-                            array( 'name' => "Instructors", 'type' => 'instructor', 'create' => 'select') 
-                           ),
-                           array(
-                            'wp_lms_link_to_type_assign', 
-                            'Go back to Assignments', 
-                            'assignment', 
-                            'side', 
-                            'high', 
-                            array( 'name' => "Go Back to Assignemnts", 'type' => 'assignment', 'create' => 'link') 
-                           ),
-                          array(
-                            'wp_lms_link_to_type_lecture', 
-                            'Go back to Lectures', 
-                            'lecture', 
-                            'side', 
-                            'high', 
-                            array( 'name' => "Go Back to Lectures", 'type' => 'lecture', 'create' => 'link') 
-                          ),
-                          array(
-                            'wp_lms_course_time', 
-                            'Course Schedule', 
-                            'course', 
-                            'side', 
-                            'high', 
-                            array( 'name' => "Course Schedule", 'type' => 'course', 'create' => 'date') 
-                          ),
-                          array(
-                            'wp_lms_session_weeks', 
-                            'Weeks Active', 
-                            'session', 
-                            'side', 
-                            'high', 
-                            array( 'name' => "Weeks Active", 'type' => 'session', 'create' => 'weeks') 
-                          ),
-                          array(
-                            'wp_lms_instructor_list_course', 
-                            'Instructor List', 
-                            'course', 
-                            'side', 
-                            'high', 
-                            array( 'name' => "Instructors", 'type' => 'instructor', 'create' => 'select') 
-                          ),
-                          array(
-                            'wp_lms_course_status', 
-                            'Course Status', 
-                            'course', 
-                            'side', 
-                            'high', 
-                            array( 'name' => "Status", 'type' => 'course', 'create' => 'status') 
-                          ) );
-        //run on this
+        
+
+        //run on this (parent)
         if( !get_parent_class( $this ) ) {
+            include('wp-lms-post-meta.php');
+            include('wp-lms-admin-bar.php');
+            // add_filter('post_type_link', array( $this, 'filter_post_links'), 1, 2);
             add_filter( 'plugin_action_links', array( $this, 'action_links' ), 10, 2 );
             add_action( 'init', array($this, 'post_types' ) );
-            add_action( 'add_meta_boxes', array( $this, 'post_metaboxes' ) );
-            add_action('save_post', array( $this, 'save_post_meta') );
-            add_filter('post_type_link', array($this, 'filter_post_links'), 1, 2);
-            //add_filter( 'manage_assignment_posts_columns', array($this,'add_assignment_columns') );
-            //add_action( 'manage_assignment_posts_custom_column' , array($this,'custom_assignment_column'), 10, 2 );
-            add_action( 'wp_before_admin_bar_render', array($this, 'content_menu' ) );
-            //sorting not working yet
-            // add_filter('manage_edit-assignment_sortable_columns', array($this, 'assignment_sortable_columns') );
-            // add_filter('requests', array($this, 'handle_assignment_column_sorting') );
+            
             //filters work though!
             add_action('restrict_manage_posts', array($this,'restrict_assign_by_course') );
             add_filter('parse_query', array($this,'convert_id_to_term_in_query') );
@@ -131,16 +50,56 @@ class wp_lms {
             //includes all admin options
             if( is_admin() ) include('admin/wp-lms-admin.php'); // Global name $wp_lms_admin
         }
+
+
+
         //run within admin class
-        if( is_admin() && get_parent_class( $this ) && strstr( get_class( $this ), "wp_lms_admin" ) ) {
+        if( is_admin() && get_parent_class( $this ) &&  get_class( $this ) == "wp_lms_admin"  ) {
             include('admin/classes/wp-lms-admin-html.php'); // Global name $wp_lms_html_gen
             add_action( 'admin_menu', array( $this,'admin_settings' ) );
             add_action( 'admin_enqueue_scripts', array( $this, 'admin_scripts' ) );
         }
+
+
+
         //run within html gen class
-        if( is_admin() && get_parent_class( $this ) && strstr( get_class( $this ), "wp_lms_html_gen" ) ) {
+        if( is_admin() && get_parent_class( $this ) &&  get_class( $this ) == "wp_lms_html_gen"  ) {
 
         }
+
+        //run within admin bar class
+        if( is_admin() && get_parent_class( $this ) && get_class( $this ) == "wp_lms_adminbar" ) {
+          add_action( 'wp_before_admin_bar_render', array($this, 'content_menu' ) );
+        }
+
+
+        //run within post meta class
+        if( is_admin() && get_parent_class( $this ) && get_class($this) == "wp_lms_post_meta" ) {
+          $this->noncename = array('coursemeta_noncename', 'instructormeta_noncename', 'coursebegin_noncename', 'sessionweeks_noncename', 'coursestatus_noncename');
+          $this->postdataname = array('_course', '_instructor', '_course_date_begin_month', '_course_date_begin_day', '_course_date_end_month', '_course_date_end_day','_course_day_sun', '_course_day_mon', '_course_day_tues', '_course_day_wedn', '_course_day_thurs', '_course_day_fri', '_course_day_sat', '_coures_begin_hr', '_coures_begin_min', '_coures_end_hr', '_coures_end_min', '_course_end_ofday', '_course_begin_ofday');
+          $this->post_metabox = array(
+            array('wp_lms_course_list_assign','Course List', 'assignment', 'side','high', array('name' => "Courses", 'type' => 'course', 'create' => 'select', 'noncename' => 'coursemeta_noncename') ), 
+            array('wp_lms_course_list_lecture', 'Course List', 'lecture', 'side', 'high', array( 'name' => "Courses", 'type' => 'course', 'create' => 'select', 'noncename' => 'coursemeta_noncename') ), 
+            array('wp_lms_instructor_list_assign', 'Instructor List', 'assignment', 'side', 'high', array( 'name' => "Instructors", 'type' => 'instructor', 'create' => 'select', 'noncename' => 'instructormeta_noncename') ),
+            array('wp_lms_instructor_list_lecture', 'Instructor List', 'lecture', 'side', 'high', array( 'name' => "Instructors", 'type' => 'instructor', 'create' => 'select', 'noncename' => 'instructormeta_noncename') ),
+            array('wp_lms_link_to_type_assign', 'Go back to Assignments', 'assignment', 'side', 'high', array( 'name' => "Go Back to Assignemnts", 'type' => 'assignment', 'create' => 'link', 'noncename' => '') ),
+            array('wp_lms_link_to_type_lecture', 'Go back to Lectures', 'lecture', 'side', 'high', array( 'name' => "Go Back to Lectures", 'type' => 'lecture', 'create' => 'link', 'noncename' => '') ),
+            array('wp_lms_course_time', 'Course Schedule', 'course', 'side', 'high', array( 'name' => "Course Schedule", 'type' => 'course', 'create' => 'date', 'noncename' => 'coursebegin_noncename') ),
+            array('wp_lms_session_weeks', 'Weeks Active', 'session', 'side', 'high', array( 'name' => "Weeks Active", 'type' => 'session', 'create' => 'weeks', 'noncename' => 'sessionweeks_noncename') ),
+            array('wp_lms_instructor_list_course', 'Instructor List', 'course', 'side', 'high', array( 'name' => "Instructors", 'type' => 'instructor', 'create' => 'select', 'noncename' => 'instructormeta_noncename') ),
+            array('wp_lms_course_status', 'Course Status', 'course', 'side', 'high', array( 'name' => "Status", 'type' => 'course', 'create' => 'status', 'noncename' => 'coursestatus_noncename') ) 
+          );
+          add_action( 'add_meta_boxes', array( $this, 'post_metaboxes' ) );
+          add_action('save_post', array( $this, 'save_post_meta') );
+
+          add_filter( 'manage_assignment_posts_columns', array( $this ,'add_assignment_columns' ) );
+          add_action( 'manage_assignment_posts_custom_column' , array($this,'custom_assignment_column'), 10, 2 );
+          //sorting not working yet
+          // add_filter('manage_edit-assignment_sortable_columns', array( $this, 'assignment_sortable_columns' ) );
+          // add_filter('requests', array( $this , 'handle_assignment_column_sorting' ) );
+        }
+
+
     }//end construct
 
     /**
@@ -226,9 +185,8 @@ class wp_lms {
      */
     public function post_types() {
 
-    }
-
-
+    }  
+ 
     public function filter_post_links($url, $post) {
       if ( 'assignment' == get_post_type( $post ) || 'lecture' == get_post_type( $post ) ) {
         $course = get_post_meta($post->ID, '_course', true);
@@ -248,9 +206,11 @@ class wp_lms {
           $instructor = strtolower($instructor);
         }
         if( 'assignment' == get_post_type( $post ) ) {
+          //flush_rewrite_rules();
           return str_replace('%assign%', "a-".$instructor."-".$course, $url);
         }
         if( 'lecture' == get_post_type( $post ) ) {
+          //flush_rewrite_rules();
           return str_replace('%lect%', "l-".$instructor."-".$course, $url);
         }
       }
@@ -258,457 +218,38 @@ class wp_lms {
     }
 
 
-    public function content_menu() {
-      global $wp_admin_bar;
-      $wp_admin_bar->add_menu( array(
-            'parent' => 'new-content',
-            'id' => 'new_assignment',
-            'title' => 'Assignment',
-            'href' => admin_url( 'post-new.php?post_type=assignment' ),
-            )
-      );
-      $wp_admin_bar->add_menu( array(
-            'parent' => 'new-content',
-            'id' => 'new_lecture',
-            'title' => 'Lecture',
-            'href' => admin_url( 'post-new.php?post_type=lecture' ),
-            )
-      );
-      $args = array(
-        'id'    => 'wp_lms',
-        'title' => 'WP LMS'
-      );
-      $wp_admin_bar->add_node( $args );
-
-      // add a child item to our parent item
-      $args = array(
-        'id'     => 'go_to_assignments',
-        'title'  => 'Assignments',
-        'parent' => 'wp_lms',
-        'href' => admin_url( 'edit.php?post_type=course&page=wp_lms_assignment' ),
-      );
-      $wp_admin_bar->add_node( $args );
-
-      $args = array(
-        'id'     => 'go_to_lectures',
-        'title'  => 'Lectures',
-        'parent' => 'wp_lms',
-        'href' => admin_url( 'edit.php?post_type=course&page=wp_lms_lecture' ),
-      );
-      $wp_admin_bar->add_node( $args );
-
-      $args = array(
-        'id'     => 'go_to_schedule',
-        'title'  => 'Schedule',
-        'parent' => 'wp_lms',
-        'href' => admin_url( 'edit.php?post_type=session&page=wp_lms_schedule' ),
-      );
-      $wp_admin_bar->add_node( $args );
-    }
-
-    public function post_metaboxes() {
-      foreach($this->post_metabox as $k => $v) {
-        add_meta_box($v[0], 
-                  $v[1], 
-                  array($this, 'create_metabox'), 
-                  $v[2], 
-                  $v[3], 
-                  $v[4], 
-                  $v[5]
-                  );
-      }
-      //add_meta_box( $id, $title, $callback, $page, $context, $priority, $callback_args );
-    }
-    public function create_metabox( $post, $metabox ) {
-      global $post;
-      $type = $metabox['args']['type'];
-      $name = $metabox['args']['name'];
-      $create = $metabox['args']['create'];
-      $page_query = new WP_Query();
-      $all_pages = $page_query->query( array( 'post_type' => $type, 'posts_per_page' => -1, 'orderby' => 'title',
-        'order' => 'ASC' ) );
-      $course = get_post_meta($post->ID, '_'.$type, true);
-      switch($create){
-
-        /**
-         *  Calls object install on plugin activation
-         *  @since 0.0.1
-        **/
-
-        case 'select':
-          //ob_start();
-          ?>
-          <label for="_<?= $type; ?>"> 
-              <?php //echo $course; ?>         
-              <?= $name; ?>
-          </label>
-          <p></p>
-          <input type="hidden" name="<?= $type; ?>meta_noncename" id="<?= $type; ?>meta_noncename" value="<?php echo wp_create_nonce( plugin_basename(__FILE__) ); ?>" />
-          <select name="_<?= $type; ?>" class="widefat">
-            <?php foreach( $all_pages as $k => $p ) { ?>
-              <? $current = "";
-                if( isset( $course ) && $course == $p->ID ) $current = " selected";
-                else if( isset( $_GET[$type] ) && $_GET[$type] == $p->ID ) $current = " selected";
-              ?>
-              <option value="<?php echo $p->ID; ?>"<?php echo $current; ?>><?php echo $p->post_title; ?></option>
-            <?php } ?>
-          </select>
-          <?
-          //ob_end_flush();
-          break;
-
-        /**
-         *  Calls object install on plugin activation
-         *  @since 0.0.1
-        **/
-
-        case 'link':
-        if($post->post_type == "assignment") {
-          $term_array = $this->tax_names['assignment'];
-          $prefix = "_a";
-        }
-        else if($post->post_type == "lecture") {
-          $term_array = $this->tax_names['lecture'];
-          $prefix = "_l";
-        }
-       // $this->terms = array('course_name','instructor_name');
-        for($i=0;$i<2;$i++){
-          $term =  $term_array[$i];
-          $terms = wp_get_post_terms($post->ID, $term);
-          $var[] = $term;
-          if( !empty($terms) ) {
-            foreach ($terms as $termid) { 
-              ${$term} = $termid->term_id;
-            }
-          }
-          if( $var[0] == "course_name".$prefix && empty( $$var[0] ) ) $course_label = " Not Set";
-          if( $var[1] == "instructor_name".$prefix  && empty( $$var[1] ) ) $instructor_label = " Not Set";
-        }
-        if( empty( $$var[1] ) && empty( $$var[0] ) ) {
-           $link = "#";
-           $link_name = "Post Not Published";
-        }
-        else {
-          $link = "edit.php?s&post_status=all&post_type=".$type."&action=-1&m=0&course_name$prefix=".$$var[0]."&instructor_name$prefix=".$$var[1]."&paged=1&action2=-1";
-          $link_name = $name;
-          if(!empty( $$var[1] ) ) $instructor_label = get_term($$var[1], 'instructor_name'.$prefix)->name;
-          if(!empty( $$var[0] ) ) $course_label = get_term($$var[0], 'course_name'.$prefix)->name;
-        }
-        ?>
-        <label class="screen-reader-text" for="_<?= $create; ?>">
-          <?= $name; ?>
-        </label>
-        <p>
-          <a href="<?= $link; ?>" title="<?= $name; ?>"><?= $link_name; ?></a>
-        </p>
-        <p>
-          <strong>Link above will use filters below:</strong>
-        </p>
-        <p>
-          Course Filter: <strong><?= $course_label; ?></strong><br>
-          Instructor Filter: <strong><?= $instructor_label; ?></strong>
-        </p>
-        <p><strong>OR</strong></p>
-        <p>
-          <a href="edit.php?post_type=course&amp;page=wp_lms_<?= $type; ?>" title="Go Back List of Courses">Go Back List of Courses</a>
-        </p>
-        <?
-          break;
-
-        /**
-         *  Calls object install on plugin activation
-         *  @since 0.0.1
-        **/
-        case 'date':
-        $d_values = array('01','02','03','04','05','06','07','08','09','10','11','12');
-        $c_values = array();
-        $c_lables = array();
-        ?>
-       <input type="hidden" name="<?= $type; ?>begin_noncename" id="<?= $type; ?>begin_noncename" value="<?php echo wp_create_nonce( plugin_basename(__FILE__) ); ?>" />
-        <div id="" class="hide-if-js" style="display: block;">
-          <div class="timestamp-wrap">
-            <p>
-              <label for="_<?= $type; ?>_date_begin_month">
-                Begin Date <?= date('M',mktime(0, 0, 0, 03, 0, 0) ); ?>
-              </label>
-            </p>
-          <select id="" name="_<?= $type; ?>_date_begin_month">
-            <option value="01">01-Jan</option>
-            <option value="02">02-Feb</option>
-            <option value="03" selected="selected">03-Mar</option>
-            <option value="04">04-Apr</option>
-            <option value="05">05-May</option>
-            <option value="06">06-Jun</option>
-            <option value="07">07-Jul</option>
-            <option value="08">08-Aug</option>
-            <option value="09">09-Sep</option>
-            <option value="10">10-Oct</option>
-            <option value="11">11-Nov</option>
-            <option value="12">12-Dec</option>
-          </select> 
-          <input type="text" name="_<?= $type; ?>_date_begin_day" value="15" size="2" maxlength="2" autocomplete="off">, <input type="text" id="" name="_date_begin_year" value="2014" size="4" maxlength="4" autocomplete="off">
-         </div>
-         <div class="timestamp-wrap">
-            <p>
-              <label for="_<?= $type; ?>_date_end_month">
-                End Date
-              </label>
-            </p>
-          <select id="" name="_<?= $type; ?>_date_end_month">
-            <option value="01">01-Jan</option>
-            <option value="02">02-Feb</option>
-            <option value="03" selected="selected">03-Mar</option>
-            <option value="04">04-Apr</option>
-            <option value="05">05-May</option>
-            <option value="06">06-Jun</option>
-            <option value="07">07-Jul</option>
-            <option value="08">08-Aug</option>
-            <option value="09">09-Sep</option>
-            <option value="10">10-Oct</option>
-            <option value="11">11-Nov</option>
-            <option value="12">12-Dec</option>
-          </select> 
-          <input type="text" name="_<?= $type; ?>_date_end_day" value="15" size="2" maxlength="2" autocomplete="off">, <input type="text" id="" name="_date_end_year" value="2014" size="4" maxlength="4" autocomplete="off">
-         </div>
-         <p>
-        <strong>Days</strong>
-      </p>
-      <label class="screen-reader-text">Days</label>
-      <div class="timestamp-wrap">
-        <label for="sun">S
-          <input type="checkbox" name="sun" value="0">
-        </label>
-        <label for="mon">M
-          <input type="checkbox" name="mon" value="1">
-        </label>
-        <label for="tues">T
-          <input type="checkbox" name="tues" value="2">
-        </label>
-        <label for="wedn">W
-          <input type="checkbox" name="wedn" value="3">
-        </label>
-        <label for="thurs">R
-          <input type="checkbox" name="thurs" value="4">
-        </label>
-        <label for="fri">F
-          <input type="checkbox" name="fri" value="5">
-        </label>
-        <label for="sat">S
-          <input type="checkbox" name="sat" value="6">
-        </label>
-      </div>
-      <p>
-        <strong>Begin Time</strong>
-      </p>
-      <label class="screen-reader-text">Begin Time</label>
-      <div class="timestamp-wrap">
-        <input type="text" name="wp_lms_hr" value="10" size="2" maxlength="2" autocomplete="off"> : 
-        <input type="text" name="wp_lms_min" value="42" size="2" maxlength="2" autocomplete="off">
-        <select name="wp_lms_ofday">
-          <option value="am">AM</option>
-          <option value="pm">PM</option>
-        </select>
-      </div>
-      <div class="timestamp-wrap">
-        <p>
-          <strong>End Time</strong>
-        </p>
-        <label class="screen-reader-text">End Time</label>
-        <input type="text" name="hh" value="10" size="2" maxlength="2" autocomplete="off"> : 
-        <input type="text" name="mn" value="42" size="2" maxlength="2" autocomplete="off">
-        <select name="mm">
-          <option value="am">AM</option>
-          <option value="pm">PM</option>
-        </select>
-      </div>
-        </div>
-        <?
-          break;
-        case 'weeks':
-        ?>
-        <input type="hidden" name="<?= $type; ?>length_noncename" id="<?= $type; ?>length_noncename" value="<?php echo wp_create_nonce( plugin_basename(__FILE__) ); ?>" />
-        <p>
-        <label class="screen-reader-text">
-            <?= $name; ?>
-        </label>
-        </p>
-        <input type="text" name="_session_length" value="" size="2" maxlength="2" autocomplete="off">
-        <select name="_period_measurement">
-          <option name="weeks">Weeks</option>
-          <option name="months">Months</option>
-        </select>
-        <?
-          break;
-
-        case "status":
-          ?>
-          <input type="hidden" name="<?= $type; ?>status_noncename" id="<?= $type; ?>status_noncename" value="<?php echo wp_create_nonce( plugin_basename(__FILE__) ); ?>" />
-          <p>
-            <label for="_status">
-              <?= $name; ?>
-            </label>
-          </p>
-          <select name="_status">
-            <option value="inactive">Inactive</option>
-            <option value="active">Active</option>
-          </select>
-          <?
-          break;
-        default:
-          //nothing to do here yet
-          break;
-        }
-
-    }
-
-    public function save_post_meta( $post_id ) {
-      global $post;
-      // verify this came from the our screen and with proper authorization,
-      // because save_post can be triggered at other times
-      if ( !wp_verify_nonce( $_POST['coursemeta_noncename'], plugin_basename(__FILE__) ) || !wp_verify_nonce( $_POST['instructormeta_noncename'], plugin_basename(__FILE__) ) ) {
-        return $post->ID;
-      }
-      // Is the user allowed to edit the post or page?
-      if ( !current_user_can( 'edit_post', $post->ID ))
-        return $post->ID;
-
-      // OK, we're authenticated: we need to find and save the data
-      // We'll put it into an array to make it easier to loop though.
-      $events_meta['_course'] = $_POST['_course'];
-      $events_meta['_instructor'] = $_POST['_instructor'];
-
-      // Add values of $events_meta as custom fields
-      foreach ($events_meta as $key => $value) { 
-      // Cycle through the $events_meta array!
-
-        if( $post->post_type == 'revision' ) return; 
-        // Don't store custom data twice
-
-        $value = implode(',', (array)$value); 
-        // If $value is an array, make it a CSV (unlikely)
-
-        if(get_post_meta($post->ID, $key, FALSE)) { 
-        // If the custom field already has a value
-          update_post_meta($post->ID, $key, $value);
-          if( $key == "_course"  && $post->post_type == "lecture" ) {
-            wp_set_object_terms( $post->ID, $value, 'course_num' );
-            wp_set_object_terms( $post->ID, get_the_title($value), 'course_name_l' );
-          }
-          if( $key == "_instructor" && $post->post_type == "lecture"  ) {
-            wp_set_object_terms( $post->ID, $value, 'instructor_num' );
-            wp_set_object_terms( $post->ID, get_the_title($value), 'instructor_name_l' ); 
-          }
-          if( $key == "_course"  && $post->post_type == "assignment" ) {
-            wp_set_object_terms( $post->ID, $value, 'course_num' );
-            wp_set_object_terms( $post->ID, get_the_title($value), 'course_name_a' );
-          }
-          if( $key == "_instructor" && $post->post_type == "assignment"  ) {
-            wp_set_object_terms( $post->ID, $value, 'instructor_num' );
-            wp_set_object_terms( $post->ID, get_the_title($value), 'instructor_name_a' ); 
-          }
-        } 
-        else { 
-        // If the custom field doesn't have a value
-          add_post_meta($post->ID, $key, $value);
-          if( $key == "_course"  && $post->post_type == "lecture" ) {
-            wp_set_object_terms( $post->ID, $value, 'course_num' );
-            wp_set_object_terms( $post->ID, get_the_title($value), 'course_name_l' );
-          }
-          if( $key == "_instructor" && $post->post_type == "lecture"  ) {
-            wp_set_object_terms( $post->ID, $value, 'instructor_num' );
-            wp_set_object_terms( $post->ID, get_the_title($value), 'instructor_name_l' ); 
-          }
-          if( $key == "_course"  && $post->post_type == "assignment" ) {
-            wp_set_object_terms( $post->ID, $value, 'course_num' );
-            wp_set_object_terms( $post->ID, get_the_title($value), 'course_name_a' );
-          }
-          if( $key == "_instructor" && $post->post_type == "assignment"  ) {
-            wp_set_object_terms( $post->ID, $value, 'instructor_num' );
-            wp_set_object_terms( $post->ID, get_the_title($value), 'instructor_name_a' ); 
-          }
-        }
-        if(!$value) delete_post_meta($post->ID, $key); 
-        // Delete if blank
-      }
-    }
-
-    public function add_assignment_columns( $columns ) {
-      return array_merge($columns, 
-                array('course_assigned' => __('Course'),
-                    'instructor' => __('Instructor'),
-                    'session' =>__( 'Session')
-                )
-            );
-    }
-    function custom_assignment_column( $column, $id ) {
-        global $post;
-        switch ( $column ) {
-          case 'course_assigned':
-            echo get_the_title( get_post_meta( $post->ID , '_course' , true ) );
-            break;
-          case 'instructor':
-            echo get_the_title( get_post_meta( $post->ID , '_instructor' , true ) );
-            break;
-          case 'session':
-            echo "-"; //get_post_meta( $post_id , 'client' , true ); 
-            break;
-        }
-    }
-
-    // public function assignment_sortable_columns( $columns ){
-    //     $columns['course_assigned'] = 'course_assigned';
-    //     $columns['session'] = 'session';
-    //     return $columns;
-    // }
-
-    // public function handle_assignment_column_sorting( $vars ){
-    //     $orderby = $query->get( 'orderby');
-    //     if( !isset( $vars['orderby'] ) || isset( $vars['orderby'] ) && 'course_assigned' == $vars['orderby'] ){
-    //       $vars = array_merge( $vars, array(
-    //         'meta_key' => 'course_assigned',
-    //         'orderby'  => 'meta_value'
-    //       ));
-    //     }
-    //     if( isset($vars['orderby']) && 'session' == $vars['orderby'] ){
-    //       $vars = array_merge( $vars, array(
-    //         'meta_key' => 'session',
-    //         'orderby'  => 'meta_value'
-    //       ));
-    //     }
-    //     return $vars;
-    // }
-
     public function restrict_assign_by_course() {
-    global $typenow;
-    if(isset($_GET['post_type'])){
-      $type = $_GET['post_type'];
-    }
-    if($type == "assignment" ) {
-      $post_type = 'assignment';
-      $taxonomy = $this->tax_names['assignment'];
-    }
-    if($type == "lecture" ) {
-      $post_type = 'lecture';
-      $taxonomy = $this->tax_names['lecture'];
-    }
-    if( empty($taxonomy) ) {
-      return;
-    }
-    foreach($taxonomy as $k => $tax){
-      if ($typenow == $post_type ) {
-        $selected = isset($_GET[$tax]) ? $_GET[$tax] : '';
-        $info_taxonomy = get_taxonomy($tax);
-        wp_dropdown_categories(array(
-          'show_option_all' => __("Show All {$info_taxonomy->label}"),
-          'taxonomy' => $tax,
-          'name' => $tax,
-          'orderby' => 'name',
-          'selected' => $selected,
-          'show_count' => true,
-          'hide_empty' => true,
-        ));
+      global $typenow;
+      if(isset($_GET['post_type'])){
+        $type = $_GET['post_type'];
       }
-    }
+      if($type == "assignment" ) {
+        $post_type = 'assignment';
+        $taxonomy = $this->tax_names['assignment'];
+      }
+      if($type == "lecture" ) {
+        $post_type = 'lecture';
+        $taxonomy = $this->tax_names['lecture'];
+      }
+      if( empty($taxonomy) ) {
+        return;
+      }
+      foreach($taxonomy as $k => $tax){
+        if ($typenow == $post_type ) {
+          $selected = isset($_GET[$tax]) ? $_GET[$tax] : '';
+          $info_taxonomy = get_taxonomy($tax);
+          wp_dropdown_categories(array(
+            'show_option_all' => __("Show All {$info_taxonomy->label}"),
+            'show_option_none' => __("No {$info_taxonomy->label}"),
+            'taxonomy' => $tax,
+            'name' => $tax,
+            'orderby' => 'name',
+            'selected' => $selected,
+            'show_count' => true,
+            'hide_empty' => true,
+          ));
+        }
+      }
   }
 
 
