@@ -15,14 +15,16 @@ class wp_lms_admin extends wp_lms {
      *  @updated 1.0.0
      **/
 	public function admin_settings(){
-		$this->menu_pages['main'] = add_menu_page( $this::$plugin_name, 'GrandPubbah', 'manage_options', $this::$plugin_name, array( $this, 'main_options_page' ) );
+		$this->menu_pages['main'] = add_menu_page( $this::$plugin_name, 'WP LMS Settings', 'manage_options', $this::$plugin_name, array( $this, 'main_options_page' ) );
 		//add_menu_page( $page_title, $menu_title, $capability, $menu_slug, $function, $icon_url, $position );
+		
 		//$this->menu_pages['schedule'] = add_submenu_page( "edit.php?post_type=session", 'WP LMS Schedule', 'Schedule Courses', 'manage_options', $this::$plugin_name.'_schedule', array( $this,"schedule_page" ), $this->plugin_img_url.'png/24/schedule.png' );
 		//$this->menu_pages['assignments'] = add_submenu_page( "edit.php?post_type=course", 'WP LMS Assignments', 'Assignments', 'manage_options', $this::$plugin_name.'_assignment', array( $this,"assignment_page" ) );
 		//$this->menu_pages['lectures'] = add_submenu_page( "edit.php?post_type=course", 'WP LMS Lectures', 'Lectures', 'manage_options', $this::$plugin_name.'_lecture', array( $this,"lecture_page" ) );
-		$this->menu_pages['settings'] = add_submenu_page( "edit.php?post_type=course", 'WP LMS Settings', 'Settings', 'manage_options', $this::$plugin_name.'_settings', array( $this,"settings_page" ) );
+		//$this->menu_pages['settings'] = add_submenu_page( "edit.php?post_type=course", 'WP LMS Settings', 'Settings', 'manage_options', $this::$plugin_name.'_settings', array( $this,"settings_page" ) );
 		//edit.php?post_type=student_directory
 		$this->menu_pages['view-student'] = add_submenu_page( "edit.php?post_type=student_directory", 'WP LMS View Students', 'View Students', 'manage_options', $this::$plugin_name.'_view_student', array( $this,"view_student" ) );
+		//$this->menu_pages['settings-student'] = add_submenu_page( "edit.php?post_type=student_directory", 'WP LMS Student Settings', 'Settings', 'manage_options', $this::$plugin_name.'_student_settings', array( $this,"student_settings" ) );
 		$this->menu_pages['view-instructors'] = add_submenu_page( "edit.php?post_type=instructor", 'WP LMS View Instrustors', 'View Instrustors', 'manage_options', $this::$plugin_name.'_view_instructor', array( $this,"view_instructor" ) );
 		//$this->menu_pages['view-course-students'] = add_submenu_page( "edit.php?post_type=course", 'WP LMS View Course Students', 'View Enrollment', 'manage_options', $this::$plugin_name.'_view_enrollment', array( $this,"view_enrollment" ) );
 		//add_submenu_page( $parent_slug, $page_title, $menu_title, $capability, $menu_slug, $function );
@@ -383,7 +385,17 @@ class wp_lms_admin extends wp_lms {
      *  @updated 1.0.0
      *  @param $hook  
      **/
-	
+	public function student_settings() {
+		$page_base = $this->page_url();
+		ob_start();
+		?>
+		<div class="wp_lms settings">
+			<h1>Student Settings</h1>
+
+		</div>
+		<?php
+		ob_end_flush();
+	}
 
     /**
      *  Load scripts and styles only on Plugin pages

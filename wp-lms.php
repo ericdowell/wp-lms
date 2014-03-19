@@ -45,7 +45,10 @@ class wp_lms {
             //filters work though!
             add_action('restrict_manage_posts', array($this,'restrict_assign_by_course') );
             add_filter('parse_query', array($this,'convert_id_to_term_in_query') );
-
+            //widget class
+            include('wp-lms-widgets.php');
+            add_action( 'widgets_init', array($this, 'create_widgets') );
+            //heler functions will go here
             include('wp-lms-helpers.php');
             //includes all admin options
             if( is_admin() ) include('admin/wp-lms-admin.php'); // Global name $wp_lms_admin
@@ -82,6 +85,7 @@ class wp_lms {
         if( is_admin() && get_parent_class( $this ) && get_class($this) == "wp_lms_post_meta" ) {
           $this->noncename = array('coursemeta_noncename', 'instructormeta_noncename', 'course_enrollment_noncename', 'coursebegin_noncename', 'sessionweeks_noncename', 'coursestatus_noncename');
           $this->postdataname = array('_course', '_instructor', '_status', '_enroll_count', '_course_date_begin_month', '_course_date_begin_day', '_course_date_end_month', '_course_date_end_day','_course_day_sun', '_course_day_mon', '_course_day_tues', '_course_day_wedn', '_course_day_thurs', '_course_day_fri', '_course_day_sat', '_course_begin_hour', '_course_begin_min', '_course_end_hour', '_course_end_min', '_course_end_ofday', '_course_begin_ofday');
+          //for enrollment use in student directory custom post type
           for($i=0;$i<10;$i++){
             $this->postdataname[] = "_course".$i;
           }
@@ -189,6 +193,10 @@ class wp_lms {
         return $links;
     }//end action_links
  
+
+    public function create_widgets() {
+       register_widget( 'wp_lms_widgets' );
+    }
 
     public function filter_post_links($url, $post) {
       if ( 'assignment' == get_post_type( $post ) || 'lecture' == get_post_type( $post ) ) {
