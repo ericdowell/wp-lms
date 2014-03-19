@@ -13,7 +13,7 @@ class wp_lms_post_types extends wp_lms {
 				'label' => 'Sessions',
 				'description' => 'This is used to created session to be used with scheduling active classes.',
 				'public' => true,
-				'show_ui' => true,
+				'show_ui' => false,
 				'show_in_menu' => true,
 				'capability_type' => 'post',
 				'map_meta_cap' => true,
@@ -275,7 +275,9 @@ class wp_lms_post_types extends wp_lms {
 					)
 				) 
 			);
-
+			/**
+			 *	 Taxonomy
+			*/
 			register_taxonomy( 'course_start_date',
 				array(
 			  	0 => 'course',

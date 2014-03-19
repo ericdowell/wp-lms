@@ -80,10 +80,15 @@ class wp_lms {
 
         //run within post meta class
         if( is_admin() && get_parent_class( $this ) && get_class($this) == "wp_lms_post_meta" ) {
-          $this->noncename = array('coursemeta_noncename', 'instructormeta_noncename', 'coursebegin_noncename', 'sessionweeks_noncename', 'coursestatus_noncename');
-          $this->postdataname = array('_course', '_instructor', '_status', '_course_date_begin_month', '_course_date_begin_day', '_course_date_end_month', '_course_date_end_day','_course_day_sun', '_course_day_mon', '_course_day_tues', '_course_day_wedn', '_course_day_thurs', '_course_day_fri', '_course_day_sat', '_coure_begin_hr', '_coure_begin_min', '_coure_end_hour', '_coure_end_min', '_course_end_ofday', '_course_begin_ofday');
+          $this->noncename = array('coursemeta_noncename', 'instructormeta_noncename', 'course_enrollment_noncename', 'coursebegin_noncename', 'sessionweeks_noncename', 'coursestatus_noncename');
+          $this->postdataname = array('_course', '_instructor', '_status', '_enroll_count', '_course_date_begin_month', '_course_date_begin_day', '_course_date_end_month', '_course_date_end_day','_course_day_sun', '_course_day_mon', '_course_day_tues', '_course_day_wedn', '_course_day_thurs', '_course_day_fri', '_course_day_sat', '_course_begin_hour', '_course_begin_min', '_course_end_hour', '_course_end_min', '_course_end_ofday', '_course_begin_ofday');
+          for($i=0;$i<10;$i++){
+            $this->postdataname[] = "_course".$i;
+          }
           $this->post_metabox = array(
-            array('wp_lms_course_list_assign','Course List', 'assignment', 'side','high', array('name' => "Courses", 'type' => 'course', 'create' => 'select', 'noncename' => 'coursemeta_noncename') ), 
+            array('wp_lms_course_list_assign','Course List', 'assignment', 'side','high', array('name' => "Courses", 'type' => 'course', 'create' => 'select', 'noncename' => 'coursemeta_noncename') ),
+            array('wp_lms_enrollment_count_student','# of Course(s) Enrolled', 'student_directory', 'side','high', array('name' => "# of Course(s) Enrolled", 'type' => 'course', 'create' => 'number', 'noncename' => 'course_enrollment_noncename') ),
+            array('wp_lms_course_list_student','Course Enrollment', 'student_directory', 'side','high', array('name' => "Courses", 'type' => 'course', 'create' => 'select', 'noncename' => 'coursemeta_noncename') ), 
             array('wp_lms_course_list_lecture', 'Course List', 'lecture', 'side', 'high', array( 'name' => "Courses", 'type' => 'course', 'create' => 'select', 'noncename' => 'coursemeta_noncename') ), 
             array('wp_lms_instructor_list_assign', 'Instructor List', 'assignment', 'side', 'high', array( 'name' => "Instructors", 'type' => 'instructor', 'create' => 'select', 'noncename' => 'instructormeta_noncename') ),
             array('wp_lms_instructor_list_lecture', 'Instructor List', 'lecture', 'side', 'high', array( 'name' => "Instructors", 'type' => 'instructor', 'create' => 'select', 'noncename' => 'instructormeta_noncename') ),

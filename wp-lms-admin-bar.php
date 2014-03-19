@@ -31,7 +31,7 @@ class wp_lms_adminbar extends wp_lms {
         'id'     => 'go_to_assignments',
         'title'  => 'Assignments',
         'parent' => 'wp_lms',
-        'href' => admin_url( 'edit.php?post_type=course&page=wp_lms_assignment' ),
+        'href' => admin_url( 'edit.php?post_type=assignment' ),
       );
       $wp_admin_bar->add_node( $args );
 
@@ -39,15 +39,15 @@ class wp_lms_adminbar extends wp_lms {
         'id'     => 'go_to_lectures',
         'title'  => 'Lectures',
         'parent' => 'wp_lms',
-        'href' => admin_url( 'edit.php?post_type=course&page=wp_lms_lecture' ),
+        'href' => admin_url( 'edit.php?post_type=lecture' ),
       );
       $wp_admin_bar->add_node( $args );
 
       $args = array(
-        'id'     => 'go_to_schedule',
-        'title'  => 'Schedule',
+        'id'     => 'go_to_students',
+        'title'  => 'Students',
         'parent' => 'wp_lms',
-        'href' => admin_url( 'edit.php?post_type=session&page=wp_lms_schedule' ),
+        'href' => admin_url( 'edit.php?post_type=student_directory' ),
       );
       $wp_admin_bar->add_node( $args );
     }
