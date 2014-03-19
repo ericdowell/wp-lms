@@ -48,6 +48,7 @@ class wp_lms {
             //widget class
             include('wp-lms-widgets.php');
             add_action( 'widgets_init', array($this, 'create_widgets') );
+            
             //heler functions will go here
             include('wp-lms-helpers.php');
             //includes all admin options
@@ -68,6 +69,10 @@ class wp_lms {
             add_action( 'admin_enqueue_scripts', array( $this, 'admin_scripts' ) );
         }
 
+
+        if( is_admin() && get_parent_class( $this ) &&  get_class( $this ) == "wp_lms_widgets"  ) {
+
+        }
 
 
         //run within html gen class

@@ -293,6 +293,7 @@ class wp_lms_admin extends wp_lms {
      *  @return HTML settings page
      **/
 	public function view_instructor(){
+		global $wpdb;
 		$page_base = $this->page_url();
 		ob_start();
 		?>
@@ -306,8 +307,9 @@ class wp_lms_admin extends wp_lms {
 				'orderby' => 'title',
 				'order' => 'ASC'
 			);
-			$pages = get_pages( $args );
-			foreach( $pages as $k => $s ){ 
+			$page_query = new WP_Query();
+			$all_pages = $page_query->query( $args );
+			foreach( $all_pages as $k => $s ){ 
 				?>
 				<h2><?= $s->post_title; ?></h2>
 				<p>Currently Teaching: </p>
