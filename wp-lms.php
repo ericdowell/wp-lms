@@ -41,14 +41,25 @@ class wp_lms {
             include('wp-lms-post-types.php');
             // add_filter('post_type_link', array( $this, 'filter_post_links'), 1, 2);
             add_filter( 'plugin_action_links', array( $this, 'action_links' ), 10, 2 );
+<<<<<<< HEAD
+             
+=======
+            //scripts and styles
+            add_action('wp_enqueue_scripts',array($this, 'styles_scripts') );
+            add_action( 'wp_header', array($this, 'add_to_header' ) );
+            add_action( 'wp_footer', array($this, 'footer_scripts' ) );
             
+>>>>>>> FETCH_HEAD
             //filters work though!
             add_action('restrict_manage_posts', array($this,'restrict_assign_by_course') );
             add_filter('parse_query', array($this,'convert_id_to_term_in_query') );
             //widget class
-            include('wp-lms-widgets.php');
-            add_action( 'widgets_init', array($this, 'create_widgets') );
+            //include('wp-lms-widgets.php');
+            //add_action( 'widgets_init', array($this, 'create_widgets') );
             
+            //shortcode class
+            include('wp-lms-shortcodes.php');
+
             //heler functions will go here
             include('wp-lms-helpers.php');
             //includes all admin options
@@ -73,6 +84,13 @@ class wp_lms {
         if( is_admin() && get_parent_class( $this ) &&  get_class( $this ) == "wp_lms_widgets"  ) {
 
         }
+
+        if( get_parent_class( $this ) &&  get_class( $this ) == "wp_lms_shortcodes"  ) {
+          add_action( 'wp_enqueue_scripts', array($this, 'styles_scripts') );
+          add_shortcode('wp_lms_active_menu', array($this, 'active_courses_menu') );
+          add_shortcode('wp_lms_active_menu_button', array($this, 'active_courses_menu_button') );
+        }
+
 
 
         //run within html gen class
@@ -134,6 +152,41 @@ class wp_lms {
       if( empty( $option ) ) return true;
       else return false; 
     }
+
+    public function styles_scripts() {
+<<<<<<< HEAD
+    wp_enqueue_style( 'wp-lms-menu-icon', plugins_url('inc/ml-push-menu/css/icons.css', dirname(__FILE__).'/'.$this->plugin_folder) );
+    wp_enqueue_style( 'wp-lms-menu-styles', plugins_url('inc/ml-push-menu/css/component.css', dirname(__FILE__).'/'.$this->plugin_folder) );
+    wp_enqueue_script( 'wp-lms-menu-js', plugins_url('inc/ml-push-menu/js/modernizr.custom.js', dirname(__FILE__).'/'.$this->plugin_folder ), '2603104', true  );
+=======
+      wp_enqueue_style( 'wp-lms-menu-styles', plugins_url('inc/ml-push-menu/component.css', dirname(__FILE__).'/'.$this->plugin_folder) );
+      wp_enqueue_script( 'wp-lms-menu-js', plugins_url('inc/ml-push-menu/modernizr.custom.js', dirname(__FILE__).'/'.$this->plugin_folder ), '2603104', true  );
+     // wp_enqueue_script( 'wp-lms-menu-js', plugins_url('inc/ml-push-menu/mlpushmenu.js', dirname(__FILE__).'/'.$this->plugin_folder ), '2603104', true  );
+     // wp_enqueue_script( 'wp-lms-menu-js', plugins_url('inc/ml-push-menu/classie.js', dirname(__FILE__).'/'.$this->plugin_folder ), '2603104', true  );
+>>>>>>> FETCH_HEAD
+    }
+
+    public function add_to_header() {
+      ?>
+      <script src="<?= $this->plugin_base_url.'inc/ml-push-menu/modernizr.custom.js'; ?>"></script>
+      <?php
+    }
+
+<<<<<<< HEAD
+
+=======
+    public function footer_scripts() {
+      ?>
+      <script src="<?= $this->plugin_base_url.'inc/ml-push-menu/classie.js'; ?>"></script>
+      <script src="<?= $this->plugin_base_url.'inc/ml-push-menu/mlpushmenu.js'; ?>"></script>
+      <script>
+        new mlPushMenu( document.getElementById( 'mp-menu' ), document.getElementById( 'trigger' ), {
+            type : 'cover'
+        } );
+      </script>
+      <?
+    }
+>>>>>>> FETCH_HEAD
 
     /**
      *  Sets Defaults in option table
