@@ -7,7 +7,7 @@ class wp_lms_post_types extends wp_lms {
      *  @since 1.0.0
      */
     public function post_types() {
-
+    	//'show_in_nav_menus' => true,
 			register_post_type('session', 
 				array(
 				'label' => 'Sessions',
@@ -48,6 +48,7 @@ class wp_lms_post_types extends wp_lms {
 				'public' => true,
 				'show_ui' => true,
 				'show_in_menu' => true,
+				'show_in_nav_menus' => true,
 				'capability_type' => 'page',
 				'map_meta_cap' => true,
 				'hierarchical' => false,
@@ -82,6 +83,7 @@ class wp_lms_post_types extends wp_lms {
 				'public' => true,
 				'show_ui' => true,
 				'show_in_menu' => true,
+				'show_in_nav_menus' => true,
 				'capability_type' => 'page',
 				'map_meta_cap' => true,
 				'hierarchical' => false,
@@ -150,6 +152,7 @@ class wp_lms_post_types extends wp_lms {
 				'public' => true,
 				'show_ui' => true,
 				'show_in_menu' => true,
+				'show_in_nav_menus' => true,
 				'capability_type' => 'page',
 				'map_meta_cap' => true,
 				'hierarchical' => true,
@@ -184,6 +187,7 @@ class wp_lms_post_types extends wp_lms {
 				'public' => true,
 				'show_ui' => true,
 				'show_in_menu' => true,
+				'show_in_nav_menus' => true,
 				'capability_type' => 'page',
 				'map_meta_cap' => true,
 				'hierarchical' => true,

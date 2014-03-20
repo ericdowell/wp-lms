@@ -12,16 +12,20 @@ class wp_lms_shortcodes extends wp_lms {
 			array( 
 			'post_type' => 'course',
 			'post_status' => 'publish', 
-			'posts_per_page' => -1 
+			'posts_per_page' => -1, 
+			'orderby' => 'title',
+			'order' => 'ASC'
 			) 
 		);
-		usort( $all_pages, array($this, 'sort_menu_order') );
+		//usort( $all_pages, array($this, 'sort_menu_order') );
 		//echo "<pre>";print_r($all_pages);echo "</pre>";
 		?>
 <div class="container">
+	<!-- push-wrapper -->
 	<div class="mp-pusher" id="mp-pusher">		
-		<nav id="mp-menu" class="mp-menu">
-			<div class="mp-level">
+		<!-- menu -->
+		<nav id="mp-menu" class="mp-menu mp-overlap">
+			<div class="mp-level" data-level="1">
 				<h2 class="icon icon-world">Active Classes</h2>
 				<ul>
 				<?
@@ -42,7 +46,7 @@ class wp_lms_shortcodes extends wp_lms {
 					?>
 					<li class="icon icon-arrow-left">
 						<a class="icon icon-display" href="#"><?= $course_title; ?></a>
-						<div class="mp-level">
+						<div class="mp-level" data-level="2">
 							<h2 class="icon icon-display"><?= $course_title; ?></h2>
 							<a class="mp-back" href="#">back</a>
 							
@@ -76,9 +80,10 @@ class wp_lms_shortcodes extends wp_lms {
 									<ul>
 										<?php
 										foreach( $page_children as $w => $child ) {
+											$cid = $child->ID;
 											$c_title = $child->post_title;
 											?>
-										<li><a href="#"><?= $c_title; ?></a></li>
+										<li><a href="<?php echo get_permalink($cid) ;?>"><?= $c_title; ?></a></li>
 											<?php
 										}
 										?>
@@ -114,8 +119,13 @@ class wp_lms_shortcodes extends wp_lms {
 	}
 
 	public function active_courses_menu_button($atts){
+		extract( shortcode_atts( array(
+      'text' => '',
+      'icon' => 'svg'
+		), $atts ) );
+		//Open/Close Menu
 		?>
-		<p><a href="#" id="trigger" class="menu-trigger">Open/Close Menu</a></p>
+		<nav class="menu-button"><a href="#" id="trigger" class="menu-trigger"><?= $atts['text']; ?></a></nav>
 		<?php
 	}
 
@@ -125,16 +135,35 @@ class wp_lms_shortcodes extends wp_lms {
 		<?php
 	}
 
+	public function inactive_courses_list($atts) {
+		?>
+
+		<?php
+	}
+
+	public function portfolio_countdown($atts) {
+		?>
+
+		<?php
+	}
+
+	public function example_url($atts) {
+		extract( shortcode_atts( array(
+	      'sub' => 'wi14wdim',
+	      'domain' => 'example.com'
+     ), $atts ) );
+			$url = $atts['sub'].".".$atts['domain'];
+		return $url;
+	}
+
 	public function footer_scripts() {
       ?>
       <script src="<?= $this->plugin_base_url.'inc/ml-push-menu/js/classie.js'; ?>"></script>
       <script src="<?= $this->plugin_base_url.'inc/ml-push-menu/js/mlpushmenu.js'; ?>"></script>
       <script>
-        new mlPushMenu( document.getElementById( 'mp-menu' ), document.getElementById( 'trigger' ), {
-            type : 'cover'
-        } );
+ 				new mlPushMenu( document.getElementById( 'mp-menu' ), document.getElementById( 'trigger' ) );
       </script>
-		</div><!-- .scroller-inner -->
+			</div><!-- .scroller-inner -->
 		</div><!-- .scroller -->
 	</div><!-- .pusher -->
 </div><!-- .container -->

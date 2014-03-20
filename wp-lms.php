@@ -2,7 +2,7 @@
 /*
 Plugin Name: WP LMS
 Plugin URI: http://ericdowell.com/wp/plugins/
-Description: Learning management system for wordpress.
+Description: Learning management system for WordPress.
 Author: Eric Dowell
 Version: 1.0.0
 Author URI: http://ericdowell.com
@@ -46,8 +46,8 @@ class wp_lms {
             add_action('restrict_manage_posts', array($this,'restrict_assign_by_course') );
             add_filter('parse_query', array($this,'convert_id_to_term_in_query') );
             //widget class
-            //include('wp-lms-widgets.php');
-            //add_action( 'widgets_init', array($this, 'create_widgets') );
+            include('wp-lms-widgets.php');
+            add_action( 'widgets_init', array($this, 'create_widgets') );
             
             //shortcode class
             include('wp-lms-shortcodes.php');
@@ -59,7 +59,7 @@ class wp_lms {
         }
 
         //run within admin class
-        if( is_admin() && get_parent_class( $this ) &&  get_class( $this ) == "wp_lms_post_types"  ) {
+        if( get_parent_class( $this ) &&  get_class( $this ) == "wp_lms_post_types"  ) {
             add_action( 'init', array($this, 'post_types' ) );
         }
 
@@ -81,6 +81,8 @@ class wp_lms {
           add_action( 'wp_enqueue_scripts', array($this, 'styles_scripts') );
           add_shortcode('wp_lms_active_menu', array($this, 'active_courses_menu') );
           add_shortcode('wp_lms_active_menu_button', array($this, 'active_courses_menu_button') );
+          add_shortcode('wp_lms_active_list', array($this, 'active_courses_list') );
+          add_shortcode('wp_lms_subdomain', array($this, 'example_url') );
         }
 
 
@@ -98,14 +100,15 @@ class wp_lms {
 
         //run within post meta class
         if( is_admin() && get_parent_class( $this ) && get_class($this) == "wp_lms_post_meta" ) {
-          $this->noncename = array('coursemeta_noncename', 'instructormeta_noncename', 'course_enrollment_noncename', 'coursebegin_noncename', 'sessionweeks_noncename', 'coursestatus_noncename');
-          $this->postdataname = array('_course', '_instructor', '_status', '_enroll_count', '_course_date_begin_month', '_course_date_begin_day', '_course_date_end_month', '_course_date_end_day','_course_day_sun', '_course_day_mon', '_course_day_tues', '_course_day_wedn', '_course_day_thurs', '_course_day_fri', '_course_day_sat', '_course_begin_hour', '_course_begin_min', '_course_end_hour', '_course_end_min', '_course_end_ofday', '_course_begin_ofday');
+          $this->noncename = array('coursemeta_noncename', 'instructormeta_noncename', 'course_enrollment_noncename', 'coursebegin_noncename', 'sessionweeks_noncename', 'coursestatus_noncename','assign_prop_meta_noncename');
+          $this->postdataname = array('_course', '_instructor', '_status', '_enroll_count', '_points', '_competencies', '_class_start', '_class_due', '_est_time', '_est_time_measure', '_turn_type', '_applies_to', '_course_date_begin_month', '_course_date_begin_day', '_course_date_end_month', '_course_date_end_day','_course_day_sun', '_course_day_mon', '_course_day_tues', '_course_day_wedn', '_course_day_thurs', '_course_day_fri', '_course_day_sat', '_course_begin_hour', '_course_begin_min', '_course_end_hour', '_course_end_min', '_course_end_ofday', '_course_begin_ofday');
           //for enrollment use in student directory custom post type
           for($i=0;$i<10;$i++){
             $this->postdataname[] = "_course".$i;
           }
           $this->post_metabox = array(
             array('wp_lms_course_list_assign','Course List', 'assignment', 'side','high', array('name' => "Courses", 'type' => 'course', 'create' => 'select', 'noncename' => 'coursemeta_noncename') ),
+            array('wp_lms_course_list_assign','Assignment Properties', 'assignment', 'side','high', array('name' => "Assignment Properties", 'type' => 'assignment', 'create' => 'assign_prop', 'noncename' => 'assign_prop_noncename') ),
             array('wp_lms_enrollment_count_student','# of Course(s) Enrolled', 'student_directory', 'side','high', array('name' => "# of Course(s) Enrolled", 'type' => 'course', 'create' => 'number', 'noncename' => 'course_enrollment_noncename') ),
             array('wp_lms_course_list_student','Course Enrollment', 'student_directory', 'side','high', array('name' => "Courses", 'type' => 'course', 'create' => 'select', 'noncename' => 'coursemeta_noncename') ), 
             array('wp_lms_course_list_lecture', 'Course List', 'lecture', 'side', 'high', array( 'name' => "Courses", 'type' => 'course', 'create' => 'select', 'noncename' => 'coursemeta_noncename') ), 
@@ -120,7 +123,7 @@ class wp_lms {
           );
           add_action( 'add_meta_boxes', array( $this, 'post_metaboxes' ) );
           add_action('save_post', array( $this, 'save_post_meta') );
-
+          //taxonomies will add post columns
           //add_filter( 'manage_assignment_posts_columns', array( $this ,'add_assignment_columns' ) );
           //add_action( 'manage_assignment_posts_custom_column' , array($this,'custom_assignment_column'), 10, 2 );
           //sorting not working yet
@@ -139,16 +142,38 @@ class wp_lms {
         $this->set_defaults();
     }//end install
 
+    /**
+     *  
+     *  @since 1.0.0
+     **/
     static public function check_option( $val ) {
       $option = get_option( $val );
       if( empty( $option ) ) return true;
       else return false; 
     }
 
+    /**
+     *  
+     *  @since 1.0.0
+     **/
+    static public function sort_menu_order( $a, $b ) {
+      return strcmp( $a->menu_order, $b->menu_order );
+    }
+
+    /**
+     *  
+     *  @since 1.0.0
+     **/
+    static public function sort_post_parent( $a, $b ) {
+      return strcmp( $a->post_parent, $b->post_parent );
+    }
+
     public function styles_scripts() {
     wp_enqueue_style( 'wp-lms-menu-icon', plugins_url('inc/ml-push-menu/css/icons.css', dirname(__FILE__).'/'.$this->plugin_folder) );
     wp_enqueue_style( 'wp-lms-menu-styles', plugins_url('inc/ml-push-menu/css/component.css', dirname(__FILE__).'/'.$this->plugin_folder) );
+
     wp_enqueue_script( 'wp-lms-menu-js', plugins_url('inc/ml-push-menu/js/modernizr.custom.js', dirname(__FILE__).'/'.$this->plugin_folder ), '2603104', true  );
+    wp_enqueue_script( 'wp-lms-menu-js', plugins_url('inc/ml-push-menu/js/demoad.js', dirname(__FILE__).'/'.$this->plugin_folder ), '2603104', true  );
     }
 
     public function add_to_header() {

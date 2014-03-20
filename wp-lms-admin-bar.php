@@ -6,23 +6,24 @@ class wp_lms_adminbar extends wp_lms {
 
 	public function content_menu() {
       global $wp_admin_bar;
-      $wp_admin_bar->add_menu( array(
-            'parent' => 'new-content',
-            'id' => 'new_assignment',
-            'title' => 'Assignment',
-            'href' => admin_url( 'post-new.php?post_type=assignment' ),
-            )
-      );
-      $wp_admin_bar->add_menu( array(
-            'parent' => 'new-content',
-            'id' => 'new_lecture',
-            'title' => 'Lecture',
-            'href' => admin_url( 'post-new.php?post_type=lecture' ),
-            )
-      );
+      // $wp_admin_bar->add_menu( array(
+      //       'parent' => 'new-content',
+      //       'id' => 'new_assignment',
+      //       'title' => 'Assignment',
+      //       'href' => admin_url( 'post-new.php?post_type=assignment' ),
+      //       )
+      // );
+      // $wp_admin_bar->add_menu( array(
+      //       'parent' => 'new-content',
+      //       'id' => 'new_lecture',
+      //       'title' => 'Lecture',
+      //       'href' => admin_url( 'post-new.php?post_type=lecture' ),
+      //       )
+      // );
       $args = array(
         'id'    => 'wp_lms',
-        'title' => 'WP LMS'
+        'title' => 'WP LMS',
+        'meta'  => array( 'class' => 'wp-lms-toolbar' )
       );
       $wp_admin_bar->add_node( $args );
 
