@@ -41,6 +41,10 @@ class wp_lms {
             include('wp-lms-post-types.php');
             // add_filter('post_type_link', array( $this, 'filter_post_links'), 1, 2);
             add_filter( 'plugin_action_links', array( $this, 'action_links' ), 10, 2 );
+            //scripts and styles
+            add_action('wp_enqueue_scripts',array($this, 'styles_scripts') );
+            add_action( 'wp_header', array($this, 'add_to_header' ) );
+            add_action( 'wp_footer', array($this, 'footer_scripts' ) );
             
             //filters work though!
             add_action('restrict_manage_posts', array($this,'restrict_assign_by_course') );
@@ -133,6 +137,31 @@ class wp_lms {
       $option = get_option( $val );
       if( empty( $option ) ) return true;
       else return false; 
+    }
+
+    public function styles_scripts() {
+      wp_enqueue_style( 'wp-lms-menu-styles', plugins_url('inc/ml-push-menu/component.css', dirname(__FILE__).'/'.$this->plugin_folder) );
+      wp_enqueue_script( 'wp-lms-menu-js', plugins_url('inc/ml-push-menu/modernizr.custom.js', dirname(__FILE__).'/'.$this->plugin_folder ), '2603104', true  );
+     // wp_enqueue_script( 'wp-lms-menu-js', plugins_url('inc/ml-push-menu/mlpushmenu.js', dirname(__FILE__).'/'.$this->plugin_folder ), '2603104', true  );
+     // wp_enqueue_script( 'wp-lms-menu-js', plugins_url('inc/ml-push-menu/classie.js', dirname(__FILE__).'/'.$this->plugin_folder ), '2603104', true  );
+    }
+
+    public function add_to_header() {
+      ?>
+      <script src="<?= $this->plugin_base_url.'inc/ml-push-menu/modernizr.custom.js'; ?>"></script>
+      <?php
+    }
+
+    public function footer_scripts() {
+      ?>
+      <script src="<?= $this->plugin_base_url.'inc/ml-push-menu/classie.js'; ?>"></script>
+      <script src="<?= $this->plugin_base_url.'inc/ml-push-menu/mlpushmenu.js'; ?>"></script>
+      <script>
+        new mlPushMenu( document.getElementById( 'mp-menu' ), document.getElementById( 'trigger' ), {
+            type : 'cover'
+        } );
+      </script>
+      <?
     }
 
     /**
