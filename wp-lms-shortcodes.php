@@ -4,9 +4,9 @@ class wp_lms_shortcodes extends wp_lms {
 
 	public function active_courses_menu($atts){
 		//scripts and styles
-    add_action( 'wp_footer', array($this, 'footer_scripts' ), 100 );
-    //ob_start();
-    //output
+	    add_action( 'wp_footer', array($this, 'footer_scripts' ), 100 );
+	    //ob_start();
+	    //output
 		$page_query = new WP_Query();
 		$all_pages = $page_query->query( 
 			array( 
@@ -139,15 +139,161 @@ class wp_lms_shortcodes extends wp_lms {
 		<?php
 	}
 
-	public function inactive_courses_list($atts) {
+	public function assignment_list($atts){
+		global $post;
+		$page_query = new WP_Query();
+		$id = $post->ID;
+		$pid = $post->post_parent;
+		$course_title = $post->post_title;
+		$status = get_post_meta($pid, '_status', true);
+		$instructor = get_post_meta($pid, '_instructor', true);
+		$assignments = $page_query->query( 
+			array( 
+			'post_type' => 'assignment',
+			'post_status' => 'publish',
+			'posts_per_page' => -1 
+			) 
+		);
 		?>
+		<ul>
+			<li><a href="<?php echo get_permalink($id) ;?>timeline">Timeline</a></li>
+			<li><a href="<?php echo get_permalink($id) ;?>">Syllabus</a></li>
+			<li><?= $id; ?> <?= get_post($id)->post_title; ?> <?= $pid; ?> <?= get_post($pid)->post_title; ?></li>
+		<?
+		//print_r($assignments);
+		usort( $assignments, array($this, 'sort_menu_order') );
+		foreach($assignments as $key => $assign) {
+			$assign_title = $assign->post_title;
+			$assign_id = $assign->ID;
+			$course = get_post_meta($assign_id, '_course', true);
+			$assign_instructor = get_post_meta($assign_id, '_instructor', true);
+			$assign_parent = $assign->post_parent;
+			echo "<li>hello $instructor $assign_title</li>";
+			//$next = $this->find_next_assignment($id, $instructor, $key, $assignments);
+			
+			//foreach( $pages as $k => $p ){ 
+			if( $assign_parent == 0 && $course == $id && $instructor == $assign_instructor ) {
+				$page_children = get_page_children( $assign_id, $assignments );
+				$hasChildren = "";
+				if( !empty( $page_children ) ) {
+					$hasChildren = " children";
+					//$parentName = $assign->post_name;
+					usort( $assignments, array($this, 'sort_menu_order') );
+					?>
+					<?php
+					foreach( $page_children as $w => $child ) {
+						$cid = $child->ID;
+						$c_title = $child->post_title;
+						?>
+					<li><a href="<?php echo get_permalink($cid) ;?>"><?= $c_title; ?></a></li>
+						<?php
+					}
+				}
+				else if( empty($page_children ) ) {
+					?>
+		<li>
+			<a class="icon icon-t-shirt" href="#"><?= $assign_title; ?></a>
+		</li>
+					<?php
+				}
+			}
+		} 
+		?>
+		<?php
+	}
 
+	public function inactive_courses_list($atts) {
+		$page_query = new WP_Query();
+		$all_pages = $page_query->query( 
+			array( 
+			'post_type' => 'course',
+			'post_status' => 'publish', 
+			'posts_per_page' => -1, 
+			'orderby' => 'title',
+			'order' => 'ASC'
+			) 
+		);
+		?>
+		<ul>
+		<?php
+		foreach($all_pages as $k => $course) {
+			$cid = $course->ID;
+			$ctitle = $course->post_title;
+			$status = get_post_meta($cid, "_status", true);
+			$ins = get_post(get_post_meta($cid, "_instructor", true));
+			if($status == 'inactive') {
+		?>
+			<li><?= $ctitle; ?> - <?= $ins->post_title; ?></li>
+		<?php
+			}
+		}
+		?>
+		</ul>
 		<?php
 	}
 
 	public function portfolio_countdown($atts) {
 		?>
 		<span class="portfolio-countdown">Porfolio show is in v Weeks x Days y Hours z Minutes w Seconds</span>
+		<?php
+	}
+
+	public function instructor_schedule($atts) {
+		$page_query = new WP_Query();
+		$args = array(
+			'sort_column' => 'menu_order',
+			'post_type' => 'instructor',
+			'post_status' => 'publish',
+			'posts_per_page' => -1,
+			'orderby' => 'title',
+			'order' => 'ASC'
+		);
+		$page_query = new WP_Query();
+		$all_pages = $page_query->query( $args );
+		?>
+		<div class="wp_lms ins_schedule">
+		<?
+		foreach( $all_pages as $k => $in ){ 
+			$id = $in->ID;
+			$ins_name = explode(" ", $in->post_title);
+			$ins_name_head = "Mr. ".$ins_name[1]."s";
+			$ins_name = "Mr. ".$ins_name[1];
+			$args = array(
+				'sort_column' => 'menu_order',
+				'post_type' => 'course',
+				'post_status' => 'publish',
+				'_instructor' => $id,
+				'posts_per_page' => -1,
+				'orderby' => 'title',
+				'order' => 'ASC'
+			);
+			$courses = $page_query->query( $args );
+			?>
+			<h2><?= $ins_name_head; ?> Schedule</h2>
+			<ul>
+			<?
+			$one = false;
+			foreach($courses as $k => $c){
+				$cid = $c->ID;
+				$ctitle = $c->post_title;
+				$ins = get_post_meta($cid, "_instructor", true);
+				$cstatus = get_post_meta($cid, "_status", true);
+				if( $ins == $id && $cstatus == "active") {
+				?>
+				<li><a href="<?= get_permalink($cid); ?>" title="<?= $ctitle; ?>"><?= $ctitle; ?></a></li>
+				<?php	
+				$one = true;
+				}
+			}
+			if(!$one){
+				echo "<li>".$ins_name." isn't teaching this term. :(</li>";
+			}
+			?>
+			</ul>
+			<?php
+		}
+		?>
+		</div>
 		<?php
 	}
 

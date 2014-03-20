@@ -24,13 +24,14 @@ class wp_lms {
      **/
     public function __construct() {
         $this->menu_pages = array();
-        //$this->plugin_folder = explode( '/', plugin_basename( __FILE__ ) )[0];
+        $this->plugin_folder = explode( '/', plugin_basename( __FILE__ ) );
+        $this->plugin_folder = $this->plugin_folder[0];
         $this->plugin_base_url = plugin_dir_url( __FILE__ );
         $this->plugin_admin_url = $this->plugin_base_url . 'admin/';
         $this->plugin_img_url = $this->plugin_base_url . 'img/';
         $this->plugin_dir_long = dirname( __FILE__ );
         $this->plugin_inc_dir = $this->plugin_dir_long . '/inc/';
-        $this->set_aval = array("admin_option_pages", "version" => $this::$version, "custom_post_type_names", "settings_page_options", "post_meta");
+        $this->set_aval = array( "admin_option_pages", "version" => $this::$version, "custom_post_type_names", "settings_page_options", "post_meta" );
         $this->tax_names = array('assignment' => array('_course_name_', '_instructor_name_'), 'lecture' => array('_course_name_', '_instructor_name_') );
         
 
@@ -82,8 +83,11 @@ class wp_lms {
           add_shortcode('wp_lms_active_menu', array($this, 'active_courses_menu') );
           add_shortcode('wp_lms_active_menu_button', array($this, 'active_courses_menu_button') );
           add_shortcode('wp_lms_active_list', array($this, 'active_courses_list') );
+          add_shortcode('wp_lms_assignment_list', array($this, 'assignment_list') );
+          add_shortcode('wp_lms_inactive_list', array($this, 'inactive_courses_list') );
           add_shortcode('wp_lms_subdomain', array($this, 'example_url') );
           add_shortcode('wp_lms_port_countdown', array($this, 'portfolio_countdown') );
+          add_shortcode('wp_lms_ins_schedule', array($this, 'instructor_schedule') );
         }
 
 
