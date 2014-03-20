@@ -142,175 +142,183 @@ class wp_lms_post_meta extends wp_lms {
          *  @since 0.0.1
         **/
         case 'date':
-          $m_labels = array('01','02','03','04','05','06','07','08','09','10','11','12');
-          $m_values = array('2','3','4','5','6','7', '8','9','10','11','12','13','14');
-          $get_meta = array('begin_month' => "_".$type."_date_begin_month", 'begin_day' => "_".$type."_date_begin_day",'begin_year' =>"_".$type."_date_begin_year",'end_month' => "_".$type."_date_end_month",'end_day' => "_".$type."_date_end_day",'end_year' => "_".$type."_date_end_year");
-          foreach($get_meta as $var => $meta){
-         		$$var = get_post_meta($post->ID, $meta, true);
-         	}
-          ?>
-         <input type="hidden" name="<?= $type; ?>begin_noncename" id="<?= $type; ?>begin_noncename" value="<?php echo wp_create_nonce( plugin_basename(__FILE__) ); ?>" />
-          <div id="" class="hide-if-js" style="display: block;">
-            <div class="timestamp-wrap">
-              <p>
-                <label for="_<?= $type; ?>_date_begin_month">
-                  Begin Date
-                </label>
-              </p>
-            <select id="" name="_<?= $type; ?>_date_begin_month">
-            	<?php 
-            	if( empty($begin_month) ) $begin_month = date("m");
-            	foreach($m_labels as $k => $n){ 
-            		$selected = "";
-            		if($n == $begin_month) {
-            			$selected = " selected";
-            		}
-            	?>
-              <option value="<?php echo $n; ?>"<?php echo $selected; ?>><?php echo $n."-".date('M', mktime(0, 0, 0, $m_values[$k], 0, 0) ); ?></option>
-              <? } ?>
-            </select> 
-           	<?
-           	if( empty( $begin_day ) ) $begin_day = date("j");
-           	?>
-            <input type="text" name="_<?= $type; ?>_date_begin_day" value="<?= $begin_day; ?>" size="2" maxlength="2" autocomplete="off">, 
-            <?
-            if( empty( $begin_year ) ) $begin_year = date("Y");
+          $post_status = get_post_meta($post->ID, "_status", true);
+          if($post_status != "timeline"){
+            $m_labels = array('01','02','03','04','05','06','07','08','09','10','11','12');
+            $m_values = array('2','3','4','5','6','7', '8','9','10','11','12','13','14');
+            $get_meta = array('begin_month' => "_".$type."_date_begin_month", 'begin_day' => "_".$type."_date_begin_day",'begin_year' =>"_".$type."_date_begin_year",'end_month' => "_".$type."_date_end_month",'end_day' => "_".$type."_date_end_day",'end_year' => "_".$type."_date_end_year");
+            foreach($get_meta as $var => $meta){
+           		$$var = get_post_meta($post->ID, $meta, true);
+           	}
             ?>
-            <input type="text" id="" name="_<?= $type; ?>_date_begin_year" value="<?= $begin_year; ?>" size="4" maxlength="4" autocomplete="off">
-           </div>
-           <div class="timestamp-wrap">
-              <p>
-                <label for="_<?= $type; ?>_date_end_month">
-                  End Date
-                </label>
-              </p>
-            <select id="" name="_<?= $type; ?>_date_end_month">
-            	<?php 
-            	if( empty($end_month) ) $end_month = date("m");
-            	foreach($m_labels as $k => $n){ 
-            		$selected = "";
-            		if($n == $end_month) {
-            			$selected = " selected";
-            		}
-            	?>
-              <option value="<?php echo $n; ?>"<?php echo $selected; ?>><?php echo $n."-".date('M', mktime(0, 0, 0, $m_values[$k], 0, 0) ); ?></option>
-              <? } ?>
-            </select> 
-            <?
-           	if( empty( $end_day ) ) $end_day = date("j")+7;
-           	?>
-            <input type="text" name="_<?= $type; ?>_date_end_day" value="<?= $end_day; ?>" size="2" maxlength="2" autocomplete="off">, 
-            <?
-            if( empty( $end_year ) ) $end_year = date("Y");
-            ?>
-            <input type="text" id="" name="_<?= $type; ?>_date_end_year" value="<?= $end_year;?>" size="4" maxlength="4" autocomplete="off">
-           </div>
-           <p>
-          <strong>Days</strong>
-        </p>
-        <label class="screen-reader-text">Days</label>
-        <div class="timestamp-wrap">
-        	<?
-        	$get_checkboxes = array('day_sun' => "_".$type."_day_sun", 'day_mon' => "_".$type."_day_mon", 'day_tues' => "_".$type."_day_tues",'day_wedn' => "_".$type."_day_wedn", 'day_thurs' => "_".$type."_day_thurs", 'day_fri' => "_".$type."_day_fri", 'day_sat' => "_".$type."_day_sat");
-        	foreach($get_checkboxes as $var => $meta) {
-        		$$var = get_post_meta($post->ID, $meta, true);
-        		$checkbox_names[] = $var;
-        		//echo $meta." ".$$var."<br>";
-        		if( !empty($$var) ) $set_checkboxes[$var] = $$var;
-        	}
-        	$ch_values = array('1', '2', '3', '4', '5', '6', '7');
-          $ch_labels = array('S', 'M', 'T', 'W', 'R', 'F', 'S');
-          ?>
-          <style type="text/css">
-          	.checkbox_label {
-          		padding-left:8px;
-          		/*text-align: center;*/
-          	}
-          	.input_checkbox {
-          		text-align: center;
-          	}
-          </style>
-          <table style="width:100%;">
-          	<thead>
-          	<tr>
-          <?
-          //echo "<pre>"; print_r($set_checkboxes);echo "</pre>";
-          foreach($ch_labels as $k => $ch) {
-        	?>
-          	<td class="checkbox_label"><label for="<?= '_'.$type.'_'.$checkbox_names[$k]; ?>"><?= $ch; ?></label></td>
-          <? } ?>
-  	      	</tr>
-  	      </thead>
-  	      	<tbody>
-  	      	<tr>
-         <? foreach($ch_labels as $k => $ch) {
-          	$checked = "";
-          	if( !empty( $set_checkboxes[$checkbox_names[$k]] ) && $set_checkboxes[$checkbox_names[$k]] == $ch_values[$k]) $checked = " checked";
-        	?>
-            <td class="input_checkbox"><input type="checkbox" name="<?= '_'.$type.'_'.$checkbox_names[$k]; ?>" value="<?= $ch_values[$k]; ?>"<?= $checked; ?>></td>
-          <? } ?>
-        		</tr>
-        		</tbody>
-        	</table>
-        </div>
-        <p>
-          <strong>Begin Time</strong>
-        </p>
-        <label class="screen-reader-text">Begin Time</label>
-        <div class="timestamp-wrap">
-      	  <?php
-      	  $get_times = array('begin_hour' => '_'.$type.'_begin_hour', 'begin_min' => '_'.$type.'_begin_min', 'begin_ofday' => '_'.$type.'_begin_ofday','end_hour' => '_'.$type.'_end_hour', 'end_min' => '_'.$type.'_end_min', 'end_ofday' => '_'.$type.'_end_ofday');
-      	  $time_of_day = array('am', 'pm');
-      	  foreach($get_times as $var => $meta) {
-      	  	$$var = get_post_meta($post->ID, $meta, true);
-      	  }
-         	if( empty( $begin_hour ) ) $begin_hour = date("g");
-         	?>
-          <input type="text" name="_<?= $type; ?>_begin_hour" value="<?= $begin_hour; ?>" size="2" maxlength="2" autocomplete="off"> : 
-          <?php
-         	if( empty( $begin_min ) ) $begin_min = date("i");
-         	?>
-          <input type="text" name="_<?= $type; ?>_begin_min" value="<?= $begin_min; ?>" size="2" maxlength="2" autocomplete="off">
-
-          <select name="_<?= $type; ?>_begin_ofday">
-          	<?
-          	foreach ($time_of_day as $key => $tod) {  
-          		$selected = "";
-    					if( $tod == $begin_ofday ) $selected = " selected";
-          	?>
-            <option value="<?= $tod; ?>"<?= $selected; ?>><?= strtoupper($tod); ?></option>
-            <?
-          	}
-            ?>
-          </select>
-        </div>
-        <div class="timestamp-wrap">
-          <p>
-            <strong>End Time</strong>
+           <input type="hidden" name="<?= $type; ?>begin_noncename" id="<?= $type; ?>begin_noncename" value="<?php echo wp_create_nonce( plugin_basename(__FILE__) ); ?>" />
+            <div id="" class="hide-if-js" style="display: block;">
+              <div class="timestamp-wrap">
+                <p>
+                  <label for="_<?= $type; ?>_date_begin_month">
+                    Begin Date
+                  </label>
+                </p>
+              <select id="" name="_<?= $type; ?>_date_begin_month">
+              	<?php 
+              	if( empty($begin_month) ) $begin_month = date("m");
+              	foreach($m_labels as $k => $n){ 
+              		$selected = "";
+              		if($n == $begin_month) {
+              			$selected = " selected";
+              		}
+              	?>
+                <option value="<?php echo $n; ?>"<?php echo $selected; ?>><?php echo $n."-".date('M', mktime(0, 0, 0, $m_values[$k], 0, 0) ); ?></option>
+                <? } ?>
+              </select> 
+             	<?
+             	if( empty( $begin_day ) ) $begin_day = date("j");
+             	?>
+              <input type="text" name="_<?= $type; ?>_date_begin_day" value="<?= $begin_day; ?>" size="2" maxlength="2" autocomplete="off">, 
+              <?
+              if( empty( $begin_year ) ) $begin_year = date("Y");
+              ?>
+              <input type="text" id="" name="_<?= $type; ?>_date_begin_year" value="<?= $begin_year; ?>" size="4" maxlength="4" autocomplete="off">
+             </div>
+             <div class="timestamp-wrap">
+                <p>
+                  <label for="_<?= $type; ?>_date_end_month">
+                    End Date
+                  </label>
+                </p>
+              <select id="" name="_<?= $type; ?>_date_end_month">
+              	<?php 
+              	if( empty($end_month) ) $end_month = date("m");
+              	foreach($m_labels as $k => $n){ 
+              		$selected = "";
+              		if($n == $end_month) {
+              			$selected = " selected";
+              		}
+              	?>
+                <option value="<?php echo $n; ?>"<?php echo $selected; ?>><?php echo $n."-".date('M', mktime(0, 0, 0, $m_values[$k], 0, 0) ); ?></option>
+                <? } ?>
+              </select> 
+              <?
+             	if( empty( $end_day ) ) $end_day = date("j")+7;
+             	?>
+              <input type="text" name="_<?= $type; ?>_date_end_day" value="<?= $end_day; ?>" size="2" maxlength="2" autocomplete="off">, 
+              <?
+              if( empty( $end_year ) ) $end_year = date("Y");
+              ?>
+              <input type="text" id="" name="_<?= $type; ?>_date_end_year" value="<?= $end_year;?>" size="4" maxlength="4" autocomplete="off">
+             </div>
+             <p>
+            <strong>Days</strong>
           </p>
-          <label class="screen-reader-text">End Time</label>
-          <?php
-           	if( empty( $end_hour ) ) $end_hour = date("g")+3;
-         	?>
-          <input type="text" name="_<?= $type; ?>_end_hour" value="<?= $end_hour; ?>" size="2" maxlength="2" autocomplete="off"> : 
-          <?php
-         	if( empty( $end_min ) ) $end_min = date("i");
-         	?>
-          <input type="text" name="_<?= $type; ?>_end_min" value="<?= $end_min; ?>" size="2" maxlength="2" autocomplete="off">
-          <select name="_<?= $type; ?>_end_ofday">
-  					<?
-          	foreach ($time_of_day as $key => $tod) {  
-          		$selected = "";
-    					if( $tod == $end_ofday ) $selected = " selected";
-          	?>
-            <option value="<?= $tod; ?>"<?= $selected; ?>><?= strtoupper($tod); ?></option>
-            <?
+          <label class="screen-reader-text">Days</label>
+          <div class="timestamp-wrap">
+          	<?
+          	$get_checkboxes = array('day_sun' => "_".$type."_day_sun", 'day_mon' => "_".$type."_day_mon", 'day_tues' => "_".$type."_day_tues",'day_wedn' => "_".$type."_day_wedn", 'day_thurs' => "_".$type."_day_thurs", 'day_fri' => "_".$type."_day_fri", 'day_sat' => "_".$type."_day_sat");
+          	foreach($get_checkboxes as $var => $meta) {
+          		$$var = get_post_meta($post->ID, $meta, true);
+          		$checkbox_names[] = $var;
+          		//echo $meta." ".$$var."<br>";
+          		if( !empty($$var) ) $set_checkboxes[$var] = $$var;
           	}
+          	$ch_values = array('1', '2', '3', '4', '5', '6', '7');
+            $ch_labels = array('S', 'M', 'T', 'W', 'R', 'F', 'S');
             ?>
-          </select>
-        </div>
+            <style type="text/css">
+            	.checkbox_label {
+            		padding-left:8px;
+            		/*text-align: center;*/
+            	}
+            	.input_checkbox {
+            		text-align: center;
+            	}
+            </style>
+            <table style="width:100%;">
+            	<thead>
+            	<tr>
+            <?
+            //echo "<pre>"; print_r($set_checkboxes);echo "</pre>";
+            foreach($ch_labels as $k => $ch) {
+          	?>
+            	<td class="checkbox_label"><label for="<?= '_'.$type.'_'.$checkbox_names[$k]; ?>"><?= $ch; ?></label></td>
+            <? } ?>
+    	      	</tr>
+    	      </thead>
+    	      	<tbody>
+    	      	<tr>
+           <? foreach($ch_labels as $k => $ch) {
+            	$checked = "";
+            	if( !empty( $set_checkboxes[$checkbox_names[$k]] ) && $set_checkboxes[$checkbox_names[$k]] == $ch_values[$k]) $checked = " checked";
+          	?>
+              <td class="input_checkbox"><input type="checkbox" name="<?= '_'.$type.'_'.$checkbox_names[$k]; ?>" value="<?= $ch_values[$k]; ?>"<?= $checked; ?>></td>
+            <? } ?>
+          		</tr>
+          		</tbody>
+          	</table>
           </div>
+          <p>
+            <strong>Begin Time</strong>
+          </p>
+          <label class="screen-reader-text">Begin Time</label>
+          <div class="timestamp-wrap">
+        	  <?php
+        	  $get_times = array('begin_hour' => '_'.$type.'_begin_hour', 'begin_min' => '_'.$type.'_begin_min', 'begin_ofday' => '_'.$type.'_begin_ofday','end_hour' => '_'.$type.'_end_hour', 'end_min' => '_'.$type.'_end_min', 'end_ofday' => '_'.$type.'_end_ofday');
+        	  $time_of_day = array('am', 'pm');
+        	  foreach($get_times as $var => $meta) {
+        	  	$$var = get_post_meta($post->ID, $meta, true);
+        	  }
+           	if( empty( $begin_hour ) ) $begin_hour = date("g");
+           	?>
+            <input type="text" name="_<?= $type; ?>_begin_hour" value="<?= $begin_hour; ?>" size="2" maxlength="2" autocomplete="off"> : 
+            <?php
+           	if( empty( $begin_min ) ) $begin_min = date("i");
+           	?>
+            <input type="text" name="_<?= $type; ?>_begin_min" value="<?= $begin_min; ?>" size="2" maxlength="2" autocomplete="off">
+
+            <select name="_<?= $type; ?>_begin_ofday">
+            	<?
+            	foreach ($time_of_day as $key => $tod) {  
+            		$selected = "";
+      					if( $tod == $begin_ofday ) $selected = " selected";
+            	?>
+              <option value="<?= $tod; ?>"<?= $selected; ?>><?= strtoupper($tod); ?></option>
+              <?
+            	}
+              ?>
+            </select>
+          </div>
+          <div class="timestamp-wrap">
+            <p>
+              <strong>End Time</strong>
+            </p>
+            <label class="screen-reader-text">End Time</label>
+            <?php
+             	if( empty( $end_hour ) ) $end_hour = date("g")+3;
+           	?>
+            <input type="text" name="_<?= $type; ?>_end_hour" value="<?= $end_hour; ?>" size="2" maxlength="2" autocomplete="off"> : 
+            <?php
+           	if( empty( $end_min ) ) $end_min = date("i");
+           	?>
+            <input type="text" name="_<?= $type; ?>_end_min" value="<?= $end_min; ?>" size="2" maxlength="2" autocomplete="off">
+            <select name="_<?= $type; ?>_end_ofday">
+    					<?
+            	foreach ($time_of_day as $key => $tod) {  
+            		$selected = "";
+      					if( $tod == $end_ofday ) $selected = " selected";
+            	?>
+              <option value="<?= $tod; ?>"<?= $selected; ?>><?= strtoupper($tod); ?></option>
+              <?
+            	}
+              ?>
+            </select>
+          </div>
+            </div>
           <?
+          }
+          else {
+          ?>
+            <p>Not Need for timelines.</p>
+          <?
+          }
           break;
 
 
@@ -347,9 +355,11 @@ class wp_lms_post_meta extends wp_lms {
           <input type="number" name="_enroll_count" value="<?= $enrollment_count; ?>"> 
           <?
           break;
+
+
           case "status":
         	$status = get_post_meta($post->ID, "_status", true);
-        	$statuses = array("inactive", "active");
+        	$statuses = array("inactive", "active", "timeline");
           ?>
           <input type="hidden" name="<?= $type; ?>status_noncename" id="<?= $type; ?>status_noncename" value="<?php echo wp_create_nonce( plugin_basename(__FILE__) ); ?>" />
           <p>

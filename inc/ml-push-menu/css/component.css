@@ -27,8 +27,9 @@ html, body, .container, .scroller {
 
 .menu-trigger {
 	position: relative;
-	padding-left: 60px;
-	font-size: 0.9em;
+	padding-left: 45px;
+	font-size: 1.56em;
+	color:#000;
 }
 
 .menu-trigger:before {
@@ -244,7 +245,7 @@ html, body, .container, .scroller {
 .mp-back {
 	background: rgba(0,0,0,0.1);
 	outline: none;
-	color: #fff;
+	color: #000;
 	text-transform: uppercase;
 	letter-spacing: 1px;
 	font-weight: 700;

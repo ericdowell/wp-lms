@@ -24,7 +24,7 @@ class wp_lms {
      **/
     public function __construct() {
         $this->menu_pages = array();
-        $this->plugin_folder = explode( '/', plugin_basename( __FILE__ ) )[0];
+        //$this->plugin_folder = explode( '/', plugin_basename( __FILE__ ) )[0];
         $this->plugin_base_url = plugin_dir_url( __FILE__ );
         $this->plugin_admin_url = $this->plugin_base_url . 'admin/';
         $this->plugin_img_url = $this->plugin_base_url . 'img/';
@@ -170,11 +170,11 @@ class wp_lms {
     }
 
     public function styles_scripts() {
-    wp_enqueue_style( 'wp-lms-menu-icon', plugins_url('inc/ml-push-menu/css/icons.css', dirname(__FILE__).'/'.$this->plugin_folder) );
-    wp_enqueue_style( 'wp-lms-menu-styles', plugins_url('inc/ml-push-menu/css/component.css', dirname(__FILE__).'/'.$this->plugin_folder) );
+    wp_enqueue_style( 'wp-lms-menu-icon', plugins_url('inc/ml-push-menu/css/icons.css', plugin_basename( __FILE__ ) ) );
+    wp_enqueue_style( 'wp-lms-menu-styles', plugins_url('inc/ml-push-menu/css/component.css', plugin_basename( __FILE__ ) ) );
 
-    wp_enqueue_script( 'wp-lms-menu-js', plugins_url('inc/ml-push-menu/js/modernizr.custom.js', dirname(__FILE__).'/'.$this->plugin_folder ), '2603104', true  );
-    wp_enqueue_script( 'wp-lms-menu-js', plugins_url('inc/ml-push-menu/js/demoad.js', dirname(__FILE__).'/'.$this->plugin_folder ), '2603104', true  );
+    wp_enqueue_script( 'wp-lms-menu-js', plugins_url('inc/ml-push-menu/js/modernizr.custom.js', plugin_basename( __FILE__ ), '2603104', true  ) );
+    wp_enqueue_script( 'wp-lms-menu-js', plugins_url('inc/ml-push-menu/js/demoad.js', plugin_basename( __FILE__ ), '2603104', true  ) );
     }
 
     public function add_to_header() {
@@ -268,7 +268,8 @@ class wp_lms {
         }
         else {
           $instructor = get_post($instructor)->post_name;
-          $instructor = explode("-", $instructor)[1];
+          $instructor = explode("-", $instructor);
+          $instructor = $instructor[1];
           $instructor = strtolower($instructor);
         }
         if( 'assignment' == get_post_type( $post ) ) {

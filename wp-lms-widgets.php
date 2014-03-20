@@ -13,7 +13,7 @@ class wp_lms_widgets extends WP_Widget {
 	}
 	public function widget( $args, $instance ) {
 		//
-		echo do_shortcode('[wp_lms_active_menu_button]'); 		
+		echo do_shortcode('[wp_lms_active_menu_button class="decornone"]'); 		
 	}
 
 	public function update( $new_instance, $old_instance ) {

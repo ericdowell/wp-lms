@@ -49,8 +49,9 @@ class wp_lms_shortcodes extends wp_lms {
 						<div class="mp-level" data-level="2">
 							<h2 class="icon icon-display"><?= $course_title; ?></h2>
 							<a class="mp-back" href="#">back</a>
-							
 							<ul>
+								<li><a href="<?php echo get_permalink($id) ;?>timeline">Timeline</a></li>
+								<li><a href="<?php echo get_permalink($id) ;?>">Syllabus</a></li>
 							<?
 							$assign_title = "";
 							$assign_id = "";
@@ -120,12 +121,15 @@ class wp_lms_shortcodes extends wp_lms {
 
 	public function active_courses_menu_button($atts){
 		extract( shortcode_atts( array(
-      'text' => '',
-      'icon' => 'svg'
+      'text' => 'Menu',
+      'icon' => 'svg',
+      'class' => ''
 		), $atts ) );
+		if( !isset($atts['text']) ) $text = "Menu";
+		else $text = $atts['text'];
 		//Open/Close Menu
 		?>
-		<nav class="menu-button"><a href="#" id="trigger" class="menu-trigger"><?= $atts['text']; ?></a></nav>
+		<nav class="menu-button"><a href="#" id="trigger" class="menu-trigger<?= ' '.$atts['class']; ?>"><?= $text; ?></a></nav>
 		<?php
 	}
 

@@ -61,6 +61,14 @@ class wp_lms_adminbar extends wp_lms {
       $wp_admin_bar->add_node( $args );
 
       $args = array(
+        'id'     => 'go_to_courese',
+        'title'  => 'Courses',
+        'parent' => 'wp_lms',
+        'href' => admin_url( 'edit.php?post_type=course' ),
+      );
+      $wp_admin_bar->add_node( $args );
+
+      $args = array(
         'id'    => 'wp_lms_attendace',
         'title' => 'Attendance',
         'meta'  => array( 'class' => 'wp-lms-toolbar' ),
