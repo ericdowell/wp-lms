@@ -12,7 +12,6 @@ html, body, .container, .scroller {
 
 .scroller {
 	overflow-y: scroll;
-	-webkit-overflow-scrolling:touch;
 }
 
 .scroller,

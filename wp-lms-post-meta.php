@@ -232,7 +232,7 @@ class wp_lms_post_meta extends wp_lms {
             		text-align: center;
             	}
             </style>
-            <table style="width:100%;">
+            <table style="width:100% max-width:254px;">
             	<thead>
             	<tr>
             <?

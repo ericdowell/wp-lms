@@ -155,10 +155,10 @@ class wp_lms_shortcodes extends wp_lms {
 			) 
 		);
 		?>
+		<h2 class="hgrp light"><?= get_post($pid)->post_title; ?></h2>
 		<ul>
 			<li><a href="<?php echo get_permalink($id) ;?>timeline">Timeline</a></li>
 			<li><a href="<?php echo get_permalink($id) ;?>">Syllabus</a></li>
-			<li><?= $id; ?> <?= get_post($id)->post_title; ?> <?= $pid; ?> <?= get_post($pid)->post_title; ?></li>
 		<?
 		//print_r($assignments);
 		usort( $assignments, array($this, 'sort_menu_order') );
@@ -168,14 +168,16 @@ class wp_lms_shortcodes extends wp_lms {
 			$course = get_post_meta($assign_id, '_course', true);
 			$assign_instructor = get_post_meta($assign_id, '_instructor', true);
 			$assign_parent = $assign->post_parent;
-			echo "<li>hello $instructor $assign_title</li>";
-			//$next = $this->find_next_assignment($id, $instructor, $key, $assignments);
 			
-			//foreach( $pages as $k => $p ){ 
-			if( $assign_parent == 0 && $course == $id && $instructor == $assign_instructor ) {
+			if( $assign_parent == 0 && $course == $pid && $instructor == $assign_instructor ) {
 				$page_children = get_page_children( $assign_id, $assignments );
 				$hasChildren = "";
 				if( !empty( $page_children ) ) {
+				?>
+				<li><?= $assign_title; ?>
+					<ul>
+
+					<?
 					$hasChildren = " children";
 					//$parentName = $assign->post_name;
 					usort( $assignments, array($this, 'sort_menu_order') );
@@ -188,6 +190,10 @@ class wp_lms_shortcodes extends wp_lms {
 					<li><a href="<?php echo get_permalink($cid) ;?>"><?= $c_title; ?></a></li>
 						<?php
 					}
+					?>
+					</ul>
+				</li>
+				<?php
 				}
 				else if( empty($page_children ) ) {
 					?>
@@ -280,7 +286,7 @@ class wp_lms_shortcodes extends wp_lms {
 				$cstatus = get_post_meta($cid, "_status", true);
 				if( $ins == $id && $cstatus == "active") {
 				?>
-				<li><a href="<?= get_permalink($cid); ?>" title="<?= $ctitle; ?>"><?= $ctitle; ?></a></li>
+				<li><a href="<?= get_permalink($cid); ?>assignments/" title="<?= $ctitle; ?>"><?= $ctitle; ?></a></li>
 				<?php	
 				$one = true;
 				}
