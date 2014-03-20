@@ -155,7 +155,6 @@ class wp_lms_shortcodes extends wp_lms {
 			) 
 		);
 		?>
-		<h2 class="hgrp light"><?= get_post($pid)->post_title; ?></h2>
 		<ul>
 			<li><a href="<?php echo get_permalink($id) ;?>timeline">Timeline</a></li>
 			<li><a href="<?php echo get_permalink($id) ;?>">Syllabus</a></li>

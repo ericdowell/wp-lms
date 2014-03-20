@@ -56,6 +56,7 @@ class wp_lms_post_meta extends wp_lms {
 	          <?
           	}
         	}
+
         	else {
         	$course = get_post_meta($post->ID, '_'.$type, true);
         	?>
@@ -66,13 +67,18 @@ class wp_lms_post_meta extends wp_lms {
           <p></p>
           <input type="hidden" name="<?= $type; ?>meta_noncename" id="<?= $type; ?>meta_noncename" value="<?php echo wp_create_nonce( plugin_basename(__FILE__) ); ?>" />
           <select name="_<?= $type; ?>" class="widefat">
-            <?php foreach( $all_pages as $k => $p ) { ?>
-              <? $current = "";
-                if( isset( $course ) && $course == $p->ID ) $current = " selected";
-                else if( isset( $_GET[$type] ) && $_GET[$type] == $p->ID ) $current = " selected";
+            <?php 
+            usort( $all_pages, array($this, 'sort_post_title') );
+            foreach( $all_pages as $k => $p ) { ?>
+              <?
+                if($p->post_parent == 0){ 
+                  $current = "";
+                  if( isset( $course ) && $course == $p->ID ) $current = " selected";
+                  else if( isset( $_GET[$type] ) && $_GET[$type] == $p->ID ) $current = " selected";
               ?>
               <option value="<?php echo $p->ID; ?>"<?php echo $current; ?>><?php echo $p->post_title; ?></option>
-            <?php } ?>
+            <?php }
+            } ?>
           </select>
           <?
         	}
