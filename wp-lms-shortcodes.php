@@ -4,7 +4,7 @@ class wp_lms_shortcodes extends wp_lms {
 
 	public function active_courses_menu($atts){
 		//scripts and styles
-	    add_action( 'wp_footer', array($this, 'footer_scripts' ), 100 );
+	    add_action( 'wp_footer', array($this, 'footer_scripts' ), 5 );
 	    //ob_start();
 	    //output
 		$page_query = new WP_Query();
