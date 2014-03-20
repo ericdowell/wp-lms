@@ -20,7 +20,7 @@ class wp_lms_widgets extends WP_Widget {
 			'post_status' => 'publish', 
 			'posts_per_page' => -1 
 			) 
-		);
+		); 
 		usort( $all_pages, array($this, 'sort_menu_order') );
 		//echo "<pre>";print_r($all_pages);echo "</pre>";
 		?>

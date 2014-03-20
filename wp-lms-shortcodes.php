@@ -119,6 +119,12 @@ class wp_lms_shortcodes extends wp_lms {
 		<?php
 	}
 
+	public function active_courses_list($atts) {
+		?>
+
+		<?php
+	}
+
 	public function footer_scripts() {
       ?>
       <script src="<?= $this->plugin_base_url.'inc/ml-push-menu/js/classie.js'; ?>"></script>
