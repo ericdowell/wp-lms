@@ -24,6 +24,7 @@ class wp_lms_admin extends wp_lms {
 		//$this->menu_pages['settings'] = add_submenu_page( "edit.php?post_type=course", 'WP LMS Settings', 'Settings', 'manage_options', $this::$plugin_name.'_settings', array( $this,"settings_page" ) );
 		//edit.php?post_type=student_directory
 		$this->menu_pages['view-student'] = add_submenu_page( "edit.php?post_type=student_directory", 'WP LMS View Students', 'View Students', 'manage_options', $this::$plugin_name.'_view_student', array( $this,"view_student" ) );
+		$this->menu_pages['student-attendance'] = add_submenu_page( "edit.php?post_type=student_directory", 'WP LMS Student attendance', 'Student Attendance', 'manage_options', $this::$plugin_name.'_student_attendance', array( $this,"student_attendance" ) );
 		//$this->menu_pages['settings-student'] = add_submenu_page( "edit.php?post_type=student_directory", 'WP LMS Student Settings', 'Settings', 'manage_options', $this::$plugin_name.'_student_settings', array( $this,"student_settings" ) );
 		$this->menu_pages['view-instructors'] = add_submenu_page( "edit.php?post_type=instructor", 'WP LMS View Instrustors', 'View Instrustors', 'manage_options', $this::$plugin_name.'_view_instructor', array( $this,"view_instructor" ) );
 		//$this->menu_pages['view-course-students'] = add_submenu_page( "edit.php?post_type=course", 'WP LMS View Course Students', 'View Enrollment', 'manage_options', $this::$plugin_name.'_view_enrollment', array( $this,"view_enrollment" ) );
@@ -285,7 +286,20 @@ class wp_lms_admin extends wp_lms {
 		ob_end_flush();
 	}//end main_options_page
 	//view_instructor
+	//student_attendance
 	
+	public function student_attendance(){
+		$page_base = $this->page_url();
+		ob_start();
+		?>
+		<div class="wp_lms settings">
+			<h1>Take Student Attendance</h1>
+
+		</div>
+		<?
+		ob_end_flush();
+	}
+
 	/**
      *  Options Page for Plugin
      *  @since 1.0.0

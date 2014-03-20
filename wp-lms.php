@@ -83,6 +83,7 @@ class wp_lms {
           add_shortcode('wp_lms_active_menu_button', array($this, 'active_courses_menu_button') );
           add_shortcode('wp_lms_active_list', array($this, 'active_courses_list') );
           add_shortcode('wp_lms_subdomain', array($this, 'example_url') );
+          add_shortcode('wp_lms_port_countdown', array($this, 'portfolio_countdown') );
         }
 
 
@@ -93,7 +94,7 @@ class wp_lms {
         }
 
         //run within admin bar class
-        if( is_admin() && get_parent_class( $this ) && get_class( $this ) == "wp_lms_adminbar" ) {
+        if( get_parent_class( $this ) && get_class( $this ) == "wp_lms_adminbar" ) {
           add_action( 'wp_before_admin_bar_render', array($this, 'content_menu' ) );
         }
 

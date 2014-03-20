@@ -143,7 +143,7 @@ class wp_lms_shortcodes extends wp_lms {
 
 	public function portfolio_countdown($atts) {
 		?>
-
+		<span class="portfolio-countdown">Porfolio show is in v Weeks x Days y Hours z Minutes w Seconds</span>
 		<?php
 	}
 
