@@ -42,8 +42,11 @@ class wp_lms {
             // add_filter('post_type_link', array( $this, 'filter_post_links'), 1, 2);
             add_filter( 'plugin_action_links', array( $this, 'action_links' ), 10, 2 );
 <<<<<<< HEAD
+<<<<<<< HEAD
              
 =======
+=======
+>>>>>>> FETCH_HEAD
             //scripts and styles
             add_action('wp_enqueue_scripts',array($this, 'styles_scripts') );
             add_action( 'wp_header', array($this, 'add_to_header' ) );
@@ -155,14 +158,20 @@ class wp_lms {
 
     public function styles_scripts() {
 <<<<<<< HEAD
+<<<<<<< HEAD
     wp_enqueue_style( 'wp-lms-menu-icon', plugins_url('inc/ml-push-menu/css/icons.css', dirname(__FILE__).'/'.$this->plugin_folder) );
     wp_enqueue_style( 'wp-lms-menu-styles', plugins_url('inc/ml-push-menu/css/component.css', dirname(__FILE__).'/'.$this->plugin_folder) );
     wp_enqueue_script( 'wp-lms-menu-js', plugins_url('inc/ml-push-menu/js/modernizr.custom.js', dirname(__FILE__).'/'.$this->plugin_folder ), '2603104', true  );
 =======
+=======
+>>>>>>> FETCH_HEAD
       wp_enqueue_style( 'wp-lms-menu-styles', plugins_url('inc/ml-push-menu/component.css', dirname(__FILE__).'/'.$this->plugin_folder) );
       wp_enqueue_script( 'wp-lms-menu-js', plugins_url('inc/ml-push-menu/modernizr.custom.js', dirname(__FILE__).'/'.$this->plugin_folder ), '2603104', true  );
      // wp_enqueue_script( 'wp-lms-menu-js', plugins_url('inc/ml-push-menu/mlpushmenu.js', dirname(__FILE__).'/'.$this->plugin_folder ), '2603104', true  );
      // wp_enqueue_script( 'wp-lms-menu-js', plugins_url('inc/ml-push-menu/classie.js', dirname(__FILE__).'/'.$this->plugin_folder ), '2603104', true  );
+<<<<<<< HEAD
+>>>>>>> FETCH_HEAD
+=======
 >>>>>>> FETCH_HEAD
     }
 
@@ -173,8 +182,11 @@ class wp_lms {
     }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 
 =======
+=======
+>>>>>>> FETCH_HEAD
     public function footer_scripts() {
       ?>
       <script src="<?= $this->plugin_base_url.'inc/ml-push-menu/classie.js'; ?>"></script>
@@ -186,6 +198,9 @@ class wp_lms {
       </script>
       <?
     }
+<<<<<<< HEAD
+>>>>>>> FETCH_HEAD
+=======
 >>>>>>> FETCH_HEAD
 
     /**
