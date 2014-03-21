@@ -299,6 +299,7 @@ class wp_lms {
 
     public function restrict_assign_by_course() {
       global $typenow;
+      $type = "";
       if(isset($_GET['post_type'])){
         $type = $_GET['post_type'];
       }
@@ -334,6 +335,7 @@ class wp_lms {
 
   public function convert_id_to_term_in_query($query) {
     global $pagenow;
+    $type = "";
     if(isset($_GET['post_type'])){
       $type = $_GET['post_type'];
     }

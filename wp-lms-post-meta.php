@@ -45,13 +45,19 @@ class wp_lms_post_meta extends wp_lms {
 	          </label>
 	          <p></p>
 	          <select name="_<?= $type.$i; ?>" class="widefat">
-	            <?php foreach( $all_pages as $k => $p ) { ?>
-	              <? $current = "";
+	            <?php 
+              usort( $all_pages, array($this, 'sort_post_title') );
+              foreach( $all_pages as $k => $p ) { ?>
+	              <? 
+                if($p->post_parent == 0){ 
+                $current = "";
 	                if( isset( $course ) && $course == $p->ID ) $current = " selected";
 	                else if( isset( $_GET[$type] ) && $_GET[$type] == $p->ID ) $current = " selected";
 	              ?>
 	              <option value="<?php echo $p->ID; ?>"<?php echo $current; ?>><?php echo $p->post_title; ?></option>
-	            <?php } ?>
+	            <?php 
+                }
+            } ?>
 	          </select>
 	          <?
           	}
@@ -107,8 +113,10 @@ class wp_lms_post_meta extends wp_lms {
                 ${$term} = $termid->term_id;
               }
             }
-            if( $var[0] == "_course_name".$prefix && empty( $$var[0] ) ) $course_label = " Not Set";
-            if( $var[1] == "_instructor_name".$prefix  && empty( $$var[1] ) ) $instructor_label = " Not Set";
+            $course_label = " Not Set";
+            $instructor_label = " Not Set";
+            if( isset($var[0]) && $var[0] == "_course_name".$prefix && empty( $$var[0] ) ) $course_label = " Not Set";
+            if( isset($var[0]) && $var[1] == "_instructor_name".$prefix  && empty( $$var[1] ) ) $instructor_label = " Not Set";
           }
           if( empty( $$var[1] ) && empty( $$var[0] ) ) {
              $link = "#";
@@ -399,6 +407,7 @@ class wp_lms_post_meta extends wp_lms {
       // verify this came from the our screen and with proper authorization,
       // because save_post can be triggered at other times
       $doReturn = true;
+      if(!empty($post)) {
       $type = $post->post_type;
       foreach( $this->noncename as $k => $v ) {
         if( wp_verify_nonce( $_POST[$v], plugin_basename(__FILE__) ) ) {
@@ -523,6 +532,7 @@ class wp_lms_post_meta extends wp_lms {
     	// 	echo "something has gone wrong";
     	// 	echo "<pre>";print_r($_POST);echo "</pre>";
     	// }
+      }
     }
 
     // public function add_assignment_columns( $columns ) {
