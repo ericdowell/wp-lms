@@ -3,5 +3,5 @@ $(document).ready(function(){
 	$( '#menu' ).multilevelpushmenu({
 		containersToPush: [$( '#pushobj' ), $( '#pushthisobjalso' ), $( '#pushthisobjtoo' )]
 	});
-	$('body').click(function() { $('#menu').multilevelpushmenu('collapse'); });
+	$('.wrap').click(function() { $('#menu').multilevelpushmenu('collapse'); });
 });

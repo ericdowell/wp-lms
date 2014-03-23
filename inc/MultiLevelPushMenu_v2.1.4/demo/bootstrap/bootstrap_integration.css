@@ -2,11 +2,20 @@ body {
 	background: #243342;
 }
 
-#pushobj {
-    margin-left: 40px;
+.wrap {
+	max-width: 1366px;
+	width:100%;
+	margin:0 auto;
+	padding:22px 22px 22px 62px;
+	z-index: 1;
 }
 
 #menu {
+	position: absolute; /* we can't use fixed here :( */
+	top: 0;
+	left: 0;
+	z-index: 300;
+	overflow: scroll
     -ms-opacity: 0.95;
     opacity: 0.95;
 }

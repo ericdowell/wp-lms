@@ -1,1 +1,1 @@
-$(document).ready(function(){$("#menu").multilevelpushmenu({containersToPush:[$("#pushobj"),$("#pushthisobjalso"),$("#pushthisobjtoo")]}),$("body").click(function(){$("#menu").multilevelpushmenu("collapse")})});
+$(document).ready(function(){$("#menu").multilevelpushmenu({containersToPush:[$("#pushobj"),$("#pushthisobjalso"),$("#pushthisobjtoo")]}),$(".wrap").click(function(){$("#menu").multilevelpushmenu("collapse")})});

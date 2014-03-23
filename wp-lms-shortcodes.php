@@ -3,8 +3,22 @@
 class wp_lms_shortcodes extends wp_lms {
 
 	public function active_courses_menu($atts){
+		switch($this->menu) {
+			case 'jquery':
+			$this->active_courses_menu_jquery($atts);
+				break;
+			case 'css3d':
+				$this->active_courses_menu_css_3dtransforms($atts);
+				break;
+			default:
+
+				break;
+		}
+	}
+
+	public function active_courses_menu_css_3dtransforms($atts){
 		//scripts and styles
-	    add_action( 'wp_footer', array($this, 'footer_scripts' ), 5 );
+	    add_action( 'wp_footer', array($this, 'footer_scripts_css_3dtransforms' ), 5 );
 	    //output
 		$page_query = new WP_Query();
 		$all_pages = $page_query->query( 
@@ -116,11 +130,113 @@ class wp_lms_shortcodes extends wp_lms {
 		//ob_end_flush();
 	}
 
+	public function active_courses_menu_jquery($atts){
+		//scripts and styles
+	    add_action( 'wp_footer', array($this, 'footer_scripts_jquery' ), 100 );
+	    //output
+		$page_query = new WP_Query();
+		$all_pages = $page_query->query( 
+			array( 
+			'post_type' => 'course',
+			'post_status' => 'publish', 
+			'posts_per_page' => -1, 
+			'orderby' => 'title',
+			'order' => 'ASC'
+			) 
+		);
+		?>
+		<div id="menu-jquery">
+			<nav class='jquery-nav'>
+				<h2><i class="fa fa-reorder"></i>Active Classes</h2>
+				<ul>
+				<?
+				foreach($all_pages as $k => $c){
+					$id = $c->ID;
+					$course_title = $c->post_title;
+					$status = get_post_meta($id, '_status', true);
+					if($status == "active"){
+						$instructor = get_post_meta($id, '_instructor', true);
+						$assignments = $page_query->query( 
+							array( 
+							'post_type' => 'assignment',
+							'post_status' => 'publish',
+							'_instructor' => $instructor,
+							'posts_per_page' => -1 
+							) 
+						);
+					?>
+					<li>
+						<a href="#"><i class="fa fa-laptop"></i><?= $course_title; ?></a>
+						<h2><i class="fa fa-laptop"></i><?= $course_title; ?></h2>
+						<ul>
+							<li><a href="<?php echo get_permalink($id) ;?>timeline">Timeline</a></li>
+							<li><a href="<?php echo get_permalink($id) ;?>">Syllabus</a></li>
+						<?
+						$assign_title = "";
+						$assign_id = "";
+						usort( $assignments, array($this, 'sort_menu_order') );
+						foreach($assignments as $key => $assign) {
+							$assign_title = $assign->post_title;
+							$assign_id = $assign->ID;
+							$course = get_post_meta($assign_id, '_course', true);
+							$assign_instructor = get_post_meta($assign_id, '_instructor', true);
+							$assign_parent = $assign->post_parent;
+							//$next = $this->find_next_assignment($id, $instructor, $key, $assignments);
+							
+							//foreach( $pages as $k => $p ){ 
+							if( $assign_parent == 0 && $course == $id && $instructor == $assign_instructor ) {
+								$page_children = get_page_children( $assign_id, $assignments );
+								$hasChildren = "";
+								if( !empty( $page_children ) ) {
+									$hasChildren = " children";
+									//$parentName = $assign->post_name;
+									usort( $assignments, array($this, 'sort_menu_order') );
+									?>
+							<li>
+								<a href="#"><i class="fa fa-phone"></i><?= $assign_title; ?></a>
+		                        <h2><i class="fa fa-phone"></i><?= $assign_title; ?></h2>
+		                        <ul>
+									<?php
+									foreach( $page_children as $w => $child ) {
+										$cid = $child->ID;
+										$c_title = $child->post_title;
+										?>
+									<li><a href="<?php echo get_permalink($cid) ;?>"><?= $c_title; ?></a></li>
+										<?php
+									}
+									?>
+								</ul>
+							</li>
+									<?php
+								}
+								else if( empty($page_children ) ) {
+									?>
+							<li>
+								<a href="<?php echo get_permalink($assign_id) ;?>"><?= $assign_title; ?></a>
+							</li>
+									<?php
+								}
+							}
+						} 
+						?>
+						</ul>
+					</li>
+							<?php
+					}
+				}
+				?>
+				</ul>
+			</nav>
+		</div>
+		<div class="container">
+		<?php
+	}
+
 	public function active_courses_menu_button($atts){
 		extract( shortcode_atts( array(
-      'text' => 'Menu',
-      'icon' => 'svg',
-      'class' => ''
+	      'text' => 'Menu',
+	      'icon' => 'svg',
+	      'class' => ''
 		), $atts ) );
 		if( !isset($atts['text']) ) $text = "Menu";
 		else $text = $atts['text'];
@@ -287,8 +403,8 @@ class wp_lms_shortcodes extends wp_lms {
 				$cstatus = get_post_meta($cid, "_status", true);
 				if( $ins == $id && $cstatus == "active") {
 				?>
-				<li><a href="<?= get_permalink($cid); ?>assignments/" title="<?= $ctitle; ?>"><?= $ctitle; ?></a></li>
-				<?php	
+				<li><?= $this->get_day_sname(0); ?> <a href="<?= get_permalink($cid); ?>assignments/" title="<?= $ctitle; ?>"><?= $ctitle; ?></a></li>
+				<?php
 				$one = true;
 				}
 			}
@@ -313,7 +429,7 @@ class wp_lms_shortcodes extends wp_lms {
 		return $url;
 	}
 
-	public function footer_scripts() {
+	public function footer_scripts_css_3dtransforms() {
       ?>
       <script src="<?= $this->plugin_base_url.'inc/ml-push-menu/js/classie.js'; ?>"></script>
       <script src="<?= $this->plugin_base_url.'inc/ml-push-menu/js/mlpushmenu.js'; ?>"></script>
@@ -328,6 +444,14 @@ class wp_lms_shortcodes extends wp_lms {
 </div><!-- .container -->
       <?
     }
+    	public function footer_scripts_jquery() {
+      ?>
+      <script src="<?= $this->plugin_base_url.'inc/MultiLevelPushMenu_v2.1.4/jquery.multilevelpushmenu.min.js'; ?>"></script>
+      <script type="text/javascript" src="<?= $this->plugin_base_url.'inc/MultiLevelPushMenu_v2.1.4/theme_integration.js'; ?>"></script>
+  	</div>
+      <?
+    }
+
 }
 $wp_lms_shortcodes = new wp_lms_shortcodes();
 ?>

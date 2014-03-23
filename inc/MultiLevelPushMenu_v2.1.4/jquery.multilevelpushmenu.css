@@ -1,5 +1,5 @@
 .multilevelpushmenu_wrapper {
-	position: absolute;
+	position: fixed;
 	overflow: hidden;
 	min-width: 100%;
 	min-height: 100%;
@@ -11,12 +11,17 @@
 	position: absolute;
 	overflow: hidden;
 	top: 0;
-	background: #336ca6;
+	background: #fff;
 	width: auto;
 	min-height: 100%;
 	font-family: 'Open Sans Condensed', sans-serif;
 	font-size: 1em;
 	zoom: 1;
+	-webkit-transition: background .75s ease-in;
+	-moz-transition: background .75s ease-in;
+	-ms-transition: background .75s ease-in;
+	-o-transition: background .75s ease-in;
+	transition: background .75s ease-in;
 }
 
 .multilevelpushmenu_wrapper .ltr {
@@ -38,7 +43,12 @@
 }
 
 .multilevelpushmenu_wrapper .multilevelpushmenu_inactive {
-	background: #2e6196;
+	background: #ccc;
+	-webkit-transition: background .2s ease-in;
+	-moz-transition: background .2s ease-in;
+	-ms-transition: background .2s ease-in;
+	-o-transition: background .2s ease-in;
+	transition: background .2s ease-in;
 }
 
 .multilevelpushmenu_wrapper h2 {
@@ -46,10 +56,13 @@
 	line-height: 1em;
 	font-weight: bold;
 	color: #1f4164;
-	padding: 0 .4em 0 .4em;
+	padding: 20px .4em;
+	cursor: default;
 }
 
 .multilevelpushmenu_wrapper ul {
+	/*-webkit-overflow-scrolling: touch;*/
+	overflow-y: scroll;
 	list-style: none;
 	padding: 0;
 	margin: 0;
@@ -77,18 +90,22 @@
 	line-height: 1em;
 	padding: .2em .2em;
 	text-decoration: none;
-	color: #fff;
+	color: #000;
 }
 
 .multilevelpushmenu_wrapper a:hover {
-	color: #ffe;
+	color: #fff;
 }
 
 .multilevelpushmenu_wrapper .backItemClass {
 	display: block;
 	padding: .4em .4em .4em .4em;
-	background: #2e6196;
+	background: #fff;
 	border-top: 1px solid #295685;
+}
+
+.multilevelpushmenu_wrapper .backItemClass:hover {
+	background-color: #295685;
 }
 
 .multilevelpushmenu_wrapper .floatRight {

@@ -1,0 +1,22 @@
+body {
+	background: #243342;
+}
+
+.container {
+	overflow: scroll;
+	z-index: 1;
+}
+
+#menu-jquery {
+	position: absolute; /* we can't use fixed here :( */
+	top: 0;
+	left: 0;
+	z-index: 300;
+	/*overflow: scroll;*/
+/*    -ms-opacity: 0.95;
+    opacity: 0.95;*/
+}
+
+.logged-in.admin-bar #menu-jquery {
+	top: 30px;
+}

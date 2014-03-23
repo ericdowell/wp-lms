@@ -38,6 +38,7 @@ class wp_lms {
         $this->plugin_inc_dir = $this->plugin_dir_long . '/inc/';
         $this->set_aval = array( "admin_option_pages", "version" => $this::$version, "custom_post_type_names", "settings_page_options", "post_meta" );
         $this->tax_names = array('assignment' => array('_course_name_', '_instructor_name_'), 'lecture' => array('_course_name_', '_instructor_name_') );
+        $this->menu = 'css3d';
         
 
         //run on this (parent)
@@ -84,6 +85,7 @@ class wp_lms {
         }
 
         if( get_parent_class( $this ) &&  get_class( $this ) == "wp_lms_shortcodes"  ) {
+          $this->days = array(array('label' => 'S', 'name' => 'Sunday', 'sname' => 'Sun'), array('label' => 'M', 'name' => 'Monday', 'sname' => 'Mon'), array('label' => 'T', 'name' => 'Tuesday', 'sname' => 'Tues'), array('label' => 'W', 'name' => 'Wednesday', 'sname' => 'Wedn'), array('label' => 'R', 'name' => 'Thursday', 'sname' => 'Thurs'), array('label' => 'F', 'name' => 'Friday', 'sname' => 'Fri'), array('label' => 'S', 'name' => 'Saturday', 'sname' => 'Sat'));
           add_action( 'wp_enqueue_scripts', array($this, 'styles_scripts') );
           add_shortcode('wp_lms_active_menu', array($this, 'active_courses_menu') );
           add_shortcode('wp_lms_active_menu_button', array($this, 'active_courses_menu_button') );
@@ -110,6 +112,8 @@ class wp_lms {
 
         //run within post meta class
         if( is_admin() && get_parent_class( $this ) && get_class($this) == "wp_lms_post_meta" ) {
+          // $ch_values = array('1', '2', '3', '4', '5', '6', '7');
+          // $ch_labels = array('S', 'M', 'T', 'W', 'R', 'F', 'S');
           $this->noncename = array('coursemeta_noncename', 'instructormeta_noncename', 'course_enrollment_noncename', 'coursebegin_noncename', 'sessionweeks_noncename', 'coursestatus_noncename','assign_prop_meta_noncename');
           $this->postdataname = array('_course', '_instructor', '_status', '_enroll_count', '_points', '_competencies', '_class_start', '_class_due', '_est_time', '_est_time_measure', '_turn_type', '_applies_to', '_course_date_begin_month', '_course_date_begin_day', '_course_date_end_month', '_course_date_end_day','_course_day_sun', '_course_day_mon', '_course_day_tues', '_course_day_wedn', '_course_day_thurs', '_course_day_fri', '_course_day_sat', '_course_begin_hour', '_course_begin_min', '_course_end_hour', '_course_end_min', '_course_end_ofday', '_course_begin_ofday');
           //for enrollment use in student directory custom post type
@@ -186,12 +190,52 @@ class wp_lms {
       return strcmp( $a->post_parent, $b->post_parent );
     }
 
-    public function styles_scripts() {
-    wp_enqueue_style( 'wp-lms-menu-icon', plugins_url('inc/ml-push-menu/css/icons.css', plugin_basename( __FILE__ ) ) );
-    wp_enqueue_style( 'wp-lms-menu-styles', plugins_url('inc/ml-push-menu/css/component.css', plugin_basename( __FILE__ ) ) );
+    /**
+     *  
+     *  @since 1.0.0
+     **/
+    public function get_day_label($num) {
+      return $this->days[$num]['label'];
+    }
 
-    wp_enqueue_script( 'wp-lms-menu-js', plugins_url('inc/ml-push-menu/js/modernizr.custom.js', plugin_basename( __FILE__ ), '2603104', false  ) );
-    //wp_enqueue_script( 'wp-lms-menu-js', plugins_url('inc/ml-push-menu/js/demoad.js', plugin_basename( __FILE__ ), '2603104', true  ) );
+    /**
+     *  
+     *  @since 1.0.0
+     **/
+    public function get_day_name($num) {
+      return $this->days[$num]['name'];
+    }
+
+    /**
+     *  
+     *  @since 1.0.0
+     **/
+    public function get_day_sname($num) {
+      return $this->days[$num]['sname'];
+    }
+
+
+    /**
+     *  
+     *  @since 1.0.0
+     **/
+    public function styles_scripts() {
+      if($this->menu == 'css3d') {
+        wp_enqueue_style( 'wp-lms-menu-icon', plugins_url('inc/ml-push-menu/css/icons.css', plugin_basename( __FILE__ ) ) );
+        wp_enqueue_style( 'wp-lms-menu-styles', plugins_url('inc/ml-push-menu/css/component.css', plugin_basename( __FILE__ ) ) );
+
+        wp_enqueue_script( 'wp-lms-menu-js', plugins_url('inc/ml-push-menu/js/modernizr.custom.js', plugin_basename( __FILE__ ), '2603104', false  ) );
+        //wp_enqueue_script( 'wp-lms-menu-js', plugins_url('inc/ml-push-menu/js/demoad.js', plugin_basename( __FILE__ ), '2603104', true  ) );
+      }
+      else if($this->menu == "jquery") {
+        //  <link href='http://fonts.googleapis.com/css?family=Open+Sans+Condensed:300,300italic,700&amp;subset=latin,cyrillic-ext,latin-ext,cyrillic' rel='stylesheet' type='text/css'>
+        wp_enqueue_style( 'wp-lms-google-font', 'http://fonts.googleapis.com/css?family=Open+Sans+Condensed:300,300italic,700&amp;subset=latin,cyrillic-ext,latin-ext,cyrillic', plugin_basename( __FILE__ ) );
+        wp_enqueue_style( 'wp-lms-font-awesome-icon', 'http://netdna.bootstrapcdn.com/font-awesome/4.0.1/css/font-awesome.min.css', plugin_basename( __FILE__ ) );
+        wp_enqueue_style( 'wp-lms-jquery-menu-styles', plugins_url('inc/MultiLevelPushMenu_v2.1.4/jquery.multilevelpushmenu.css', plugin_basename( __FILE__ ) ) );
+        wp_enqueue_style( 'wp-lms-theme-menu-styles', plugins_url('inc/MultiLevelPushMenu_v2.1.4/theme_integration.css', plugin_basename( __FILE__ ) ) );
+        wp_enqueue_script( 'wp-lms-jquery-menu', plugins_url('inc/MultiLevelPushMenu_v2.1.4/modernizr.min.js', plugin_basename( __FILE__ ), '2603104', false  ) );
+      }
+
     }
 
     public function add_to_header() {

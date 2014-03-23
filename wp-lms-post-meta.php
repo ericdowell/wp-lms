@@ -234,6 +234,7 @@ class wp_lms_post_meta extends wp_lms {
           		//echo $meta." ".$$var."<br>";
           		if( !empty($$var) ) $set_checkboxes[$var] = $$var;
           	}
+            
           	$ch_values = array('1', '2', '3', '4', '5', '6', '7');
             $ch_labels = array('S', 'M', 'T', 'W', 'R', 'F', 'S');
             ?>
@@ -263,7 +264,7 @@ class wp_lms_post_meta extends wp_lms {
             	$checked = "";
             	if( !empty( $set_checkboxes[$checkbox_names[$k]] ) && $set_checkboxes[$checkbox_names[$k]] == $ch_values[$k]) $checked = " checked";
           	?>
-              <td class="input_checkbox"><input type="checkbox" name="<?= '_'.$type.'_'.$checkbox_names[$k]; ?>" value="<?= $ch_values[$k]; ?>"<?= $checked; ?>></td>
+              <td class="input_checkbox"><input type="checkbox" name="<?= '_'.$type.'_days[]'; ?>" value="<?= $ch_values[$k]; ?>"<?= $checked; ?>></td>
             <? } ?>
           		</tr>
           		</tbody>
