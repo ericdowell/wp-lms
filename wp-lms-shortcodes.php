@@ -5,7 +5,6 @@ class wp_lms_shortcodes extends wp_lms {
 	public function active_courses_menu($atts){
 		//scripts and styles
 	    add_action( 'wp_footer', array($this, 'footer_scripts' ), 5 );
-	    //ob_start();
 	    //output
 		$page_query = new WP_Query();
 		$all_pages = $page_query->query( 
@@ -17,14 +16,12 @@ class wp_lms_shortcodes extends wp_lms {
 			'order' => 'ASC'
 			) 
 		);
-		//usort( $all_pages, array($this, 'sort_menu_order') );
-		//echo "<pre>";print_r($all_pages);echo "</pre>";
 		?>
 <div class="container">
 	<!-- push-wrapper -->
 	<div class="mp-pusher" id="mp-pusher">		
 		<!-- menu -->
-		<nav id="mp-menu" class="mp-menu mp-overlap">
+		<nav id="mp-menu" class="mp-menu">
 			<div class="mp-level" data-level="1">
 				<h2 class="icon icon-world">Active Classes</h2>
 				<ul>
@@ -44,7 +41,7 @@ class wp_lms_shortcodes extends wp_lms {
 							) 
 						);
 					?>
-					<li class="icon icon-arrow-left">
+					<li class="icon icon-arrow-left mp-level-container">
 						<a class="icon icon-display" href="#"><?= $course_title; ?></a>
 						<div class="mp-level" data-level="2">
 							<h2 class="icon icon-display"><?= $course_title; ?></h2>
@@ -95,8 +92,8 @@ class wp_lms_shortcodes extends wp_lms {
 									}
 									else if( empty($page_children ) ) {
 										?>
-							<li class="icon icon-arrow-left">
-								<a class="icon icon-t-shirt" href="#"><?= $assign_title; ?></a>
+							<li class="icon">
+								<a class="icon icon-t-shirt" href="<?php echo get_permalink($assign_id) ;?>"><?= $assign_title; ?></a>
 							</li>
 										<?php
 									}
@@ -244,6 +241,11 @@ class wp_lms_shortcodes extends wp_lms {
 	}
 
 	public function instructor_schedule($atts) {
+		extract( shortcode_atts( array(
+	      'class' => '',
+	      'id' => ''
+     	), $atts ) );
+     	$class = ' '.$atts['class'].'';
 		$page_query = new WP_Query();
 		$args = array(
 			'sort_column' => 'menu_order',
@@ -256,7 +258,7 @@ class wp_lms_shortcodes extends wp_lms {
 		$page_query = new WP_Query();
 		$all_pages = $page_query->query( $args );
 		?>
-		<div class="wp_lms ins_schedule">
+		<div class="wp_lms ins_schedule<?= $class; ?>">
 		<?
 		foreach( $all_pages as $k => $in ){ 
 			$id = $in->ID;
@@ -316,7 +318,9 @@ class wp_lms_shortcodes extends wp_lms {
       <script src="<?= $this->plugin_base_url.'inc/ml-push-menu/js/classie.js'; ?>"></script>
       <script src="<?= $this->plugin_base_url.'inc/ml-push-menu/js/mlpushmenu.js'; ?>"></script>
       <script>
- 				new mlPushMenu( document.getElementById( 'mp-menu' ), document.getElementById( 'trigger' ) );
+ 		new mlPushMenu( document.getElementById( 'mp-menu' ), document.getElementById( 'trigger' ), {
+    		type : 'cover'
+		} );
       </script>
 			</div><!-- .scroller-inner -->
 		</div><!-- .scroller -->

@@ -330,7 +330,7 @@ class wp_lms_post_meta extends wp_lms {
           }
           else {
           ?>
-            <p>Not Need for timelines.</p>
+            <p>Not needed for timelines.</p>
           <?
           }
           break;
@@ -407,7 +407,7 @@ class wp_lms_post_meta extends wp_lms {
       // verify this came from the our screen and with proper authorization,
       // because save_post can be triggered at other times
       $doReturn = true;
-      if(!empty($post)) {
+      if( !empty($post) || isset( $_POST['_wpnonce'] ) && !wp_verify_nonce( $_POST['_wpnonce'], plugin_basename(__FILE__) ) )  {
       $type = $post->post_type;
       foreach( $this->noncename as $k => $v ) {
         if( wp_verify_nonce( $_POST[$v], plugin_basename(__FILE__) ) ) {

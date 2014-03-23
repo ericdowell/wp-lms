@@ -1,12 +1,17 @@
 <?php
 /*
 Plugin Name: WP LMS
-Plugin URI: http://ericdowell.com/wp/plugins/
+Plugin URI: http://wordpress.org/extend/plugins/wp-lms/
 Description: Learning management system for WordPress.
 Author: Eric Dowell
 Version: 1.0.0
-Author URI: http://ericdowell.com
+Author URI: http://ericdowell.com/
+License: GPL2
 */
+
+// Report all errors except E_NOTICE
+// This is the default value set in php.ini
+// error_reporting(E_ALL ^ E_NOTICE);
 
 /**
  *  Plugin Object
@@ -185,8 +190,8 @@ class wp_lms {
     wp_enqueue_style( 'wp-lms-menu-icon', plugins_url('inc/ml-push-menu/css/icons.css', plugin_basename( __FILE__ ) ) );
     wp_enqueue_style( 'wp-lms-menu-styles', plugins_url('inc/ml-push-menu/css/component.css', plugin_basename( __FILE__ ) ) );
 
-    wp_enqueue_script( 'wp-lms-menu-js', plugins_url('inc/ml-push-menu/js/modernizr.custom.js', plugin_basename( __FILE__ ), '2603104', true  ) );
-    wp_enqueue_script( 'wp-lms-menu-js', plugins_url('inc/ml-push-menu/js/demoad.js', plugin_basename( __FILE__ ), '2603104', true  ) );
+    wp_enqueue_script( 'wp-lms-menu-js', plugins_url('inc/ml-push-menu/js/modernizr.custom.js', plugin_basename( __FILE__ ), '2603104', false  ) );
+    //wp_enqueue_script( 'wp-lms-menu-js', plugins_url('inc/ml-push-menu/js/demoad.js', plugin_basename( __FILE__ ), '2603104', true  ) );
     }
 
     public function add_to_header() {

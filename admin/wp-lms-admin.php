@@ -256,7 +256,10 @@ class wp_lms_admin extends wp_lms {
 				if($course_count > 1) {
 					//echo "true";
 					for ($i=0; $i < $course_count; $i++) { 
-						echo '<li>'.get_post(get_post_meta($s->ID, '_course'.$i, true))->post_title.'</li>';
+						$obj = get_post(get_post_meta($s->ID, '_course'.$i, true));
+						if( !empty($obj) ) {
+							echo '<li>'.$obj->post_title.'</li>';
+						}
 					}
 				}
 				else if ($course_count == 1) {

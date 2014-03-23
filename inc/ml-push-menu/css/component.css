@@ -11,6 +11,7 @@ html, body, .container, .scroller {
 }
 
 .scroller {
+	/*-webkit-overflow-scrolling: touch;*/
 	overflow-y: scroll;
 }
 
@@ -53,11 +54,15 @@ html, body, .container, .scroller {
 	top: 0;
 	left: 0;
 	z-index: 1;
-	width: 300px;
+	width: 330px;
 	height: 100%;
 	-webkit-transform: translate3d(-100%, 0, 0);
 	-moz-transform: translate3d(-100%, 0, 0);
 	transform: translate3d(-100%, 0, 0);
+}
+
+.mp-level-container {
+	overflow: hidden;
 }
 
 .mp-level {
@@ -67,6 +72,7 @@ html, body, .container, .scroller {
 	width: 100%;
 	height: 100%;
 	background: #fff;
+	overflow-y: scroll;
 	-webkit-transform: translate3d(-100%, 0, 0);
 	-moz-transform: translate3d(-100%, 0, 0);
 	transform: translate3d(-100%, 0, 0);
@@ -131,6 +137,12 @@ html, body, .container, .scroller {
 	-webkit-transform: translate3d(-40px, 0, 0);
 	-moz-transform: translate3d(-40px, 0, 0);
 	transform: translate3d(-40px, 0, 0);
+}
+
+.mp-level.mp-level-open:not(.mp-level-overlay) > ul {
+height: 100%;
+overflow-y: scroll;
+-webkit-overflow-scrolling:touch;
 }
 
 /* First level */
@@ -278,7 +290,7 @@ html, body, .container, .scroller {
 /* We'll show the first level only */
 .no-csstransforms3d .mp-pusher,
 .no-js .mp-pusher {
-	padding-left: 300px;
+	padding-left: 330px;
 }
 
 .no-csstransforms3d .mp-menu .mp-level,
