@@ -235,11 +235,10 @@ class wp_lms_admin extends wp_lms {
 			<h1>View Student Information</h1>
 			<?
 			$args = array(
+				'sort_order' => 'ASC',
 				'sort_column' => 'menu_order',
 				'post_type' => 'student_directory',
 				'post_status' => 'publish',
-				'orderby' => 'title',
-				'order' => 'ASC'
 			);
 			$pages = get_pages( $args );
 			?>

@@ -225,7 +225,6 @@ class wp_lms {
         wp_enqueue_style( 'wp-lms-menu-styles', plugins_url('inc/ml-push-menu/css/component.css', plugin_basename( __FILE__ ) ) );
 
         wp_enqueue_script( 'wp-lms-menu-js', plugins_url('inc/ml-push-menu/js/modernizr.custom.js', plugin_basename( __FILE__ ), '2603104', false  ) );
-        //wp_enqueue_script( 'wp-lms-menu-js', plugins_url('inc/ml-push-menu/js/demoad.js', plugin_basename( __FILE__ ), '2603104', true  ) );
       }
       else if($this->menu == "jquery") {
         //  <link href='http://fonts.googleapis.com/css?family=Open+Sans+Condensed:300,300italic,700&amp;subset=latin,cyrillic-ext,latin-ext,cyrillic' rel='stylesheet' type='text/css'>

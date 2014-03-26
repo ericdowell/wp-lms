@@ -18,7 +18,7 @@ class wp_lms_shortcodes extends wp_lms {
 
 	public function active_courses_menu_css_3dtransforms($atts){
 		//scripts and styles
-	    add_action( 'wp_footer', array($this, 'footer_scripts_css_3dtransforms' ), 5 );
+	    add_action( 'wp_footer', array($this, 'footer_scripts_css_3dtransforms' ), 100 );
 	    //output
 		$page_query = new WP_Query();
 		$all_pages = $page_query->query( 
@@ -36,10 +36,12 @@ class wp_lms_shortcodes extends wp_lms {
 	<div class="mp-pusher" id="mp-pusher">		
 		<!-- menu -->
 		<nav id="mp-menu" class="mp-menu">
-			<div class="mp-level" data-level="1">
+			<div class="mp-level">
 				<h2 class="icon icon-world">Active Classes</h2>
-				<ul>
-				<?
+				<a class="mp-close" href="#">Close</a>
+				<div class="mp-scroller">
+				<ul class="mp-list">
+				<?php
 				foreach($all_pages as $k => $c){
 					$id = $c->ID;
 					$course_title = $c->post_title;
@@ -56,10 +58,11 @@ class wp_lms_shortcodes extends wp_lms {
 						);
 					?>
 					<li class="icon icon-arrow-left mp-level-container">
-						<a class="icon icon-display" href="#"><?= $course_title; ?></a>
-						<div class="mp-level" data-level="2">
-							<h2 class="icon icon-display"><?= $course_title; ?></h2>
+						<a class="icon  icon-study" href="#"><?= $course_title; ?></a>
+						<div class="mp-level">
+							<h2 class="icon icon-study"><?= $course_title; ?></h2>
 							<a class="mp-back" href="#">back</a>
+							<div class="mp-scroller">
 							<ul>
 								<li><a href="<?php echo get_permalink($id) ;?>timeline">Timeline</a></li>
 								<li><a href="<?php echo get_permalink($id) ;?>">Syllabus</a></li>
@@ -69,6 +72,7 @@ class wp_lms_shortcodes extends wp_lms {
 							usort( $assignments, array($this, 'sort_menu_order') );
 							foreach($assignments as $key => $assign) {
 								$assign_title = $assign->post_title;
+								$assign_name = $assign->post_name;
 								$assign_id = $assign->ID;
 								$course = get_post_meta($assign_id, '_course', true);
 								$assign_instructor = get_post_meta($assign_id, '_instructor', true);
@@ -85,9 +89,9 @@ class wp_lms_shortcodes extends wp_lms {
 										usort( $assignments, array($this, 'sort_menu_order') );
 										?>
 							<li class="icon icon-arrow-left">
-								<a class="icon icon-t-shirt" href="#"><?= $assign_title; ?></a>
+								<a class="icon" href="#"><?= $assign_title; ?></a>
 								<div class="mp-level">
-									<h2 class="icon icon-t-shirt"><?= $assign_title; ?></h2>
+									<h2 class="icon"><?= $assign_title; ?></h2>
 									<a class="mp-back" href="#">back</a>
 									<ul>
 										<?php
@@ -106,8 +110,8 @@ class wp_lms_shortcodes extends wp_lms {
 									}
 									else if( empty($page_children ) ) {
 										?>
-							<li class="icon">
-								<a class="icon icon-t-shirt" href="<?php echo get_permalink($assign_id) ;?>"><?= $assign_title; ?></a>
+							<li>
+								<a href="<?php echo get_permalink($assign_id) ;?>"><?= $assign_title; ?></a>
 							</li>
 										<?php
 									}
@@ -115,6 +119,7 @@ class wp_lms_shortcodes extends wp_lms {
 							} 
 							?>
 							</ul>
+							</div>
 						</div>
 					</li>
 							<?php
@@ -122,8 +127,14 @@ class wp_lms_shortcodes extends wp_lms {
 				}
 				?>
 				</ul>
+				</div>
 			</div>
 		</nav>
+		<div class="add-scroll">
+			<div class="inner-add-scroll">
+			 <? echo do_shortcode('[wp_lms_active_menu_button class="decornone" text="Active Courses"]'); ?>
+			</div>
+		</div>
 		<div class="scroller">
 			<div class="scoller-inner">
 		<?php
@@ -268,9 +279,10 @@ class wp_lms_shortcodes extends wp_lms {
 			) 
 		);
 		?>
-		<ul>
-			<li><a href="<?php echo get_permalink($id) ;?>timeline">Timeline</a></li>
-			<li><a href="<?php echo get_permalink($id) ;?>">Syllabus</a></li>
+		<div class="wp-lms wp-lms-list">
+		<ul class="mast-ul">
+			<li class="assign top"><a href="<?php echo get_permalink($id) ;?>timeline"  class="assign-title">Timeline</a></li>
+			<li class="assign top"><a href="<?php echo get_permalink($id) ;?>" class="assign-title">Syllabus</a></li>
 		<?
 		//print_r($assignments);
 		usort( $assignments, array($this, 'sort_menu_order') );
@@ -286,8 +298,8 @@ class wp_lms_shortcodes extends wp_lms {
 				$hasChildren = "";
 				if( !empty( $page_children ) ) {
 				?>
-				<li><?= $assign_title; ?>
-					<ul>
+				<li class="parent-li top"><h3 class="hgrp hgrp-3 parent-title"><?= $assign_title; ?></h3>
+					<ul class="parent-ul">
 
 					<?
 					$hasChildren = " children";
@@ -299,7 +311,7 @@ class wp_lms_shortcodes extends wp_lms {
 						$cid = $child->ID;
 						$c_title = $child->post_title;
 						?>
-					<li><a href="<?php echo get_permalink($cid) ;?>"><?= $c_title; ?></a></li>
+					<li class="assign child"><a href="<?php echo get_permalink($cid) ;?>"  class="assign-title"><?= $c_title; ?></a></li>
 						<?php
 					}
 					?>
@@ -309,14 +321,16 @@ class wp_lms_shortcodes extends wp_lms {
 				}
 				else if( empty($page_children ) ) {
 					?>
-		<li>
-			<a class="icon icon-t-shirt" href="#"><?= $assign_title; ?></a>
+		<li class="assign top">
+			<a href="<?php echo get_permalink($cid) ;?>" class="assign-title"><?= $assign_title; ?></a>
 		</li>
 					<?php
 				}
 			}
 		} 
 		?>
+		</ul>
+		</div>
 		<?php
 	}
 
@@ -332,6 +346,7 @@ class wp_lms_shortcodes extends wp_lms {
 			) 
 		);
 		?>
+		<div class="wp-lms-list">
 		<ul>
 		<?php
 		foreach($all_pages as $k => $course) {
@@ -341,12 +356,13 @@ class wp_lms_shortcodes extends wp_lms {
 			$ins = get_post(get_post_meta($cid, "_instructor", true));
 			if($status == 'inactive') {
 		?>
-			<li><?= $ctitle; ?> - <?= $ins->post_title; ?></li>
+			<li><a href="<?php echo get_permalink($cid) ;?>" title="<?= $ctitle; ?> - <?= $ins->post_title; ?>"><?= $ctitle; ?> - <?= $ins->post_title; ?></a></li>
 		<?php
 			}
 		}
 		?>
 		</ul>
+		</div>
 		<?php
 	}
 
@@ -374,7 +390,7 @@ class wp_lms_shortcodes extends wp_lms {
 		$page_query = new WP_Query();
 		$all_pages = $page_query->query( $args );
 		?>
-		<div class="wp_lms ins_schedule<?= $class; ?>">
+		<div class="wp_lms wp-lms-list ins_schedule<?= $class; ?>">
 		<?
 		foreach( $all_pages as $k => $in ){ 
 			$id = $in->ID;
@@ -403,7 +419,7 @@ class wp_lms_shortcodes extends wp_lms {
 				$cstatus = get_post_meta($cid, "_status", true);
 				if( $ins == $id && $cstatus == "active") {
 				?>
-				<li><?= $this->get_day_sname(0); ?> <a href="<?= get_permalink($cid); ?>assignments/" title="<?= $ctitle; ?>"><?= $ctitle; ?></a></li>
+				<li><? //echo $this->get_day_sname(0); ?> <a href="<?= get_permalink($cid); ?>assignments/" title="<?= $ctitle; ?>"><?= $ctitle; ?></a></li>
 				<?php
 				$one = true;
 				}
@@ -430,6 +446,7 @@ class wp_lms_shortcodes extends wp_lms {
 	}
 
 	public function footer_scripts_css_3dtransforms() {
+		//wp_enqueue_script('jquery', array('jquery'));
       ?>
       <script src="<?= $this->plugin_base_url.'inc/ml-push-menu/js/classie.js'; ?>"></script>
       <script src="<?= $this->plugin_base_url.'inc/ml-push-menu/js/mlpushmenu.js'; ?>"></script>
@@ -437,6 +454,7 @@ class wp_lms_shortcodes extends wp_lms {
  		new mlPushMenu( document.getElementById( 'mp-menu' ), document.getElementById( 'trigger' ), {
     		type : 'cover'
 		} );
+		//jQuery('.site a').unbind('click');
       </script>
 			</div><!-- .scroller-inner -->
 		</div><!-- .scroller -->
@@ -446,8 +464,8 @@ class wp_lms_shortcodes extends wp_lms {
     }
     	public function footer_scripts_jquery() {
       ?>
-      <script src="<?= $this->plugin_base_url.'inc/MultiLevelPushMenu_v2.1.4/jquery.multilevelpushmenu.min.js'; ?>"></script>
-      <script type="text/javascript" src="<?= $this->plugin_base_url.'inc/MultiLevelPushMenu_v2.1.4/theme_integration.js'; ?>"></script>
+	<script src="<?= $this->plugin_base_url.'inc/MultiLevelPushMenu_v2.1.4/jquery.multilevelpushmenu.min.js'; ?>"></script>
+     <script type="text/javascript" src="<?= $this->plugin_base_url.'inc/MultiLevelPushMenu_v2.1.4/theme_integration.js'; ?>"></script>
   	</div>
       <?
     }

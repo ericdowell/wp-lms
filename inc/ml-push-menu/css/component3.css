@@ -8,16 +8,17 @@
 
 html, body, .container, .scroller {
 	height: 100%;
-	min-height: 100%;
+	/*min-height: 100%;*/
 }
 
-.scroller , .scroll :not(.menu-button) {
+.mp-pushed .scroller {
+	-webkit-overflow-scrolling: touch;
+	overflow-y: scroll;
+}
+
+.scroller { 
 	overflow-y: scroll;
 	-webkit-overflow-scrolling: touch;
-}
-
-.add-scroll {
-	overflow-y:scroll;
 }
 
 .scroller,
@@ -38,14 +39,14 @@ html, body, .container, .scroller {
 }
 
 .menu-trigger:before {
-	position: absolute;
-	top: 2px;
-	left: 0;
-	width: 40px;
-	height: 6px;
-	background: #fff;
-	box-shadow: 0 6px #34495e, 0 12px #fff, 0 18px #34495e, 0 24px #fff;
-	content: '';
+	/*position: absolute;*/
+	/*top: 2px;*/
+	/*left: 0;*/
+	/*width: 40px;*/
+	/*height: 6px;*/
+	/*background: #fff;*/
+	/*box-shadow: 0 6px #34495e, 0 12px #fff, 0 18px #34495e, 0 24px #fff;*/
+	/*content: '';*/
 }
 
 .mp-pusher {
@@ -61,31 +62,19 @@ html, body, .container, .scroller {
 	z-index: 1;
 	width: 330px;
 	height: 100%;
+	overflow: hidden;
 	-webkit-transform: translate3d(-100%, 0, 0);
 	-moz-transform: translate3d(-100%, 0, 0);
 	transform: translate3d(-100%, 0, 0);
 }
 
+.mp-scroller {
+	width:330px;
+	overflow-y: scroll;
+}
+
 .mp-level-container {
 	overflow: hidden;
-}
-
-.mp-level li:last-child {
-	margin-bottom: 50px;
-}
-
-/*viewport height less than 630px shows last layer*/
-
-.mp-level[data-level='2'], 
-.mp-level[data-level='3'],
-.mp-level[data-level='4'] {
-	width:344px;
-	height:100%;
-}
-
-
-.mp-level.mp-level-open.mp-level-overlay {
-	overflow-y:hidden;
 }
 
 .mp-level {
@@ -95,10 +84,14 @@ html, body, .container, .scroller {
 	width: 100%;
 	height: 100%;
 	background: #fff;
-	overflow-x: hidden;
+	overflow-y: scroll;
 	-webkit-transform: translate3d(-100%, 0, 0);
 	-moz-transform: translate3d(-100%, 0, 0);
 	transform: translate3d(-100%, 0, 0);
+}
+
+.mp-level li:last-child {
+	margin-bottom: 200px;
 }
 
 /* overlays for pusher and for level that gets covered */
@@ -163,9 +156,9 @@ html, body, .container, .scroller {
 }
 
 .mp-level.mp-level-open:not(.mp-level-overlay) > ul {
-	height: 100%;
-	overflow-y: scroll;
-	-webkit-overflow-scrolling:touch;
+height: 100%;
+overflow-y: scroll;
+-webkit-overflow-scrolling:touch;
 }
 
 /* First level */
@@ -181,8 +174,6 @@ html, body, .container, .scroller {
 
 /* cover */
 .mp-cover .mp-level.mp-level-open {
-	overflow-y:scroll;
-	-webkit-overflow-scrolling: touch;
 	-webkit-transform: translate3d(0, 0, 0);
 	-moz-transform: translate3d(0, 0, 0);
 	transform: translate3d(0, 0, 0);
@@ -249,7 +240,7 @@ html, body, .container, .scroller {
 	outline: none;
 	box-shadow: inset 0 -1px rgba(0,0,0,0.2);
 	text-shadow: 0 0 1px rgba(255,255,255,0.1);
-	font-size: 1.3em;
+	font-size: 1.4em;
 	-webkit-transition: background 0.3s, box-shadow 0.3s;
 	-moz-transition: background 0.3s, box-shadow 0.3s;
 	transition: background 0.3s, box-shadow 0.3s;
@@ -278,8 +269,7 @@ html, body, .container, .scroller {
 	box-shadow: inset 0 -1px rgba(0,0,0,0);
 }
 
-.mp-back,
-.mp-close {
+.mp-back {
 	background: rgba(0,0,0,0.1);
 	outline: none;
 	color: #000;
@@ -296,8 +286,7 @@ html, body, .container, .scroller {
 	transition: background 0.3s;
 }
 
-.mp-back::after,
-.mp-close::after  {
+.mp-back::after {
 	font-family: 'linecons';
 	position: absolute;
 	content: "\e037";
@@ -306,14 +295,13 @@ html, body, .container, .scroller {
 	color: rgba(0,0,0,0.3);
 }
 
-/*.mp-close {
+.mp-close {
 	background: rgba(0,0,0,0.1);
 	outline: none;
-	color: #000;
+	color: #fff;
 	letter-spacing: 1px;
 	font-weight: 700;
 	display: block;	
-	font-size: 0.8em;
 	padding: 1em;
 	position: relative;
 	box-shadow: inset 0 1px rgba(0,0,0,0.1);
@@ -326,13 +314,13 @@ html, body, .container, .scroller {
 .mp-close::after {
 	font-family: 'linecons';
 	position: absolute;
-	content: "\e037";
+	content: "\e033";
 	right: 10px;
 	font-size: 1.3em;
 	color: rgba(0,0,0,0.3);
-}*/
+}
 
-/*.mp-close:hover {background: rgba(255,255,255,0.1);}*/
+.mp-close:hover {background: rgba(255,255,255,0.1);}
 
 .mp-menu .mp-level.mp-level-overlay > .mp-back,
 .mp-menu .mp-level.mp-level-overlay > .mp-back::after {

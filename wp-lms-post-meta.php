@@ -116,7 +116,7 @@ class wp_lms_post_meta extends wp_lms {
             $course_label = " Not Set";
             $instructor_label = " Not Set";
             if( isset($var[0]) && $var[0] == "_course_name".$prefix && empty( $$var[0] ) ) $course_label = " Not Set";
-            if( isset($var[0]) && $var[1] == "_instructor_name".$prefix  && empty( $$var[1] ) ) $instructor_label = " Not Set";
+            if( isset($var[1]) && $var[1] == "_instructor_name".$prefix  && empty( $$var[1] ) ) $instructor_label = " Not Set";
           }
           if( empty( $$var[1] ) && empty( $$var[0] ) ) {
              $link = "#";
