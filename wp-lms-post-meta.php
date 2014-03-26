@@ -20,6 +20,7 @@ class wp_lms_post_meta extends wp_lms {
       $type = $metabox['args']['type'];
       $name = $metabox['args']['name'];
       $create = $metabox['args']['create'];
+      $nonce = $metabox['args']['noncename'];
       $page_query = new WP_Query();
       $all_pages = $page_query->query( array( 'post_type' => $type, 'posts_per_page' => -1, 'orderby' => 'title',
         'order' => 'ASC' ) );
@@ -370,6 +371,134 @@ class wp_lms_post_meta extends wp_lms {
           <input type="number" name="_enroll_count" value="<?= $enrollment_count; ?>"> 
           <?
           break;
+
+          case 'assign_prop':
+            /*
+            '_points', 
+            '_competencies', 
+            '_class_start', 
+            '_class_due', 
+            '_est_time', 
+            '_est_time_measure', 
+            '_turn_type', 
+            '_applies_to'
+            */
+            $points = get_post_meta($post->ID, "_points", true);
+            $comps = get_post_meta($post->ID, "_competencies", true);
+            $_class_start = get_post_meta($post->ID, "_class_start", true);
+            $_class_due = get_post_meta($post->ID, "_class_due", true);
+            $est_time = get_post_meta($post->ID, "_est_time", true);
+            $turn_type = get_post_meta($post->ID, "_turn_type", true);
+            $applies = get_post_meta($post->ID, "_applies_to", true);
+            ?>
+            <input type="hidden" name="<?php echo $nonce; ?>" id="<?php echo $nonce; ?>" value="<?php echo wp_create_nonce( plugin_basename(__FILE__) ); ?>" />
+            <p><label for="_points">Point Possible</label><br>
+            <input type="text" name="_points" value="<?= $points; ?>"></p>
+            <p><label for="_competencies">Competencies</label><br>
+            <input type="text" name="_competencies" value="<?= $comps; ?>"></p>
+            <?
+            $start_end = array("_class_start" => "Class to Start Working", "_class_due" => "Class Due");
+            foreach($start_end as $name => $label) {
+            ?>
+            <p><label for="<?= $name; ?>"><?= $label; ?></label><br>
+              <select name="<?= $name; ?>">
+            <?
+              foreach(range(1, 11) as $num) {
+                $cfirst = "";
+                $csec = "";
+                $class = explode(".", $$name);
+                if( isset($class) && is_array($class) && $class[0] == $num ){ 
+                  //echo "true";
+                  if($class[1] == '1') { $cfirst = ' selected'; }
+                  else if($class[1] == '2') { $csec = ' selected'; }
+                }
+                ?>
+                <option value="<?= $num; ?>.1"<?= $cfirst; ?>><?= $num; ?>.1</option>
+                <option value="<?= $num; ?>.2"<?= $csec; ?>><?= $num; ?>.2</option>
+                <?
+              }
+            ?>
+              </select>
+            </p>
+            <?
+            }
+            $tval = "";
+            $tmeasure = "";
+            if( isset($est_time) && strstr($est_time, ",") ) $est_time = explode(",", $est_time);
+            if( is_array($est_time) && isset($est_time[0]) ) $tval = $est_time[0];
+            if( is_array($est_time) && isset($est_time[1]) ) $tmeasure = $est_time[1];
+            ?>
+            <p><label for="_est_time">Estimated Time</label><br>
+              <input type="text" name="_est_time[]" value="<?= $tval; ?>">
+              <select name="_est_time[]">
+                <?
+                $t_types = array("minutes", "hours");
+                foreach( $t_types as $v ) {
+                  $t_select = "";
+                  if( isset($tmeasure) && $v == $tmeasure) {
+                    $t_select = " selected";
+                  }
+                ?>
+                  <option value="<?= $v; ?>"<?= $t_select; ?>><?= ucfirst($v); ?></option>
+                <?
+                }
+                ?>
+              </select>
+            </p>
+            <?
+            $turn = array("subdomain" => "Subdomain", "email" => "Email", "drop_off" => "Drop Off", "shared" => "Shared");
+            ?>
+            <p><label for="_turn_type">Turn in Type</label><br>
+              <select name="_turn_type">
+                <?
+                foreach($turn as $name => $lab){
+                  $selected = '';
+                  if($turn_type == $name) {
+                    $selected = ' selected';
+                  }
+                ?>
+                <option value="<?= $name; ?>"<?= $selected; ?>><?= $lab; ?></option>
+                <?
+                }
+                ?>
+              </select>
+            </p>
+            <? 
+            $ins = get_post_meta($post->ID, "_instructor", true);
+            $cour = get_post_meta($post->ID, "_course", true);
+            ?>
+            <p><label for="_applies_to">Applies to</label><br>
+              <select name="_applies_to">            
+                <option value="none">N/A</option>
+                <?
+                if( !empty($ins) || !empty($cour)) {
+                  $page_query = new WP_Query();
+                  $args = array(
+                    'post_type' => 'assignment',
+                    'post_status' => 'publish',
+                    '_instructor_num_assignment' => $ins,
+                    '_course_num_assignment' => $cour,
+                    'orderby' => 'title',
+                    'order' => 'ASC'
+                  );
+                  $assigns = $page_query->query( $args );
+                  foreach($assigns as $k => $a) {
+                    $aid = $a->ID;
+                    $aname = $a->post_title;
+                    $selected = "";
+                    if(isset($applies) && $applies == $aid){
+                      $selected = " selected";
+                    }
+                    ?>
+                  <option value="<?= $aid; ?>"<?= $selected; ?>><?=$aname; ?></option>
+                    <?
+                  }
+                }
+                ?>
+              </select>
+            </p>
+            <?
+            break;
 
 
           case "status":

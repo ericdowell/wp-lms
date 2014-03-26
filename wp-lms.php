@@ -122,7 +122,7 @@ class wp_lms {
           }
           $this->post_metabox = array(
             array('wp_lms_course_list_assign','Course List', 'assignment', 'side','high', array('name' => "Courses", 'type' => 'course', 'create' => 'select', 'noncename' => 'coursemeta_noncename') ),
-            //array('wp_lms_course_assign_prop','Assignment Properties', 'assignment', 'side','high', array('name' => "Assignment Properties", 'type' => 'assignment', 'create' => 'assign_prop', 'noncename' => 'assign_prop_meta_noncename') ),
+            array('wp_lms_course_assign_prop','Assignment Properties', 'assignment', 'normal','high', array('name' => "Assignment Properties", 'type' => 'assignment', 'create' => 'assign_prop', 'noncename' => 'assign_prop_meta_noncename') ),
             array('wp_lms_enrollment_count_student','# of Course(s) Enrolled', 'student_directory', 'side','high', array('name' => "# of Course(s) Enrolled", 'type' => 'course', 'create' => 'number', 'noncename' => 'course_enrollment_noncename') ),
             array('wp_lms_course_list_student','Course Enrollment', 'student_directory', 'side','high', array('name' => "Courses", 'type' => 'course', 'create' => 'select', 'noncename' => 'coursemeta_noncename') ), 
             array('wp_lms_course_list_lecture', 'Course List', 'lecture', 'side', 'high', array( 'name' => "Courses", 'type' => 'course', 'create' => 'select', 'noncename' => 'coursemeta_noncename') ), 

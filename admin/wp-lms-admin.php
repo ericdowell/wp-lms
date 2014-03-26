@@ -292,14 +292,76 @@ class wp_lms_admin extends wp_lms {
 	
 	public function student_attendance(){
 		$page_base = $this->page_url();
-		ob_start();
+		$page_query = new WP_Query();
+		$all_pages = $page_query->query( 
+			array( 
+			'post_type' => 'course',
+			'post_status' => 'publish', 
+			'posts_per_page' => -1, 
+			'orderby' => 'title',
+			'order' => 'ASC'
+			) 
+		);
 		?>
 		<div class="wp_lms settings">
 			<h1>Take Student Attendance</h1>
 
+			<h2 class="nav-tab-wrapper">
+			<?
+			$first = false;
+			foreach($all_pages as $k => $course) {
+			$cid = $course->ID;
+			$ctitle = $course->post_title;
+			$status = get_post_meta($cid, "_status", true);
+			$ins = get_post(get_post_meta($cid, "_instructor", true));
+				if($status == 'active') {
+					if(!$first) {
+						$first = true;
+						$num = $k;
+						$course_id = $cid;
+					}
+					$current = "";
+					if( !isset( $_GET['id'] ) && $k == $num ) {
+						$current = " nav-tab-active";
+					}
+					else if( $_GET['id'] == $cid ) {
+						$current = " nav-tab-active";
+						$course_id = $cid;
+					}
+				?>
+					<a href="<?= $page_base;?>&amp;id=<?= $cid; ?>" class="nav-tab<?= $current; ?>" title="<?= $ctitle; ?>"><?= $ctitle; ?></a>
+				<?
+				}
+			}
+			?>
+			</h2>
+			<h3>Student List</h3>
+			<p>Check if Present</p>
+			<?
+			$args = array(
+				'sort_order' => 'ASC',
+				'sort_column' => 'menu_order',
+				'post_type' => 'student_directory',
+				'post_status' => 'publish',
+			);
+			$students = get_pages( $args );
+			?>
+			<p><input type="checkbox" name="select-all" class="select-all" id="wp-lms-select-all">
+			<label for="select-all">Select All</label></p>
+			<form method="post" action="<?= $page_base;?>&amp;id=<?= $course_id; ?>">
+			<?
+			foreach($students as $key => $stu){
+				$sid = $stu->ID;
+				$stitle = $stu->post_title;
+			?>
+			<p><input type="checkbox" name="<?= $sid; ?>" class="student">
+			<label for="<?= $sid; ?>"><?= $stitle; ?></label></p>
+			<?
+			}
+			?>
+			</form>
 		</div>
 		<?
-		ob_end_flush();
 	}
 
 	/**
