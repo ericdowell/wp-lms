@@ -32,7 +32,7 @@ html, body, .container, .scroller {
 
 .menu-trigger {
 	position: relative;
-	padding-left: 45px;
+	/*padding-left: 45px;*/
 	font-size: 1.56em;
 	color:#000;
 }
@@ -41,11 +41,11 @@ html, body, .container, .scroller {
 	position: absolute;
 	top: 2px;
 	left: 0;
-	width: 40px;
-	height: 6px;
-	background: #fff;
+	/*width: 40px;*/
+	/*height: 6px;*/
+	/*background: #fff;*/
 	box-shadow: 0 6px #34495e, 0 12px #fff, 0 18px #34495e, 0 24px #fff;
-	content: '';
+	/*content: '';*/
 }
 
 .mp-pusher {

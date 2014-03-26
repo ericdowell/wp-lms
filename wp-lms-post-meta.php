@@ -158,7 +158,7 @@ class wp_lms_post_meta extends wp_lms {
         **/
         case 'date':
           $post_status = get_post_meta($post->ID, "_status", true);
-          if($post_status != "timeline"){
+          if($post_status != "timeline" && $post_status != "assignments"){
             $m_labels = array('01','02','03','04','05','06','07','08','09','10','11','12');
             $m_values = array('2','3','4','5','6','7', '8','9','10','11','12','13','14');
             $get_meta = array('begin_month' => "_".$type."_date_begin_month", 'begin_day' => "_".$type."_date_begin_day",'begin_year' =>"_".$type."_date_begin_year",'end_month' => "_".$type."_date_end_month",'end_day' => "_".$type."_date_end_day",'end_year' => "_".$type."_date_end_year");
@@ -332,7 +332,7 @@ class wp_lms_post_meta extends wp_lms {
           }
           else {
           ?>
-            <p>Not needed for timelines.</p>
+            <p>Not needed.</p>
           <?
           }
           break;
@@ -383,6 +383,7 @@ class wp_lms_post_meta extends wp_lms {
             '_turn_type', 
             '_applies_to'
             */
+            $assignment_type = get_post_meta($post->ID, "_assign_type", true);
             $points = get_post_meta($post->ID, "_points", true);
             $comps = get_post_meta($post->ID, "_competencies", true);
             $_class_start = get_post_meta($post->ID, "_class_start", true);
@@ -392,6 +393,25 @@ class wp_lms_post_meta extends wp_lms {
             $applies = get_post_meta($post->ID, "_applies_to", true);
             ?>
             <input type="hidden" name="<?php echo $nonce; ?>" id="<?php echo $nonce; ?>" value="<?php echo wp_create_nonce( plugin_basename(__FILE__) ); ?>" />
+            <?
+            $assign_types = array('assignment', 'information');
+            ?>
+            <p><label for="_assign_type">Assignment Type:</label><br>
+              <select name="_assign_type">
+                <?
+                foreach($assign_types as $k => $type){
+                  $selected = "";
+                  if($type == $assignment_type) $selected = " selected";
+                ?>
+                <option value="<?= $type; ?>"<?= $selected; ?>><?= ucfirst($type); ?></option>
+                <?
+                }
+                ?>
+              </select>
+            </p>
+            <?
+            if($assignment_type == 'assignment'){
+            ?>
             <p><label for="_points">Point Possible</label><br>
             <input type="text" name="_points" value="<?= $points; ?>"></p>
             <p><label for="_competencies">Competencies</label><br>
@@ -498,12 +518,18 @@ class wp_lms_post_meta extends wp_lms {
               </select>
             </p>
             <?
+            }
+            else if($assignment_type == 'information') {
+              ?>
+              <p>Properties aren't needed.</p>
+              <?
+            }
             break;
 
 
           case "status":
         	$status = get_post_meta($post->ID, "_status", true);
-        	$statuses = array("inactive", "active", "timeline");
+        	$statuses = array("inactive", "active", "timeline", "assignments");
           ?>
           <input type="hidden" name="<?= $type; ?>status_noncename" id="<?= $type; ?>status_noncename" value="<?php echo wp_create_nonce( plugin_basename(__FILE__) ); ?>" />
           <p>

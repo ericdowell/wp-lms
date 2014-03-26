@@ -115,7 +115,7 @@ class wp_lms {
           // $ch_values = array('1', '2', '3', '4', '5', '6', '7');
           // $ch_labels = array('S', 'M', 'T', 'W', 'R', 'F', 'S');
           $this->noncename = array('coursemeta_noncename', 'instructormeta_noncename', 'course_enrollment_noncename', 'coursebegin_noncename', 'sessionweeks_noncename', 'coursestatus_noncename','assign_prop_meta_noncename');
-          $this->postdataname = array('_course', '_instructor', '_status', '_enroll_count', '_points', '_competencies', '_class_start', '_class_due', '_est_time', '_est_time_measure', '_turn_type', '_applies_to', '_course_date_begin_month', '_course_date_begin_day', '_course_date_end_month', '_course_date_end_day','_course_day_sun', '_course_day_mon', '_course_day_tues', '_course_day_wedn', '_course_day_thurs', '_course_day_fri', '_course_day_sat', '_course_begin_hour', '_course_begin_min', '_course_end_hour', '_course_end_min', '_course_end_ofday', '_course_begin_ofday');
+          $this->postdataname = array('_course', '_instructor', '_status', '_enroll_count', '_assign_type', '_points', '_competencies', '_class_start', '_class_due', '_est_time', '_est_time_measure', '_turn_type', '_applies_to', '_course_date_begin_month', '_course_date_begin_day', '_course_date_end_month', '_course_date_end_day','_course_day_sun', '_course_day_mon', '_course_day_tues', '_course_day_wedn', '_course_day_thurs', '_course_day_fri', '_course_day_sat', '_course_begin_hour', '_course_begin_min', '_course_end_hour', '_course_end_min', '_course_end_ofday', '_course_begin_ofday');
           //for enrollment use in student directory custom post type
           for($i=0;$i<10;$i++){
             $this->postdataname[] = "_course".$i;

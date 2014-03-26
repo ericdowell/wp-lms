@@ -294,28 +294,32 @@ class wp_lms_shortcodes extends wp_lms {
 			$assign_parent = $assign->post_parent;
 			
 			if( $assign_parent == 0 && $course == $pid && $instructor == $assign_instructor ) {
-				$points = get_post_meta($assign_id, "_points", true);
-				$_class_start = get_post_meta($assign_id, "_class_start", true);
-				if( !empty($_class_start) ) {
-					$_class_start = explode(".", $_class_start);
-					$start_week = $_class_start[0];
-					$start_class = $_class_start[1];
-				}
-				$_class_due = get_post_meta($assign_id, "_class_due", true);
-				if( !empty($_class_due) ) {
-					$_class_end = explode(".", $_class_due);
-					$end_week = $_class_end[0];
-					$end_class = $_class_end[1];
-				}
-				$est_time = get_post_meta($assign_id, "_est_time", true);
-				if( !empty($est_time) ) {
-					$est_time = explode(",", $est_time);
-					$time = $est_time[0];
-					$measure = $est_time[1];
-				}
-				$turn_type = get_post_meta($assign_id, "_turn_type", true);
-				if(strstr($turn_type, "_")) {
-					$turn_type = str_replace("_", " ", $turn_type);
+				$assignment_type = get_post_meta($assign_id, "_assign_type", true);
+				if($assignment_type == 'assignment') {
+					$points = get_post_meta($assign_id, "_points", true);
+					$_class_start = get_post_meta($assign_id, "_class_start", true);
+					if( !empty($_class_start) ) {
+						$_class_start = explode(".", $_class_start);
+						$start_week = $_class_start[0];
+						$start_class = $_class_start[1];
+					}
+					$_class_due = get_post_meta($assign_id, "_class_due", true);
+					if( !empty($_class_due) ) {
+						$_class_end = explode(".", $_class_due);
+						$end_week = $_class_end[0];
+						$end_class = $_class_end[1];
+					}
+					$est_time = get_post_meta($assign_id, "_est_time", true);
+					if( !empty($est_time) ) {
+						$est_time = explode(",", $est_time);
+						$time = $est_time[0];
+						$measure = $est_time[1];
+					}
+					$turn_type = get_post_meta($assign_id, "_turn_type", true);
+					if(strstr($turn_type, "_")) {
+						$turn_type = str_replace("_", " ", $turn_type);
+					}
+					$info = " - Due: W".$end_week." C".$end_class." - P".$points;
 				}
 				$page_children = get_page_children( $assign_id, $assignments );
 				$hasChildren = "";
@@ -333,31 +337,35 @@ class wp_lms_shortcodes extends wp_lms {
 					foreach( $page_children as $w => $child ) {
 						$cid = $child->ID;
 						$c_title = $child->post_title;
-						$points = get_post_meta($cid, "_points", true);
-						$_class_start = get_post_meta($cid, "_class_start", true);
-						if( !empty($_class_start) ) {
-							$_class_start = explode(".", $_class_start);
-							$start_week = $_class_start[0];
-							$start_class = $_class_start[1];
-						}
-						$_class_due = get_post_meta($cid, "_class_due", true);
-						if( !empty($_class_due) ) {
-							$_class_end = explode(".", $_class_due);
-							$end_week = $_class_end[0];
-							$end_class = $_class_end[1];
-						}
-						$est_time = get_post_meta($cid, "_est_time", true);
-						if( !empty($est_time) ) {
-							$est_time = explode(",", $est_time);
-							$time = $est_time[0];
-							$measure = $est_time[1];
-						}
-						$turn_type = get_post_meta($cid, "_turn_type", true);
-						if(strstr($turn_type, "_")) {
-							$turn_type = str_replace("_", " ", $turn_type);
+						$assignment_type = get_post_meta($cid, "_assign_type", true);
+						if($assignment_type == 'assignment') {
+							$points = get_post_meta($cid, "_points", true);
+							$_class_start = get_post_meta($cid, "_class_start", true);
+							if( !empty($_class_start) ) {
+								$_class_start = explode(".", $_class_start);
+								$start_week = $_class_start[0];
+								$start_class = $_class_start[1];
+							}
+							$_class_due = get_post_meta($cid, "_class_due", true);
+							if( !empty($_class_due) ) {
+								$_class_end = explode(".", $_class_due);
+								$end_week = $_class_end[0];
+								$end_class = $_class_end[1];
+							}
+							$est_time = get_post_meta($cid, "_est_time", true);
+							if( !empty($est_time) ) {
+								$est_time = explode(",", $est_time);
+								$time = $est_time[0];
+								$measure = $est_time[1];
+							}
+							$turn_type = get_post_meta($cid, "_turn_type", true);
+							if(strstr($turn_type, "_")) {
+								$turn_type = str_replace("_", " ", $turn_type);
+							}
+							$infochild = " - Due: W".$end_week." C".$end_class." - P".$points;
 						}
 						?>
-					<li class="assign child"><a href="<?php echo get_permalink($cid) ;?>"  class="assign-title"><?= $c_title; ?></a> - Due: W<?= $end_week; ?> C<?= $end_class; ?> - P<?= $points; ?></li>
+					<li class="assign child"><a href="<?php echo get_permalink($cid) ;?>"  class="assign-title"><?= $c_title; ?></a><?= $infochild; ?></li>
 						<?php
 					}
 					?>
@@ -368,7 +376,7 @@ class wp_lms_shortcodes extends wp_lms {
 				else if( empty($page_children ) ) {
 					?>
 		<li class="assign top">
-			<a href="<?php echo get_permalink($assign_id) ;?>" class="assign-title"><?= $assign_title; ?></a> - Due: W<?= $end_week; ?> C<?= $end_class; ?> - P<?= $points; ?>
+			<a href="<?php echo get_permalink($assign_id) ;?>" class="assign-title"><?= $assign_title; ?></a><?= $info; ?>
 		</li>
 					<?php
 				}
