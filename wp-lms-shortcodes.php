@@ -171,7 +171,7 @@ class wp_lms_shortcodes extends wp_lms {
 							array( 
 							'post_type' => 'assignment',
 							'post_status' => 'publish',
-							'_instructor_num_assignment' => $instructor,
+							'_instructor_nu_assignment' => $instructor,
 							'posts_per_page' => -1 
 							) 
 						);
@@ -295,6 +295,7 @@ class wp_lms_shortcodes extends wp_lms {
 			
 			if( $assign_parent == 0 && $course == $pid && $instructor == $assign_instructor ) {
 				$assignment_type = get_post_meta($assign_id, "_assign_type", true);
+				$info = "";
 				if($assignment_type == 'assignment') {
 					$points = get_post_meta($assign_id, "_points", true);
 					$_class_start = get_post_meta($assign_id, "_class_start", true);
@@ -338,6 +339,7 @@ class wp_lms_shortcodes extends wp_lms {
 						$cid = $child->ID;
 						$c_title = $child->post_title;
 						$assignment_type = get_post_meta($cid, "_assign_type", true);
+						$infochild = "";
 						if($assignment_type == 'assignment') {
 							$points = get_post_meta($cid, "_points", true);
 							$_class_start = get_post_meta($cid, "_class_start", true);

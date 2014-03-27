@@ -332,7 +332,7 @@ class wp_lms_post_types extends wp_lms {
 					)
 				) 
 			);
-			register_taxonomy( 'course_instructor_name',
+			register_taxonomy( 'course_instructor_na',
 				array(
 			  	0 => 'course',
 				),
@@ -357,7 +357,7 @@ class wp_lms_post_types extends wp_lms {
 					)
 				) 
 			);
-			register_taxonomy( 'course_days_name',
+			register_taxonomy( 'course_days_na',
 				array(
 				  0 => 'course',
 				),
@@ -382,7 +382,7 @@ class wp_lms_post_types extends wp_lms {
 					)
 				) 
 			);
-			register_taxonomy( 'course_days_num',
+			register_taxonomy( 'course_days_nu',
 				array(
 				  0 => 'course',
 				),
@@ -407,17 +407,17 @@ class wp_lms_post_types extends wp_lms {
 					)
 				) 
 			);
-			register_taxonomy( '_instructor_name_lecture', 
+			register_taxonomy( '_instructor_na_lecture_active', 
 				array(
 			  	0 => 'lecture',
 				),
 				array( 'hierarchical' => false,
-					'label' => 'Instructor',
+					'label' => 'Active Instructor',
 					'show_ui' => false,
 					'query_var' => true,
 					'show_admin_column' => true,
 					'labels' => array(
-					  'search_items' => 'Instructor',
+					  'search_items' => 'Active Instructor',
 					  'popular_items' => '',
 					  'all_items' => '',
 					  'parent_item' => '',
@@ -432,7 +432,7 @@ class wp_lms_post_types extends wp_lms {
 					)
 				) 
 			);
-			register_taxonomy( '_instructor_num_lecture',
+			register_taxonomy( '_instructor_nu_lecture_active',
 				array(
 			  	0 => 'lecture',
 				),
@@ -457,7 +457,57 @@ class wp_lms_post_types extends wp_lms {
 					)
 				) 
 			);
-			register_taxonomy( '_course_name_lecture',
+			register_taxonomy( '_instructor_na_lecture', 
+				array(
+			  	0 => 'lecture',
+				),
+				array( 'hierarchical' => false,
+					'label' => 'Instructor',
+					'show_ui' => false,
+					'query_var' => true,
+					'show_admin_column' => false,
+					'labels' => array(
+					  'search_items' => 'Instructor',
+					  'popular_items' => '',
+					  'all_items' => '',
+					  'parent_item' => '',
+					  'parent_item_colon' => '',
+					  'edit_item' => '',
+					  'update_item' => '',
+					  'add_new_item' => '',
+					  'new_item_name' => '',
+					  'separate_items_with_commas' => '',
+					  'add_or_remove_items' => '',
+					  'choose_from_most_used' => '',
+					)
+				) 
+			);
+			register_taxonomy( '_instructor_nu_lecture',
+				array(
+			  	0 => 'lecture',
+				),
+				array( 'hierarchical' => false,
+					'label' => 'Instructor',
+					'show_ui' => false,
+					'query_var' => true,
+					'show_admin_column' => false,
+					'labels' => array(
+					  'search_items' => 'Instructor',
+					  'popular_items' => '',
+					  'all_items' => '',
+					  'parent_item' => '',
+					  'parent_item_colon' => '',
+					  'edit_item' => '',
+					  'update_item' => '',
+					  'add_new_item' => '',
+					  'new_item_name' => '',
+					  'separate_items_with_commas' => '',
+					  'add_or_remove_items' => '',
+					  'choose_from_most_used' => '',
+					)
+				) 
+			);
+			register_taxonomy( '_course_na_lecture',
 				array(
 			  	0 => 'lecture',
 				),
@@ -482,7 +532,7 @@ class wp_lms_post_types extends wp_lms {
 					)
 				) 
 			);
-			register_taxonomy( '_course_num_lecture',
+			register_taxonomy( '_course_nu_lecture',
 				array(
 			  	0 => 'lecture',
 				),
@@ -507,17 +557,17 @@ class wp_lms_post_types extends wp_lms {
 					)
 				) 
 			);
-			register_taxonomy( '_instructor_name_assignment',
+			register_taxonomy( '_instructor_na_assignment_active', 
 				array(
 			  	0 => 'assignment',
 				),
 				array( 'hierarchical' => false,
-					'label' => 'Instructor',
+					'label' => 'Active Instructor',
 					'show_ui' => false,
 					'query_var' => true,
 					'show_admin_column' => true,
 					'labels' => array(
-					  'search_items' => 'Instructor',
+					  'search_items' => 'Active Instructor',
 					  'popular_items' => '',
 					  'all_items' => '',
 					  'parent_item' => '',
@@ -532,7 +582,32 @@ class wp_lms_post_types extends wp_lms {
 					)
 				) 
 			);
-			register_taxonomy( '_instructor_num_assignment',
+			register_taxonomy( '_instructor_nu_assignment_active',
+				array(
+			  	0 => 'assignment',
+				),
+				array( 'hierarchical' => false,
+					'label' => 'A Instructor',
+					'show_ui' => false,
+					'query_var' => true,
+					'show_admin_column' => false,
+					'labels' => array(
+					  'search_items' => 'A Instructor',
+					  'popular_items' => '',
+					  'all_items' => '',
+					  'parent_item' => '',
+					  'parent_item_colon' => '',
+					  'edit_item' => '',
+					  'update_item' => '',
+					  'add_new_item' => '',
+					  'new_item_name' => '',
+					  'separate_items_with_commas' => '',
+					  'add_or_remove_items' => '',
+					  'choose_from_most_used' => '',
+					)
+				) 
+			);
+			register_taxonomy( '_instructor_na_assignment',
 				array(
 			  	0 => 'assignment',
 				),
@@ -557,7 +632,32 @@ class wp_lms_post_types extends wp_lms {
 					)
 				) 
 			);
-			register_taxonomy( '_course_name_assignment',
+			register_taxonomy( '_instructor_nu_assignment',
+				array(
+			  	0 => 'assignment',
+				),
+				array( 'hierarchical' => false,
+					'label' => 'Instructor',
+					'show_ui' => false,
+					'query_var' => true,
+					'show_admin_column' => false,
+					'labels' => array(
+					  'search_items' => 'Instructor',
+					  'popular_items' => '',
+					  'all_items' => '',
+					  'parent_item' => '',
+					  'parent_item_colon' => '',
+					  'edit_item' => '',
+					  'update_item' => '',
+					  'add_new_item' => '',
+					  'new_item_name' => '',
+					  'separate_items_with_commas' => '',
+					  'add_or_remove_items' => '',
+					  'choose_from_most_used' => '',
+					)
+				) 
+			);
+			register_taxonomy( '_course_na_assignment',
 				array(
 			  	0 => 'assignment',
 				),
@@ -582,7 +682,7 @@ class wp_lms_post_types extends wp_lms {
 					)
 				) 
 			);
-			register_taxonomy( '_course_num_assignment',
+			register_taxonomy( '_course_nu_assignment',
 				array(
 				  0 => 'assignment',
 				),

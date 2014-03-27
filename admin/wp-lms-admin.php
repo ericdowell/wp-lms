@@ -154,12 +154,12 @@ class wp_lms_admin extends wp_lms {
 			$class_num = "568";
 			$instructor_num = "Douglas Brull";
 			$the_post_type = 'lecture';
-			$the_course_term = "course_num";
+			$the_course_term = "course_nu";
 			$the_instructor_term = "instructor_name";
 			$args = array(
 				'sort_column' => 'menu_order',
 				'post_type' => $the_post_type,
-				"course_num" => $class_num,
+				"course_nu" => $class_num,
 				'instructor_name' => $instructor_num,
 				'post_status' => 'publish'
 			);
@@ -426,8 +426,8 @@ class wp_lms_admin extends wp_lms {
 			$args = array(
 				'sort_column' => 'menu_order',
 				'post_type' => 'course',
-				//"course_assigned_num" => $class_num,
-				//'instructor_assigned_num' => $instructor_num,
+				//"course_assigned_nu" => $class_num,
+				//'instructor_assigned_nu' => $instructor_num,
 				'post_status' => 'publish',
 				'orderby' => 'title',
 				'order' => 'ASC'

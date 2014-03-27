@@ -18,11 +18,13 @@ class wp_lms_post_meta extends wp_lms {
     public function create_metabox( $post, $metabox ) {
       global $post;
       $type = $metabox['args']['type'];
+      $post_type = $post->post_type;
+      $pid = $post->ID;
       $name = $metabox['args']['name'];
       $create = $metabox['args']['create'];
       $nonce = $metabox['args']['noncename'];
       $page_query = new WP_Query();
-      $all_pages = $page_query->query( array( 'post_type' => $type, 'posts_per_page' => -1, 'orderby' => 'title',
+      $all_pages = $page_query->query( array( 'post_type' => $type, '_status' => 'active', 'posts_per_page' => -1, 'orderby' => 'title',
         'order' => 'ASC' ) );
       switch($create){
 
@@ -30,65 +32,96 @@ class wp_lms_post_meta extends wp_lms {
          *  
          *  @since 0.0.1
         **/
-        case 'select':        	
-        	if($post->post_type == 'student_directory') { 
-        		$course_count = get_post_meta($post->ID, "_enroll_count", true);
-        		if( empty($course_count) ) $course_count = 1;
+        case 'select':       
+          $course = get_post_meta($post->ID, '_'.$type, true); 	
+          $status = get_post_meta($post->ID, '_status', true);  
+        	if($post_type == 'student_directory') {
+        		//$course_count = get_post_meta($post->ID, "_enroll_count", true);
+        		//if( empty($course_count) ) $course_count = 1;
+            $course = explode(",",$course);
         		?>
         		<input type="hidden" name="<?= $type; ?>meta_noncename" id="<?= $type; ?>meta_noncename" value="<?php echo wp_create_nonce( plugin_basename(__FILE__) ); ?>" />
-        		<?
-        		for($i=0;$i<$course_count;$i++){
-        			$course = get_post_meta($post->ID, '_'.$type.$i, true);
-	          ?>
-	          <label for="_<?= $type.$i; ?>"> 
-	              <?php //echo $course; ?>
+	          <label for="_<?= $type.$i; ?>[]"> 
+	              <?php //echo "<pre>";print_r($course);echo "</pre>"; ?>
 	              <?= $name; ?>
 	          </label>
 	          <p></p>
-	          <select name="_<?= $type.$i; ?>" class="widefat">
+	          <select multiple name="_<?= $type.$i; ?>[]" class="widefat">
 	            <?php 
               usort( $all_pages, array($this, 'sort_post_title') );
               foreach( $all_pages as $k => $p ) { ?>
 	              <? 
-                if($p->post_parent == 0){ 
-                $current = "";
-	                if( isset( $course ) && $course == $p->ID ) $current = " selected";
+                if($p->post_parent == 0){
+                  $current = "";
+	                if( isset( $course ) && is_array($course) && in_array($p->ID, $course) ) $current = " selected";
+                  if( isset( $course ) && $course == $p->ID ) $current = " selected";
 	                else if( isset( $_GET[$type] ) && $_GET[$type] == $p->ID ) $current = " selected";
 	              ?>
 	              <option value="<?php echo $p->ID; ?>"<?php echo $current; ?>><?php echo $p->post_title; ?></option>
-	            <?php 
+	             <?php 
                 }
-            } ?>
+              } ?>
 	          </select>
 	          <?
-          	}
         	}
-
-        	else {
-        	$course = get_post_meta($post->ID, '_'.$type, true);
-        	?>
-          <label for="_<?= $type; ?>"> 
-              <?php //echo $course; ?>
-              <?= $name; ?>
-          </label>
-          <p></p>
-          <input type="hidden" name="<?= $type; ?>meta_noncename" id="<?= $type; ?>meta_noncename" value="<?php echo wp_create_nonce( plugin_basename(__FILE__) ); ?>" />
-          <select name="_<?= $type; ?>" class="widefat">
-            <?php 
-            usort( $all_pages, array($this, 'sort_post_title') );
-            foreach( $all_pages as $k => $p ) { ?>
-              <?
-                if($p->post_parent == 0){ 
-                  $current = "";
-                  if( isset( $course ) && $course == $p->ID ) $current = " selected";
-                  else if( isset( $_GET[$type] ) && $_GET[$type] == $p->ID ) $current = " selected";
-              ?>
-              <option value="<?php echo $p->ID; ?>"<?php echo $current; ?>><?php echo $p->post_title; ?></option>
-            <?php }
-            } ?>
-          </select>
-          <?
+          else if($type == "instructor" && $post_type == "assignment" || $type == "instructor" && $post_type == "lecture") {
+            $ins = explode(",", $course);
+            ?>
+            <label for="_<?= $type; ?>"> 
+                <?php //echo $course; ?>
+                <?= $name; ?>
+            </label>
+            <p></p>
+            <input type="hidden" name="<?= $type; ?>meta_noncename" id="<?= $type; ?>meta_noncename" value="<?php echo wp_create_nonce( plugin_basename(__FILE__) ); ?>" />
+            <select multiple name="_<?= $type; ?>[]" class="widefat">
+              <?php 
+              usort( $all_pages, array($this, 'sort_post_title') );
+              foreach( $all_pages as $k => $p ) {
+                  $pid = $p->ID;
+                  if($p->post_parent == 0){ 
+                    $current = "";
+                    if( isset( $ins ) && in_array($pid, $ins)  ) $current = " selected";
+                    else if( isset( $_GET[$type] ) && $_GET[$type] == $p->ID ) $current = " selected";
+                ?>
+                <option value="<?php echo $p->ID; ?>"<?php echo $current; ?>><?php echo $p->post_title; ?></option>
+              <?php }
+              } ?>
+            </select>
+            <?
+          }
+        	else if($type == 'instructor' && isset($status) && strstr($status, "active") || $type != 'instructor' ) {
+          	?>
+            <label for="_<?= $type; ?>"> 
+                <?php //echo $course; ?>
+                <?= $name; ?>
+            </label>
+            <p></p>
+            <input type="hidden" name="<?= $type; ?>meta_noncename" id="<?= $type; ?>meta_noncename" value="<?php echo wp_create_nonce( plugin_basename(__FILE__) ); ?>" />
+            <select name="_<?= $type; ?>" class="widefat">
+              <?php 
+              usort( $all_pages, array($this, 'sort_post_title') );
+              foreach( $all_pages as $k => $p ) { ?>
+                <?
+                  if($p->post_parent == 0){ 
+                    $current = "";
+                    if( isset( $course ) && $course == $p->ID ) $current = " selected";
+                    else if( isset( $_GET[$type] ) && $_GET[$type] == $p->ID ) $current = " selected";
+                ?>
+                <option value="<?php echo $p->ID; ?>"<?php echo $current; ?>><?php echo $p->post_title; ?></option>
+              <?php }
+              } ?>
+            </select>
+            <?
         	}
+          else if( $type == 'instructor' && isset($status) && !strstr($status, "active") ) {
+            ?>
+            <input type="hidden" name="<?= $type; ?>meta_noncename" id="<?= $type; ?>meta_noncename" value="<?php echo wp_create_nonce( plugin_basename(__FILE__) ); ?>" />
+             <label for="_<?= $type; ?>"> 
+                Inherited By Parent
+            </label>
+            <input type="hidden" name="_<?= $type; ?>" value="inherited">
+            <?
+          }
           //ob_end_flush();
           break;
 
@@ -161,8 +194,8 @@ class wp_lms_post_meta extends wp_lms {
           if($post_status != "timeline" && $post_status != "assignments"){
             $m_labels = array('01','02','03','04','05','06','07','08','09','10','11','12');
             $m_values = array('2','3','4','5','6','7', '8','9','10','11','12','13','14');
-            $get_meta = array('begin_month' => "_".$type."_date_begin_month", 'begin_day' => "_".$type."_date_begin_day",'begin_year' =>"_".$type."_date_begin_year",'end_month' => "_".$type."_date_end_month",'end_day' => "_".$type."_date_end_day",'end_year' => "_".$type."_date_end_year");
-            foreach($get_meta as $var => $meta){
+            $get_date_meta = array('begin_month' => "_".$type."_d_begin_month", 'begin_day' => "_".$type."_d_begin_day",'begin_year' =>"_".$type."_d_begin_year",'end_month' => "_".$type."_d_end_month",'end_day' => "_".$type."_d_end_day",'end_year' => "_".$type."_d_end_year");
+            foreach($get_date_meta as $var => $meta){
            		$$var = get_post_meta($post->ID, $meta, true);
            	}
             ?>
@@ -170,11 +203,11 @@ class wp_lms_post_meta extends wp_lms {
             <div id="" class="hide-if-js" style="display: block;">
               <div class="timestamp-wrap">
                 <p>
-                  <label for="_<?= $type; ?>_date_begin_month">
+                  <label for="_<?= $type; ?>_d_begin_month">
                     Begin Date
                   </label>
                 </p>
-              <select id="" name="_<?= $type; ?>_date_begin_month">
+              <select id="" name="_<?= $type; ?>_d_begin_month">
               	<?php 
               	if( empty($begin_month) ) $begin_month = date("m");
               	foreach($m_labels as $k => $n){ 
@@ -189,21 +222,21 @@ class wp_lms_post_meta extends wp_lms {
              	<?
              	if( empty( $begin_day ) ) $begin_day = date("j");
              	?>
-              <input type="text" name="_<?= $type; ?>_date_begin_day" value="<?= $begin_day; ?>" size="2" maxlength="2" autocomplete="off">, 
+              <input type="text" required name="_<?= $type; ?>_d_begin_day" value="<?= $begin_day; ?>" size="2" maxlength="2" autocomplete="off">, 
               <?
               if( empty( $begin_year ) ) $begin_year = date("Y");
               ?>
-              <input type="text" id="" name="_<?= $type; ?>_date_begin_year" value="<?= $begin_year; ?>" size="4" maxlength="4" autocomplete="off">
+              <input type="text" required name="_<?= $type; ?>_d_begin_year" value="<?= $begin_year; ?>" size="4" maxlength="4" autocomplete="off">
              </div>
              <div class="timestamp-wrap">
                 <p>
-                  <label for="_<?= $type; ?>_date_end_month">
+                  <label for="_<?= $type; ?>_d_end_month">
                     End Date
                   </label>
                 </p>
-              <select id="" name="_<?= $type; ?>_date_end_month">
+              <select id="" name="_<?= $type; ?>_d_end_month">
               	<?php 
-              	if( empty($end_month) ) $end_month = date("m");
+              	if( empty($end_month) ) $end_month = date("m", mktime(0,0,0,$begin_month,$begin_day+7,$begin_year) );
               	foreach($m_labels as $k => $n){ 
               		$selected = "";
               		if($n == $end_month) {
@@ -214,13 +247,13 @@ class wp_lms_post_meta extends wp_lms {
                 <? } ?>
               </select> 
               <?
-             	if( empty( $end_day ) ) $end_day = date("j")+7;
+             	if( empty( $end_day ) ) $end_day = date("j", mktime(0,0,0,$begin_month,$begin_day+7,$begin_year) );
              	?>
-              <input type="text" name="_<?= $type; ?>_date_end_day" value="<?= $end_day; ?>" size="2" maxlength="2" autocomplete="off">, 
+              <input type="text" required name="_<?= $type; ?>_d_end_day" value="<?= $end_day; ?>" size="2" maxlength="2" autocomplete="off">, 
               <?
               if( empty( $end_year ) ) $end_year = date("Y");
               ?>
-              <input type="text" id="" name="_<?= $type; ?>_date_end_year" value="<?= $end_year;?>" size="4" maxlength="4" autocomplete="off">
+              <input type="text" required name="_<?= $type; ?>_d_end_year" value="<?= $end_year;?>" size="4" maxlength="4" autocomplete="off">
              </div>
              <p>
             <strong>Days</strong>
@@ -228,15 +261,19 @@ class wp_lms_post_meta extends wp_lms {
           <label class="screen-reader-text">Days</label>
           <div class="timestamp-wrap">
           	<?
-          	$get_checkboxes = array('day_sun' => "_".$type."_day_sun", 'day_mon' => "_".$type."_day_mon", 'day_tues' => "_".$type."_day_tues",'day_wedn' => "_".$type."_day_wedn", 'day_thurs' => "_".$type."_day_thurs", 'day_fri' => "_".$type."_day_fri", 'day_sat' => "_".$type."_day_sat");
-          	foreach($get_checkboxes as $var => $meta) {
-          		$$var = get_post_meta($post->ID, $meta, true);
-          		$checkbox_names[] = $var;
+          	//$get_checkboxes = array('day_sun' => "_".$type."_day_sun", 'day_mon' => "_".$type."_day_mon", 'day_tues' => "_".$type."_day_tues",'day_wedn' => "_".$type."_day_wedn", 'day_thurs' => "_".$type."_day_thurs", 'day_fri' => "_".$type."_day_fri", 'day_sat' => "_".$type."_day_sat");
+          	//foreach($get_checkboxes as $var => $meta) {
+          		//$$var = get_post_meta($post->ID, $meta, true);
+          	//	$checkbox_names[] = $var;
           		//echo $meta." ".$$var."<br>";
-          		if( !empty($$var) ) $set_checkboxes[$var] = $$var;
-          	}
-            
-          	$ch_values = array('1', '2', '3', '4', '5', '6', '7');
+          		//if( !empty($$var) ) $set_checkboxes[$var] = $$var;
+          	//}
+            $course_days = get_post_meta($post->ID, "_course_days", true);
+            //echo $course_days." From Post<br>";
+            if( isset($course_days) && !empty($course_days) ) $course_days = explode(",", $course_days);
+            //echo $course_days." After Explode?<br>";
+           // echo "<pre>";print_r($course_days);echo "</pre>";
+          	$ch_values = array('0', '1', '2', '3', '4', '5', '6');
             $ch_labels = array('S', 'M', 'T', 'W', 'R', 'F', 'S');
             ?>
             <style type="text/css">
@@ -255,7 +292,7 @@ class wp_lms_post_meta extends wp_lms {
             //echo "<pre>"; print_r($set_checkboxes);echo "</pre>";
             foreach($ch_labels as $k => $ch) {
           	?>
-            	<td class="checkbox_label"><label for="<?= '_'.$type.'_'.$checkbox_names[$k]; ?>"><?= $ch; ?></label></td>
+            	<td class="checkbox_label"><label for="_course_days[]"><?= $ch; ?></label></td>
             <? } ?>
     	      	</tr>
     	      </thead>
@@ -263,9 +300,10 @@ class wp_lms_post_meta extends wp_lms {
     	      	<tr>
            <? foreach($ch_labels as $k => $ch) {
             	$checked = "";
-            	if( !empty( $set_checkboxes[$checkbox_names[$k]] ) && $set_checkboxes[$checkbox_names[$k]] == $ch_values[$k]) $checked = " checked";
+            	if( is_array($course_days) && in_array($ch_values[$k], $course_days) ) $checked = " checked";
+              if( !is_array($course_days) && $course_days == $ch_values[$k] ) $checked = " checked";
           	?>
-              <td class="input_checkbox"><input type="checkbox" name="<?= '_'.$type.'_days[]'; ?>" value="<?= $ch_values[$k]; ?>"<?= $checked; ?>></td>
+              <td class="input_checkbox"><input type="checkbox" name="_course_days[]" value="<?= $ch_values[$k]; ?>"<?= $checked; ?>></td>
             <? } ?>
           		</tr>
           		</tbody>
@@ -354,35 +392,8 @@ class wp_lms_post_meta extends wp_lms {
           <?
           break;
 
-        case "number":
-        	$enrollment_count = get_post_meta($post->ID, "_enroll_count", true);
-        	$statuses = array("inactive", "active");
-          ?>
-          <input type="hidden" name="<?= $type; ?>_enrollment_noncename" id="<?= $type; ?>status_noncename" value="<?php echo wp_create_nonce( plugin_basename(__FILE__) ); ?>" />
-          <p>
-            <label for="_enroll_count">
-            	<? //echo $status; ?>
-              <?= $name; ?>
-            </label>
-          </p>
-          <?
-          if( empty($enrollment_count) ) $enrollment_count = 1;
-          ?>
-          <input type="number" name="_enroll_count" value="<?= $enrollment_count; ?>"> 
-          <?
-          break;
 
           case 'assign_prop':
-            /*
-            '_points', 
-            '_competencies', 
-            '_class_start', 
-            '_class_due', 
-            '_est_time', 
-            '_est_time_measure', 
-            '_turn_type', 
-            '_applies_to'
-            */
             $assignment_type = get_post_meta($post->ID, "_assign_type", true);
             $points = get_post_meta($post->ID, "_points", true);
             $comps = get_post_meta($post->ID, "_competencies", true);
@@ -496,8 +507,8 @@ class wp_lms_post_meta extends wp_lms {
                   $args = array(
                     'post_type' => 'assignment',
                     'post_status' => 'publish',
-                    '_instructor_num_assignment' => $ins,
-                    '_course_num_assignment' => $cour,
+                    '_instructor_nu_assignment' => $ins,
+                    '_course_nu_assignment' => $cour,
                     'orderby' => 'title',
                     'order' => 'ASC'
                   );
@@ -582,8 +593,19 @@ class wp_lms_post_meta extends wp_lms {
       // We'll put it into an array to make it easier to loop though.
     	foreach( $this->postdataname as $k => $v ) {
     		if( array_key_exists($v, $_POST) ){
+          //changes any invalid date to a correct date
+          if( strstr($v, "_month") && strstr($v, "_course") ) {
+              $month_l = $this->postdataname[$k];
+              $day_l = $this->postdataname[$k+1];
+              $year_l = $this->postdataname[$k+2];
+              $month_v = $_POST[$this->postdataname[$k]];
+              $day_v = $_POST[$this->postdataname[$k+1]];
+              $year_v = $_POST[$this->postdataname[$k+2]];
+              $_POST[$month_l] = date("m", mktime(0,0,0,$month_v,$day_v,$year_v) );
+              $_POST[$day_l] = date("j", mktime(0,0,0,$mont_v,$day_v,$year_v) );
+              $_POST[$year_l] = date("Y", mktime(0,0,0,$month_v,$day_v,$year_v) );
+          }
 	      	$events_meta[$v] = $_POST[$v];
-	      	//$events_meta['_instructor'] = $_POST['_instructor'];
       	}
       	// else {
       	// 	echo $v." is not in the array of POST<br>";
@@ -598,78 +620,147 @@ class wp_lms_post_meta extends wp_lms {
 	        if( $post->post_type == 'revision' ) return; 
 	        // Don't store custom data twice
 
+          // if($key == "_course_days") {
+          //   echo $value." before <br>";
+          // }
+
 	        $value = implode(',', (array)$value); 
 	        // If $value is an array, make it a CSV (unlikely)
 
+          // if($key == "_course_days") {
+          //   echo $value." after <br>";
+          // }
+          // If the custom field already has a value
 	        if(get_post_meta($post->ID, $key, FALSE)) { 
-	        // If the custom field already has a value
-	        	if($post->post_type == 'student_directory'){
-	        		$course_count = get_post_meta($post->ID, "_enroll_count", true);
-	        		if(empty( $course_count )) $course_count = 1;
-	        		for($i=0;$i<$course_count;$i++){
-	        			update_post_meta($post->ID, $key, $value);
-	        		}
-	        	}
-	        	else {
-	          	update_post_meta($post->ID, $key, $value);
-	        	}
-	          if($key == "_status") {
-	          	wp_set_object_terms( $post->ID, $value, 'course_status' );
-	          }
-	          if($key == "_instructor" && $post->post_type == 'course') {
-	          	wp_set_object_terms( $post->ID, get_the_title($value), 'course_instructor_name' );
-	          }
-	          if( $key == "_course"  && $post->post_type == "lecture" ) {
-	            wp_set_object_terms( $post->ID, $value, 'course_num' );
-	            wp_set_object_terms( $post->ID, get_the_title($value), $key.'_name_'.$type );
-	          }
-	          if( $key == "_instructor" && $post->post_type == "lecture"  ) {
-	            wp_set_object_terms( $post->ID, $value, $key.'_num_'.$type );
-	            wp_set_object_terms( $post->ID, get_the_title($value), $key.'_name_'.$type );
-	          }
-	          if( $key == "_course"  && $post->post_type == "assignment" ) {
-	            wp_set_object_terms( $post->ID, $value, $key.'_num_'.$type );
-	            wp_set_object_terms( $post->ID, get_the_title($value), $key.'_name_'.$type );
-	          }
-	          if( $key == "_instructor" && $post->post_type == "assignment"  ) {
-	            wp_set_object_terms( $post->ID, $value, $key.'_num_'.$type );
-	            wp_set_object_terms( $post->ID, get_the_title($value), $key.'_name_'.$type );
-	          }
+              // if($key == "_course_days") {
+              //   echo $value." inside already value <br>";
+              // }
+  	        	if($post->post_type == 'student_directory'){
+                //should create taxomony for courses enrolled
+  	        	}
+  	        	else {
+  	          	update_post_meta($post->ID, $key, $value);
+  	        	}
+              //updates course days term nu/na
+              if($key == "_course_days"){
+                wp_set_object_terms( $post->ID, $value, 'course_days_nu' );
+                $value = explode(",", $value);
+                foreach( $value as $dkey => $dnum ) {
+                  $dnames[] = $this->get_day_sname($dnum);
+                }
+                $value = implode(",", $dnames);
+                wp_set_object_terms( $post->ID, $value, 'course_days_na' ); 
+              }
+              //updates course status term
+  	          if($key == "_status") {
+  	          	wp_set_object_terms( $post->ID, $value, 'course_status' );
+  	          }
+              //updates course instructor term
+  	          if($key == "_instructor" && $post->post_type == 'course') {
+                if($value != "inherited"){
+  	          	  wp_set_object_terms( $post->ID, get_the_title($value), 'course_instructor_na' );
+                  //query and replace all active instructor if there is a change
+                  // $query = new WP_Query();
+                  // $assign_pages = $query->query(
+
+                  //  );
+                }
+                else {
+                   wp_set_object_terms( $post->ID, $value, 'course_instructor_na' );
+                }
+  	          }
+              //updates lecture course term
+  	          if( $key == "_course"  && $post->post_type == "lecture" ) {
+  	            wp_set_object_terms( $post->ID, $value, 'course_nu' );
+  	            wp_set_object_terms( $post->ID, get_the_title($value), $key.'_na_'.$type );
+  	          }
+              //updates lecture instructor term
+  	          if( $key == "_instructor" && $post->post_type == "lecture"  ) {
+  	            wp_set_object_terms( $post->ID, $value, $key.'_nu_'.$type );
+  	            wp_set_object_terms( $post->ID, get_the_title($value), $key.'_na_'.$type );
+  	          }
+              //updates assignment course term
+  	          if( $key == "_course"  && $post->post_type == "assignment" ) {
+  	            wp_set_object_terms( $post->ID, $value, $key.'_nu_'.$type );
+  	            wp_set_object_terms( $post->ID, get_the_title($value), $key.'_na_'.$type );
+  	          }
+              //updates assignment instructor term
+  	          if( $key == "_instructor" && $post->post_type == "assignment"  ) {
+                $course = get_post_meta($post->ID, '_course', true);
+                //checks to see if the active instructor for course is assigned to assignment
+                if( !empty($course) ){
+                  $active_ins = get_post_meta($course, '_instructor', true);
+                  if( strstr($course, ",") ) $active_array = explode(",", $course);
+                  wp_set_object_terms( $post->ID, get_the_title($active_ins), $key.'_na_assignment_active' );
+                  wp_set_object_terms( $post->ID, $active_ins, $key.'_nu_assignment_active' );
+                }
+                else if( empty($course) ) {
+                  $active_ins = get_post_meta($events_meta["_course"], '_instructor', true);
+                  if( strstr($events_meta["_course"], ",") ) $active_array = explode(",", $events_meta["_course"]);
+                  wp_set_object_terms( $post->ID, get_the_title($active_ins), $key.'_na_assignment_active' );
+                  wp_set_object_terms( $post->ID, $active_ins, $key.'_nu_assignment_active' ); 
+                }
+  	            wp_set_object_terms( $post->ID, $value, $key.'_nu_'.$type );
+  	            wp_set_object_terms( $post->ID, get_the_title($value), $key.'_na_'.$type );
+  	          }
 	        }
+          // If the custom field doesn't have a value
 	        else { 
-	        // If the custom field doesn't have a value
-	        	if($post->post_type == 'student_directory'){
-	        		$course_count = get_post_meta($post->ID, "_enroll_count", true);
-	        		if(empty( $course_count )) $course_count = 1;
-	        		for($i=0;$i<$course_count;$i++){
-	        			add_post_meta($post->ID, $key, $value);
-	        		}
-	        	}
-	        	else {
-	          	add_post_meta($post->ID, $key, $value);
-	        	}
-	          if($key == "_status" && $post->post_type == 'course') {
-	          	wp_set_object_terms( $post->ID, $value, 'course_status' );
-	          }
-	          if($key == "_instructor" && $post->post_type == 'course') {
-	          	wp_set_object_terms( $post->ID, get_the_title($value), 'course_instructor_name' );
-	          }
-	          if( $key == "_course"  && $post->post_type == "lecture" ) {
-	            wp_set_object_terms( $post->ID, $value, $key.'_num_'.$type );
-	            wp_set_object_terms( $post->ID, get_the_title($value), $key.'_name_'.$type );
-	          }
-	          if( $key == "_instructor" && $post->post_type == "lecture"  ) {
-	            wp_set_object_terms( $post->ID, $value, $key.'_num_'.$type );
-	            wp_set_object_terms( $post->ID, get_the_title($value), $key.'_name_'.$type ); 
-	          }
-	          if( $key == "_course"  && $post->post_type == "assignment" ) {
-	            wp_set_object_terms( $post->ID, $value, $key.'_num_'.$type );
-	            wp_set_object_terms( $post->ID, get_the_title($value), $key.'_name_'.$type );
-	          }
-	          if( $key == "_instructor" && $post->post_type == "assignment"  ) {
-	            wp_set_object_terms( $post->ID, $value, $key.'_num_'.$type );
-	            wp_set_object_terms( $post->ID, get_the_title($value), $key.'_name_'.$type ); 
-	          }
+  	        	if($post->post_type == 'student_directory'){
+
+  	        	}
+  	        	else {
+  	          	add_post_meta($post->ID, $key, $value);
+  	        	}
+              if($key == "_course_days"){
+                wp_set_object_terms( $post->ID, $value, 'course_days_nu' );
+                $value = explode(",", $value);
+                foreach( $value as $dkey => $dnum ) {
+                  $dnames[] = $this->get_day_sname($dnum);
+                }
+                $value = implode(",", $dnames);
+                wp_set_object_terms( $post->ID, $value, 'course_days_na' ); 
+              }
+  	          if($key == "_status" && $post->post_type == 'course') {
+  	          	wp_set_object_terms( $post->ID, $value, 'course_status' );
+  	          }
+  	          if($key == "_instructor" && $post->post_type == 'course') {
+  	          	if($value != "inherited"){
+                  wp_set_object_terms( $post->ID, get_the_title($value), 'course_instructor_na' );
+                }
+                else {
+                   wp_set_object_terms( $post->ID, $value, 'course_instructor_na' );
+                }
+  	          }
+  	          if( $key == "_course"  && $post->post_type == "lecture" ) {
+  	            wp_set_object_terms( $post->ID, $value, $key.'_nu_'.$type );
+  	            wp_set_object_terms( $post->ID, get_the_title($value), $key.'_na_'.$type );
+  	          }
+  	          if( $key == "_instructor" && $post->post_type == "lecture"  ) {
+  	            wp_set_object_terms( $post->ID, $value, $key.'_nu_'.$type );
+  	            wp_set_object_terms( $post->ID, get_the_title($value), $key.'_na_'.$type ); 
+  	          }
+  	          if( $key == "_course"  && $post->post_type == "assignment" ) {
+  	            wp_set_object_terms( $post->ID, $value, $key.'_nu_'.$type );
+  	            wp_set_object_terms( $post->ID, get_the_title($value), $key.'_na_'.$type );
+  	          }
+  	          if( $key == "_instructor" && $post->post_type == "assignment"  ) {
+                $course = get_post_meta($post->ID, '_course', true);
+                if( !empty($course) ){
+                  $active_ins = get_post_meta($course, '_instructor', true);
+                  if( strstr($course, ",") ) $active_array = explode(",", $course);
+                  wp_set_object_terms( $post->ID, get_the_title($active_ins), $key.'_na_assignment_active' );
+                  wp_set_object_terms( $post->ID, $active_ins, $key.'_nu_assignment_active' );
+                }
+                else if( empty($course) ) {
+                  $active_ins = get_post_meta($events_meta["_course"], '_instructor', true);
+                  if( strstr($events_meta["_course"], ",") ) $active_array = explode(",", $events_meta["_course"]);
+                  wp_set_object_terms( $post->ID, get_the_title($active_ins), $key.'_na_assignment_active' );
+                  wp_set_object_terms( $post->ID, $active_ins, $key.'_nu_assignment_active' ); 
+                }
+  	            wp_set_object_terms( $post->ID, $value, $key.'_nu_'.$type );
+  	            wp_set_object_terms( $post->ID, get_the_title($value), $key.'_na_'.$type ); 
+  	          }
 	        }
 	        if( empty($value) ) {
 	        	delete_post_meta($post->ID, $key);

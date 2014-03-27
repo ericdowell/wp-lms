@@ -37,7 +37,8 @@ class wp_lms {
         $this->plugin_dir_long = dirname( __FILE__ );
         $this->plugin_inc_dir = $this->plugin_dir_long . '/inc/';
         $this->set_aval = array( "admin_option_pages", "version" => $this::$version, "custom_post_type_names", "settings_page_options", "post_meta" );
-        $this->tax_names = array('assignment' => array('_course_name_', '_instructor_name_'), 'lecture' => array('_course_name_', '_instructor_name_') );
+        $this->tax_names = array('assignment' => array('_course_na_', '_instructor_na_'), 'lecture' => array('_course_na_', '_instructor_na_') );
+       $this->days = array(array('label' => 'S', 'name' => 'Sunday', 'sname' => 'Sun'), array('label' => 'M', 'name' => 'Monday', 'sname' => 'Mon'), array('label' => 'T', 'name' => 'Tuesday', 'sname' => 'Tues'), array('label' => 'W', 'name' => 'Wednesday', 'sname' => 'Wedn'), array('label' => 'R', 'name' => 'Thursday', 'sname' => 'Thurs'), array('label' => 'F', 'name' => 'Friday', 'sname' => 'Fri'), array('label' => 'S', 'name' => 'Saturday', 'sname' => 'Sat'));
         $this->menu = 'css3d';
         
 
@@ -85,7 +86,6 @@ class wp_lms {
         }
 
         if( get_parent_class( $this ) &&  get_class( $this ) == "wp_lms_shortcodes"  ) {
-          $this->days = array(array('label' => 'S', 'name' => 'Sunday', 'sname' => 'Sun'), array('label' => 'M', 'name' => 'Monday', 'sname' => 'Mon'), array('label' => 'T', 'name' => 'Tuesday', 'sname' => 'Tues'), array('label' => 'W', 'name' => 'Wednesday', 'sname' => 'Wedn'), array('label' => 'R', 'name' => 'Thursday', 'sname' => 'Thurs'), array('label' => 'F', 'name' => 'Friday', 'sname' => 'Fri'), array('label' => 'S', 'name' => 'Saturday', 'sname' => 'Sat'));
           add_action( 'wp_enqueue_scripts', array($this, 'styles_scripts') );
           add_shortcode('wp_lms_active_menu', array($this, 'active_courses_menu') );
           add_shortcode('wp_lms_active_menu_button', array($this, 'active_courses_menu_button') );
@@ -115,7 +115,7 @@ class wp_lms {
           // $ch_values = array('1', '2', '3', '4', '5', '6', '7');
           // $ch_labels = array('S', 'M', 'T', 'W', 'R', 'F', 'S');
           $this->noncename = array('coursemeta_noncename', 'instructormeta_noncename', 'course_enrollment_noncename', 'coursebegin_noncename', 'sessionweeks_noncename', 'coursestatus_noncename','assign_prop_meta_noncename');
-          $this->postdataname = array('_course', '_instructor', '_status', '_enroll_count', '_assign_type', '_points', '_competencies', '_class_start', '_class_due', '_est_time', '_est_time_measure', '_turn_type', '_applies_to', '_course_date_begin_month', '_course_date_begin_day', '_course_date_end_month', '_course_date_end_day','_course_day_sun', '_course_day_mon', '_course_day_tues', '_course_day_wedn', '_course_day_thurs', '_course_day_fri', '_course_day_sat', '_course_begin_hour', '_course_begin_min', '_course_end_hour', '_course_end_min', '_course_end_ofday', '_course_begin_ofday');
+          $this->postdataname = array('_course', '_instructor', '_status', '_assign_type', '_points', '_competencies', '_class_start', '_class_due', '_est_time', '_est_time_measure', '_turn_type', '_applies_to', '_course_d_begin_month', '_course_d_begin_day', '_course_d_begin_year', '_course_d_end_month', '_course_d_end_day', '_course_d_end_year', '_course_days', '_course_day_sun', '_course_day_mon', '_course_day_tues', '_course_day_wedn', '_course_day_thurs', '_course_day_fri', '_course_day_sat', '_course_begin_hour', '_course_begin_min', '_course_end_hour', '_course_end_min', '_course_end_ofday', '_course_begin_ofday');
           //for enrollment use in student directory custom post type
           for($i=0;$i<10;$i++){
             $this->postdataname[] = "_course".$i;
@@ -123,7 +123,7 @@ class wp_lms {
           $this->post_metabox = array(
             array('wp_lms_course_list_assign','Course List', 'assignment', 'side','high', array('name' => "Courses", 'type' => 'course', 'create' => 'select', 'noncename' => 'coursemeta_noncename') ),
             array('wp_lms_course_assign_prop','Assignment Properties', 'assignment', 'normal','high', array('name' => "Assignment Properties", 'type' => 'assignment', 'create' => 'assign_prop', 'noncename' => 'assign_prop_meta_noncename') ),
-            array('wp_lms_enrollment_count_student','# of Course(s) Enrolled', 'student_directory', 'side','high', array('name' => "# of Course(s) Enrolled", 'type' => 'course', 'create' => 'number', 'noncename' => 'course_enrollment_noncename') ),
+            //array('wp_lms_enrollment_count_student','# of Course(s) Enrolled', 'student_directory', 'side','high', array('name' => "# of Course(s) Enrolled", 'type' => 'course', 'create' => 'number', 'noncename' => 'course_enrollment_noncename') ),
             array('wp_lms_course_list_student','Course Enrollment', 'student_directory', 'side','high', array('name' => "Courses", 'type' => 'course', 'create' => 'select', 'noncename' => 'coursemeta_noncename') ), 
             array('wp_lms_course_list_lecture', 'Course List', 'lecture', 'side', 'high', array( 'name' => "Courses", 'type' => 'course', 'create' => 'select', 'noncename' => 'coursemeta_noncename') ), 
             array('wp_lms_instructor_list_assign', 'Instructor List', 'assignment', 'side', 'high', array( 'name' => "Instructors", 'type' => 'instructor', 'create' => 'select', 'noncename' => 'instructormeta_noncename') ),
