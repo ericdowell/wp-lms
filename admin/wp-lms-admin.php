@@ -2,7 +2,7 @@
 /**
  *  Admin Page Object, Child of Plugin Object
  *  @since 1.0.0
- *  @updated 1.0.0
+ *  @updated 1.0.0 
  **/
 class wp_lms_admin extends wp_lms {
 	/**

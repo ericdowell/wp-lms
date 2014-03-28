@@ -1,4 +1,4 @@
-<?
+<?php 
 
 class wp_lms_shortcodes extends wp_lms {
 

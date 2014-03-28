@@ -1,4 +1,4 @@
-<?
+<?php 
 
 class wp_lms_post_types extends wp_lms {
 	

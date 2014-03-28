@@ -6,7 +6,7 @@ Description: Learning management system for WordPress.
 Author: Eric Dowell
 Version: 1.0.0
 Author URI: http://ericdowell.com/
-License: GPL2
+License: GPL2 
 */
 
 // Report all errors except E_NOTICE
