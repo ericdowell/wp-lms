@@ -4,16 +4,16 @@ class wp_lms_widgets extends WP_Widget {
 	
 	public function __construct () {
 		parent::__construct( 
-			'active_courses', 
-			'Active Courses Button',
+			'schedule', 
+			'Schedule (WP LMS)',
             array( 'description' =>
-            	'Displays button for active courses navigation.' 
+            	'Displays list of active course.' 
             ) 
         );
 	}
 	public function widget( $args, $instance ) {
 		//
-		echo do_shortcode('[wp_lms_active_menu_button class="decornone" text="Active Courses"]'); 		
+		echo do_shortcode('[wp_lms_ins_schedule]'); 		
 	}
 
 	public function update( $new_instance, $old_instance ) {

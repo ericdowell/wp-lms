@@ -64,7 +64,7 @@ class wp_lms_post_meta extends wp_lms {
 	          </select>
 	          <?
         	}
-          else if($type == "instructor" && $post_type == "assignment" || $type == "instructor" && $post_type == "lecture") {
+          else if($type == "instructor" && $post_type == "assignment" || $type == "instructor" && $post_type == "lecture" || $type == "instructor" && $post_type == "assignment" && empty($course) || $type == "instructor" && $post_type == "lecture" && empty($course) || $type == 'instructor' && empty($status) ) {
             $ins = explode(",", $course);
             ?>
             <label for="_<?= $type; ?>"> 
@@ -191,7 +191,7 @@ class wp_lms_post_meta extends wp_lms {
         **/
         case 'date':
           $post_status = get_post_meta($post->ID, "_status", true);
-          if($post_status != "timeline" && $post_status != "assignments"){
+          if($post_status != "timeline" && $post_status != "assignments" ){
             $m_labels = array('01','02','03','04','05','06','07','08','09','10','11','12');
             $m_values = array('2','3','4','5','6','7', '8','9','10','11','12','13','14');
             $get_date_meta = array('begin_month' => "_".$type."_d_begin_month", 'begin_day' => "_".$type."_d_begin_day",'begin_year' =>"_".$type."_d_begin_year",'end_month' => "_".$type."_d_end_month",'end_day' => "_".$type."_d_end_day",'end_year' => "_".$type."_d_end_year");
@@ -421,7 +421,7 @@ class wp_lms_post_meta extends wp_lms {
               </select>
             </p>
             <?
-            if($assignment_type == 'assignment'){
+            if($assignment_type == 'assignment'  || empty($assignment_type)){
             ?>
             <p><label for="_points">Point Possible</label><br>
             <input type="text" name="_points" value="<?= $points; ?>"></p>

@@ -9,7 +9,7 @@
    == Description ==
    This plugin lets you add a Learning Management system to your WordPress
    site. Using custom post types, administrators will be able to
-   create and edit instructors, courses, assignments, and lectures to be published on your site.
+   create and edit instructors, courses, assignments, and lectures to be published on your site. 
    == Installation ==
    1. Download the plugin
    1. Upload the wp-lms folder to your site's
