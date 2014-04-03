@@ -73,6 +73,13 @@ class wp_lms_post_meta extends wp_lms {
             </label>
             <p></p>
             <input type="hidden" name="<?= $type; ?>meta_noncename" id="<?= $type; ?>meta_noncename" value="<?php echo wp_create_nonce( plugin_basename(__FILE__) ); ?>" />
+            <?php
+            if($post_type == 'course' && $type == 'instructor') {
+            ?>
+            <input type="hidden" name="_<?= $type; ?>" value="inherited">
+            <?php
+            }
+            ?>
             <select multiple name="_<?= $type; ?>[]" class="widefat">
               <?php 
               usort( $all_pages, array($this, 'sort_post_title') );
@@ -97,6 +104,13 @@ class wp_lms_post_meta extends wp_lms {
             </label>
             <p></p>
             <input type="hidden" name="<?= $type; ?>meta_noncename" id="<?= $type; ?>meta_noncename" value="<?php echo wp_create_nonce( plugin_basename(__FILE__) ); ?>" />
+             <?php
+            if($post_type == 'course' && $type == 'instructor') {
+            ?>
+            <input type="hidden" name="_<?= $type; ?>" value="inherited">
+            <?php
+            }
+            ?>
             <select name="_<?= $type; ?>" class="widefat">
               <?php 
               usort( $all_pages, array($this, 'sort_post_title') );

@@ -433,7 +433,12 @@ class wp_lms_shortcodes extends wp_lms {
 	      'class' => '',
 	      'id' => ''
      	), $atts ) );
-     	$class = ' '.$atts['class'].'';
+     	if( !empty($atts['class']) ) {
+     		$class = ' '.$atts['class'].'';
+     	}
+		else {
+			$class = "";
+		}
 		$page_query = new WP_Query();
 		$args = array(
 			'sort_column' => 'menu_order',
